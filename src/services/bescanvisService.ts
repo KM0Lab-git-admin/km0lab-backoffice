@@ -17,10 +17,17 @@ function matches(b: Bescanvi, f: BescanviFiltres | undefined): boolean {
   if (f.tipus && f.tipus !== "tots" && b.recompensaTipus !== f.tipus) return false;
   if (f.estat && f.estat !== "tots" && b.estat !== f.estat) return false;
   if (f.comercId && f.comercId !== "tots" && b.comercId !== f.comercId) return false;
+  if (f.pagament && f.pagament !== "tots") {
+    const aplica = b.flux === "val_qr" && b.estat === "utilitzat";
+    if (f.pagament === "no_aplica" && aplica) return false;
+    if (f.pagament === "pendent" && (!aplica || b.pagamentEstat !== "pendent")) return false;
+    if (f.pagament === "pagat" && (!aplica || b.pagamentEstat !== "pagat")) return false;
+  }
   if (f.desde && b.dataSolicitud < f.desde) return false;
   if (f.fins && b.dataSolicitud > f.fins) return false;
   return true;
 }
+
 
 export const bescanvisService = {
   async list(filtres?: BescanviFiltres): Promise<Bescanvi[]> {

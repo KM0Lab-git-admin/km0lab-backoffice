@@ -110,7 +110,6 @@ export default function ComercosPage() {
   const poblacioNom = meQ.data?.poblacioNom ?? "";
 
   const handleToggle = (c: ComercAdmin, next: boolean) => {
-    if (c.estat === "pendent") return;
     toggleMut.mutate({ id: c.id, estat: next ? "actiu" : "inactiu" });
   };
 
@@ -179,7 +178,6 @@ export default function ComercosPage() {
               <SelectContent>
                 <SelectItem value="tots">{t("comercos.filter.all")}</SelectItem>
                 <SelectItem value="actiu">{t("comercos.estat.actiu")}</SelectItem>
-                <SelectItem value="pendent">{t("comercos.estat.pendent")}</SelectItem>
                 <SelectItem value="inactiu">{t("comercos.estat.inactiu")}</SelectItem>
               </SelectContent>
             </Select>

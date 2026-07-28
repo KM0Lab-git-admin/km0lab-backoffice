@@ -119,7 +119,7 @@ export type Recompensa = {
 export type RecompensaInput = Omit<Recompensa, "id" | "poblacioId">;
 
 // Admin · Comerços (llistat + alta/invitació)
-export type ComercEstat = "actiu" | "pendent" | "inactiu";
+export type ComercEstat = "actiu" | "inactiu";
 
 export type ComercAdmin = {
   id: string;
@@ -215,6 +215,8 @@ export type BescanviHist = {
   nota?: string;
 };
 
+export type BescanviPagamentEstat = "pendent" | "pagat";
+
 export type Bescanvi = {
   id: string;
   poblacioId: string;
@@ -230,10 +232,16 @@ export type Bescanvi = {
   // val_qr
   import?: string;
   qrGenerat?: boolean;
+  codi?: string; // codi de 5 dígits que el veí ensenya al comerç
   comercId?: string;
   comercNom?: string;
   dataUs?: string;
   importAplicat?: string;
+  // val_qr · pagament al comerç
+  importPagatNum?: number; // import numèric del val a abonar al comerç
+  pagamentEstat?: BescanviPagamentEstat;
+  pagamentId?: string;
+  dataPagament?: string;
   // lliurament
   dataLliurament?: string;
   historial?: BescanviHist[];
@@ -244,6 +252,7 @@ export type BescanviFiltres = {
   tipus?: RecompensaTipus | "tots";
   estat?: BescanviEstat | "tots";
   comercId?: string | "tots";
+  pagament?: "tots" | "pendent" | "pagat" | "no_aplica";
   desde?: string;
   fins?: string;
 };
@@ -251,5 +260,26 @@ export type BescanviFiltres = {
 export function deriveBescanviFlux(tipus: RecompensaTipus): BescanviFlux {
   return tipus === "saldo" || tipus === "descompte" ? "val_qr" : "lliurament";
 }
+
+// Admin · Pagaments als comerços (liquidació dels vals utilitzats)
+export type PagamentComerc = {
+  id: string;
+  poblacioId: string;
+  comercId: string;
+  comercNom: string;
+  data: string; // ISO
+  bescanviIds: string[];
+  importTotal: number;
+  nota?: string;
+};
+
+export type DeuteComerc = {
+  comercId: string;
+  comercNom: string;
+  nBescanvisPendents: number;
+  importPendent: number;
+  importPagatHistoric: number;
+};
+
 
 

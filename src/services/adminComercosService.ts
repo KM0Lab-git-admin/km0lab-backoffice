@@ -36,7 +36,7 @@ export const adminComercosService = {
       ...input,
       id: newId(input.nom),
       poblacioId,
-      estat: "pendent",
+      estat: "actiu",
       qrGenerat: true,
       nPromocionsActives: 0,
       dataAlta: new Date().toISOString(),

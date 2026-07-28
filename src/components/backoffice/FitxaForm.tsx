@@ -2,14 +2,28 @@ import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUploader } from "@/components/backoffice/ImageUploader";
 import { useLang } from "@/contexts/LangContext";
+import { cn } from "@/lib/utils";
+import { CATEGORIES_FITXA } from "@/data/fixtures/categoriesFitxa";
 import type { MessageKey } from "@/lib/i18n";
 import type {
   ComercFitxa,
@@ -38,7 +52,7 @@ const horariDiaSchema: z.ZodType<HorariDia> = z.object({
 
 const schema = z.object({
   nom: z.string().trim().min(1).max(80),
-  categoriesText: z.string().trim().min(1).max(120),
+  categories: z.array(z.string().min(1)).min(1).max(6),
   descripcio: z.string().trim().max(400),
   logoUrl: z.string().optional(),
   heroUrl: z.string().optional(),
@@ -70,7 +84,7 @@ type Props = {
 function toFormValues(f: ComercFitxa): FormValues {
   return {
     nom: f.nom,
-    categoriesText: f.categories.join(", "),
+    categories: [...f.categories],
     descripcio: f.descripcio,
     logoUrl: f.logoUrl,
     heroUrl: f.heroUrl,
@@ -86,10 +100,7 @@ function toFormValues(f: ComercFitxa): FormValues {
 function toInput(v: FormValues): ComercFitxaInput {
   return {
     nom: v.nom,
-    categories: v.categoriesText
-      .split(",")
-      .map((c) => c.trim())
-      .filter(Boolean),
+    categories: v.categories,
     descripcio: v.descripcio,
     logoUrl: v.logoUrl,
     heroUrl: v.heroUrl,
@@ -195,14 +206,118 @@ export function FitxaForm({
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="categoriesText">{t("fitxa.categories.label")}</Label>
-          <Input
-            id="categoriesText"
-            aria-invalid={!!errors.categoriesText}
-            {...register("categoriesText")}
+          <Controller
+            name="categories"
+            control={control}
+            render={({ field }) => {
+              const selected = field.value ?? [];
+              const toggle = (cat: string) => {
+                if (selected.includes(cat)) {
+                  field.onChange(selected.filter((c) => c !== cat));
+                } else {
+                  field.onChange([...selected, cat]);
+                }
+              };
+              const remove = (cat: string) =>
+                field.onChange(selected.filter((c) => c !== cat));
+              const countLabel = t("fitxa.categories.count").replace(
+                "{{count}}",
+                String(selected.length),
+              );
+              return (
+                <div className="flex flex-col gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="categoriesText"
+                        type="button"
+                        variant="outline"
+                        role="combobox"
+                        aria-invalid={!!errors.categories}
+                        className={cn(
+                          "h-10 justify-between font-normal",
+                          selected.length === 0 && "text-muted-foreground",
+                        )}
+                      >
+                        <span className="truncate">
+                          {selected.length === 0
+                            ? t("fitxa.categories.placeholder")
+                            : countLabel}
+                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-60" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="start"
+                      className="w-[--radix-popover-trigger-width] p-0"
+                    >
+                      <Command>
+                        <CommandInput
+                          placeholder={t("fitxa.categories.search")}
+                        />
+                        <CommandList>
+                          <CommandEmpty>
+                            {t("fitxa.categories.empty")}
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {CATEGORIES_FITXA.map((cat) => {
+                              const checked = selected.includes(cat);
+                              return (
+                                <CommandItem
+                                  key={cat}
+                                  value={cat}
+                                  onSelect={() => toggle(cat)}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Checkbox
+                                    checked={checked}
+                                    aria-hidden
+                                    tabIndex={-1}
+                                    className="pointer-events-none"
+                                  />
+                                  <span>{cat}</span>
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  {selected.length > 0 ? (
+                    <ul className="flex flex-wrap gap-1.5">
+                      {selected.map((cat) => (
+                        <li key={cat}>
+                          <Badge
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                          >
+                            {cat}
+                            <button
+                              type="button"
+                              onClick={() => remove(cat)}
+                              className="inline-flex h-4 w-4 items-center justify-center rounded-sm hover:bg-muted-foreground/20"
+                              aria-label={cat}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            }}
           />
           <p className="text-xs text-muted-foreground">
             {t("fitxa.categories.hint")}
           </p>
+          {errors.categories ? (
+            <p className="text-xs text-destructive">
+              {t("form.error.required")}
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-2">

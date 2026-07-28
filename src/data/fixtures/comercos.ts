@@ -58,7 +58,7 @@ export const comercosFixture: ComercAdmin[] = [
     emailContacte: "flors@floristerianom.cat",
     puntsPerVisita: 20,
     adreca: "Plaça de l'Església, 3",
-    estat: "pendent",
+    estat: "actiu",
     qrGenerat: true,
     nPromocionsActives: 0,
     dataAlta: iso(10),

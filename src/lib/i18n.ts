@@ -26,6 +26,7 @@ export const messages = {
   "nav.estadistiques": { ca: "Estadístiques", es: "Estadísticas", en: "Statistics" },
   "nav.laMevaFitxa": { ca: "La meva fitxa", es: "Mi ficha", en: "My profile" },
   "nav.configuracio": { ca: "Configuració", es: "Configuración", en: "Settings" },
+  "nav.vals": { ca: "Validar vals", es: "Validar vales", en: "Validate vouchers" },
   "nav.openMenu": { ca: "Obrir menú", es: "Abrir menú", en: "Open menu" },
 
   "common.loading": { ca: "Carregant…", es: "Cargando…", en: "Loading…" },
@@ -274,9 +275,29 @@ export const messages = {
   "fitxa.nom.label": { ca: "Nom del comerç", es: "Nombre del comercio", en: "Merchant name" },
   "fitxa.categories.label": { ca: "Categories", es: "Categorías", en: "Categories" },
   "fitxa.categories.hint": {
-    ca: "Separa-les per comes. P. ex. Alimentació, Fleca",
-    es: "Sepáralas por comas. P. ej. Alimentación, Panadería",
-    en: "Comma-separated. E.g. Food, Bakery",
+    ca: "Tria una o més categories que descriguin el teu comerç.",
+    es: "Elige una o más categorías que describan tu comercio.",
+    en: "Pick one or more categories that describe your shop.",
+  },
+  "fitxa.categories.placeholder": {
+    ca: "Selecciona categories",
+    es: "Selecciona categorías",
+    en: "Select categories",
+  },
+  "fitxa.categories.search": {
+    ca: "Cerca categoria…",
+    es: "Buscar categoría…",
+    en: "Search category…",
+  },
+  "fitxa.categories.empty": {
+    ca: "Sense resultats",
+    es: "Sin resultados",
+    en: "No results",
+  },
+  "fitxa.categories.count": {
+    ca: "{{count}} seleccionades",
+    es: "{{count}} seleccionadas",
+    en: "{{count}} selected",
   },
   "fitxa.descripcio.label": { ca: "Descripció", es: "Descripción", en: "Description" },
   "fitxa.descripcio.hint": {
@@ -1595,9 +1616,25 @@ export const messages = {
   },
 
   "bescanvis.search.placeholder": {
-    ca: "Cerca per usuari…",
-    es: "Buscar por usuario…",
-    en: "Search by user…",
+    ca: "Cerca per usuari o referència…",
+    es: "Buscar por usuario o referencia…",
+    en: "Search by user or reference…",
+  },
+  "bescanvis.col.referencia": { ca: "Referència", es: "Referencia", en: "Reference" },
+  "bescanvis.detall.referencia": {
+    ca: "Referència del bescanvi",
+    es: "Referencia del canje",
+    en: "Redemption reference",
+  },
+  "bescanvis.detall.referenciaAjuda": {
+    ca: "Identificador únic. Fes-lo servir en cas d'incidència.",
+    es: "Identificador único. Úsalo en caso de incidencia.",
+    en: "Unique identifier. Use it for any incident.",
+  },
+  "bescanvis.copy.ok": {
+    ca: "Referència copiada",
+    es: "Referencia copiada",
+    en: "Reference copied",
   },
   "bescanvis.filter.tipus": { ca: "Tipus de premi", es: "Tipo de premio", en: "Reward type" },
   "bescanvis.filter.estat": { ca: "Estat", es: "Estado", en: "Status" },
@@ -1746,7 +1783,406 @@ export const messages = {
     en: "Update failed",
   },
 
+  // Bescanvis · Pestanyes i pagaments als comerços
+  "bescanvis.tabs.bescanvis": { ca: "Bescanvis", es: "Canjes", en: "Redemptions" },
+  "bescanvis.tabs.pagaments": {
+    ca: "Pagaments als comerços",
+    es: "Pagos a los comercios",
+    en: "Merchant payouts",
+  },
+  "bescanvis.tabs.lliuraments": {
+    ca: "Lliuraments",
+    es: "Entregas",
+    en: "Deliveries",
+  },
+
+  "lliuraments.subtitle": {
+    ca: "Gestiona la preparació i entrega de marxandatge i experiències als veïns. Els punts ja s'han descomptat en el moment del bescanvi.",
+    es: "Gestiona la preparación y entrega de merchandising y experiencias a los vecinos. Los puntos ya se descontaron en el momento del canje.",
+    en: "Manage preparation and delivery of merchandise and experiences to residents. Points were already deducted at redemption time.",
+  },
+  "lliuraments.kpi.perPreparar": {
+    ca: "Per preparar",
+    es: "Por preparar",
+    en: "To prepare",
+  },
+  "lliuraments.kpi.perEntregar": {
+    ca: "Per entregar",
+    es: "Por entregar",
+    en: "To deliver",
+  },
+  "lliuraments.kpi.entregatsMes": {
+    ca: "Entregats aquest mes",
+    es: "Entregados este mes",
+    en: "Delivered this month",
+  },
+  "lliuraments.filter.allTipus": {
+    ca: "Marxandatge i experiències",
+    es: "Merchandising y experiencias",
+    en: "Merchandise and experiences",
+  },
+  "lliuraments.col.item": { ca: "Ítem", es: "Ítem", en: "Item" },
+  "lliuraments.col.acciorapida": {
+    ca: "Acció ràpida",
+    es: "Acción rápida",
+    en: "Quick action",
+  },
+  "lliuraments.action.marcar": {
+    ca: "Marcar com a {estat}",
+    es: "Marcar como {estat}",
+    en: "Mark as {estat}",
+  },
+  "lliuraments.action.veureDetall": {
+    ca: "Veure detall",
+    es: "Ver detalle",
+    en: "View detail",
+  },
+  "lliuraments.empty.title": {
+    ca: "Encara no hi ha lliuraments",
+    es: "Aún no hay entregas",
+    en: "No deliveries yet",
+  },
+  "lliuraments.empty.subtitle": {
+    ca: "Quan un veí bescanviï marxandatge o una experiència, apareixerà aquí perquè el gestionis.",
+    es: "Cuando un vecino canjee merchandising o una experiencia, aparecerá aquí para que lo gestiones.",
+    en: "When a resident redeems merchandise or an experience, it will appear here for you to manage.",
+  },
+
+  "bescanvis.col.pagament": { ca: "Pagament", es: "Pago", en: "Payout" },
+  "bescanvis.pagament.pendent": {
+    ca: "Pendent de pagar",
+    es: "Pendiente de pago",
+    en: "Payment pending",
+  },
+  "bescanvis.pagament.pagat": { ca: "Pagat", es: "Pagado", en: "Paid" },
+  "bescanvis.pagament.noAplica": { ca: "—", es: "—", en: "—" },
+
+  "bescanvis.filter.pagament": { ca: "Estat pagament", es: "Estado pago", en: "Payout status" },
+  "bescanvis.filter.allPagaments": {
+    ca: "Tots els pagaments",
+    es: "Todos los pagos",
+    en: "All payouts",
+  },
+  "bescanvis.filter.pagamentNoAplica": {
+    ca: "No aplica",
+    es: "No aplica",
+    en: "Not applicable",
+  },
+
+  "bescanvis.detall.pagament": {
+    ca: "Pagament al comerç",
+    es: "Pago al comercio",
+    en: "Merchant payout",
+  },
+  "bescanvis.detall.pagamentId": {
+    ca: "Referència de pagament",
+    es: "Referencia de pago",
+    en: "Payout reference",
+  },
+  "bescanvis.detall.dataPagament": {
+    ca: "Data de pagament",
+    es: "Fecha de pago",
+    en: "Payout date",
+  },
+
+  "pagaments.kpi.pendent": {
+    ca: "Pendent de pagar",
+    es: "Pendiente de pago",
+    en: "Pending payout",
+  },
+  "pagaments.kpi.comercos": {
+    ca: "Comerços amb deute",
+    es: "Comercios con deuda",
+    en: "Merchants with debt",
+  },
+  "pagaments.kpi.pagatMes": {
+    ca: "Pagat aquest mes",
+    es: "Pagado este mes",
+    en: "Paid this month",
+  },
+
+  "pagaments.col.comerc": { ca: "Comerç", es: "Comercio", en: "Merchant" },
+  "pagaments.col.pendents": {
+    ca: "Vals pendents",
+    es: "Vales pendientes",
+    en: "Pending vouchers",
+  },
+  "pagaments.col.importPendent": {
+    ca: "Import pendent",
+    es: "Importe pendiente",
+    en: "Pending amount",
+  },
+  "pagaments.col.importPagat": {
+    ca: "Pagat històric",
+    es: "Pagado histórico",
+    en: "Paid history",
+  },
+  "pagaments.col.accions": { ca: "Accions", es: "Acciones", en: "Actions" },
+
+  "pagaments.action.veureILiquidar": {
+    ca: "Veure i liquidar",
+    es: "Ver y liquidar",
+    en: "View & settle",
+  },
+
+  "pagaments.empty.title": {
+    ca: "Cap deute pendent",
+    es: "Sin deudas pendientes",
+    en: "No outstanding debt",
+  },
+  "pagaments.empty.subtitle": {
+    ca: "Quan els comerços comencin a escanejar vals de saldo o descompte, apareixeran aquí.",
+    es: "Cuando los comercios empiecen a escanear vales de saldo o descuento, aparecerán aquí.",
+    en: "As merchants scan balance or discount vouchers, they will appear here.",
+  },
+
+  "pagaments.sheet.title": {
+    ca: "Liquidar pagament",
+    es: "Liquidar pago",
+    en: "Settle payout",
+  },
+  "pagaments.sheet.subtitle": {
+    ca: "Selecciona els vals que abonaràs al comerç.",
+    es: "Selecciona los vales que abonarás al comercio.",
+    en: "Select the vouchers you're paying to the merchant.",
+  },
+  "pagaments.sheet.selected": {
+    ca: "Vals seleccionats",
+    es: "Vales seleccionados",
+    en: "Selected vouchers",
+  },
+  "pagaments.sheet.totalSeleccionat": {
+    ca: "Total a pagar",
+    es: "Total a pagar",
+    en: "Total to pay",
+  },
+  "pagaments.sheet.selectAll": {
+    ca: "Seleccionar-los tots",
+    es: "Seleccionar todos",
+    en: "Select all",
+  },
+  "pagaments.sheet.empty": {
+    ca: "No hi ha vals pendents per aquest comerç.",
+    es: "No hay vales pendientes para este comercio.",
+    en: "No pending vouchers for this merchant.",
+  },
+  "pagaments.sheet.nota": {
+    ca: "Nota interna (opcional)",
+    es: "Nota interna (opcional)",
+    en: "Internal note (optional)",
+  },
+  "pagaments.sheet.notaPlaceholder": {
+    ca: "Referència de transferència, mètode, etc.",
+    es: "Referencia de transferencia, método, etc.",
+    en: "Transfer reference, method, etc.",
+  },
+  "pagaments.sheet.marcarPagat": {
+    ca: "Marcar com a pagat",
+    es: "Marcar como pagado",
+    en: "Mark as paid",
+  },
+  "pagaments.sheet.historial": {
+    ca: "Historial de pagaments",
+    es: "Historial de pagos",
+    en: "Payout history",
+  },
+  "pagaments.sheet.historialEmpty": {
+    ca: "Encara no hi ha pagaments registrats.",
+    es: "Aún no hay pagos registrados.",
+    en: "No payouts recorded yet.",
+  },
+  "pagaments.sheet.pagamentDe": {
+    ca: "Pagament de {n} vals",
+    es: "Pago de {n} vales",
+    en: "Payout of {n} vouchers",
+  },
+
+  "pagaments.confirm.title": {
+    ca: "Confirmar el pagament",
+    es: "Confirmar el pago",
+    en: "Confirm payout",
+  },
+  "pagaments.confirm.body": {
+    ca: "Marcaràs {n} vals com a pagats per un total de {total}. Aquesta acció no es pot desfer.",
+    es: "Marcarás {n} vales como pagados por un total de {total}. Esta acción no se puede deshacer.",
+    en: "You will mark {n} vouchers as paid for a total of {total}. This cannot be undone.",
+  },
+  "pagaments.confirm.action": {
+    ca: "Confirmar pagament",
+    es: "Confirmar pago",
+    en: "Confirm payout",
+  },
+
+  "pagaments.toast.registrat": {
+    ca: "Pagament registrat correctament",
+    es: "Pago registrado correctamente",
+    en: "Payout recorded",
+  },
+  "pagaments.toast.error": {
+    ca: "No s'ha pogut registrar el pagament",
+    es: "No se ha podido registrar el pago",
+    en: "Could not record the payout",
+  },
+
+  // Vals · validació al comerç
+  "vals.title": {
+    ca: "Validar vals",
+    es: "Validar vales",
+    en: "Validate vouchers",
+  },
+  "vals.subtitle": {
+    ca: "Introdueix el codi de 5 dígits que el veí et mostra a l'app per aplicar el descompte i registrar el val al teu historial.",
+    es: "Introduce el código de 5 dígitos que el vecino te muestra en la app para aplicar el descuento y registrar el vale en tu historial.",
+    en: "Enter the 5-digit code the neighbour shows in the app to apply the discount and add the voucher to your history.",
+  },
+  "vals.validar.card.title": {
+    ca: "Codi de bescanvi",
+    es: "Código de canje",
+    en: "Redemption code",
+  },
+  "vals.validar.card.help": {
+    ca: "Vals disponibles a l'app: 5 €, 10 €, 20 € i 50 €.",
+    es: "Vales disponibles en la app: 5 €, 10 €, 20 € y 50 €.",
+    en: "Vouchers available in the app: 5 €, 10 €, 20 € and 50 €.",
+  },
+  "vals.validar.action": {
+    ca: "Validar codi",
+    es: "Validar código",
+    en: "Validate code",
+  },
+  "vals.validar.reset": {
+    ca: "Nou val",
+    es: "Nuevo vale",
+    en: "New voucher",
+  },
+  "vals.validar.zod.length": {
+    ca: "El codi ha de tenir 5 dígits.",
+    es: "El código debe tener 5 dígitos.",
+    en: "The code must be 5 digits.",
+  },
+  "vals.validar.ok.title": {
+    ca: "Val vàlid — aplica el descompte",
+    es: "Vale válido — aplica el descuento",
+    en: "Valid voucher — apply the discount",
+  },
+  "vals.validar.ok.body": {
+    ca: "{recompensa} de {veí}. S'ha registrat al teu historial com a pendent de cobrament via Bizum.",
+    es: "{recompensa} de {veí}. Se ha registrado en tu historial como pendiente de cobro por Bizum.",
+    en: "{recompensa} from {veí}. Recorded in your history as pending Bizum payout.",
+  },
+  "vals.validar.err.no_trobat": {
+    ca: "No hem trobat cap val amb aquest codi. Comprova-ho amb el veí.",
+    es: "No hemos encontrado ningún vale con este código. Compruébalo con el vecino.",
+    en: "No voucher matches this code. Please double-check with the neighbour.",
+  },
+  "vals.validar.err.ja_utilitzat": {
+    ca: "Aquest val ja s'ha utilitzat.",
+    es: "Este vale ya se ha utilizado.",
+    en: "This voucher has already been used.",
+  },
+  "vals.validar.err.cancelat": {
+    ca: "Aquest val està cancel·lat i no es pot aplicar.",
+    es: "Este vale está cancelado y no se puede aplicar.",
+    en: "This voucher is cancelled and cannot be used.",
+  },
+  "vals.validar.toast.ok": {
+    ca: "Val validat correctament",
+    es: "Vale validado correctamente",
+    en: "Voucher validated",
+  },
+
+  "vals.historial.title": {
+    ca: "Historial de vals",
+    es: "Historial de vales",
+    en: "Voucher history",
+  },
+  "vals.historial.search": {
+    ca: "Cerca per referència o codi",
+    es: "Buscar por referencia o código",
+    en: "Search by reference or code",
+  },
+  "vals.historial.filter.all": { ca: "Tots", es: "Todos", en: "All" },
+  "vals.historial.filter.pendent": {
+    ca: "Pendents Bizum",
+    es: "Pendientes Bizum",
+    en: "Pending Bizum",
+  },
+  "vals.historial.filter.pagat": {
+    ca: "Cobrats",
+    es: "Cobrados",
+    en: "Paid",
+  },
+  "vals.historial.col.ref": { ca: "Referència", es: "Referencia", en: "Reference" },
+  "vals.historial.col.codi": { ca: "Codi", es: "Código", en: "Code" },
+  "vals.historial.col.data": { ca: "Data d'ús", es: "Fecha de uso", en: "Used on" },
+  "vals.historial.col.import": { ca: "Import", es: "Importe", en: "Amount" },
+  "vals.historial.col.vei": { ca: "Veí", es: "Vecino", en: "Neighbour" },
+  "vals.historial.col.cobrament": {
+    ca: "Cobrament",
+    es: "Cobro",
+    en: "Payout",
+  },
+  "vals.historial.empty": {
+    ca: "Encara no has validat cap val.",
+    es: "Aún no has validado ningún vale.",
+    en: "You haven't validated any voucher yet.",
+  },
+  "vals.historial.emptyFiltres": {
+    ca: "Cap val amb aquests filtres.",
+    es: "Ningún vale con estos filtros.",
+    en: "No vouchers match these filters.",
+  },
+
+  "vals.kpi.mes": {
+    ca: "Vals validats aquest mes",
+    es: "Vales validados este mes",
+    en: "Vouchers validated this month",
+  },
+  "vals.kpi.pendent": {
+    ca: "Import pendent de cobrament",
+    es: "Importe pendiente de cobro",
+    en: "Pending payout amount",
+  },
+  "vals.kpi.cobrat": {
+    ca: "Import cobrat històric",
+    es: "Importe cobrado histórico",
+    en: "Total paid out",
+  },
+
+  "vals.cobrament.pendent": {
+    ca: "Pendent Bizum",
+    es: "Pendiente Bizum",
+    en: "Pending Bizum",
+  },
+  "vals.cobrament.pagat": {
+    ca: "Cobrat",
+    es: "Cobrado",
+    en: "Paid",
+  },
+
+  "vals.detall.title": {
+    ca: "Detall del val",
+    es: "Detalle del vale",
+    en: "Voucher detail",
+  },
+  "vals.detall.validat": {
+    ca: "Validat el {data}",
+    es: "Validado el {data}",
+    en: "Validated on {data}",
+  },
+  "vals.detall.cobrat": {
+    ca: "Cobrat el {data}",
+    es: "Cobrado el {data}",
+    en: "Paid on {data}",
+  },
+  "vals.detall.pendentCobrament": {
+    ca: "L'administració registrarà el cobrament via Bizum quan es faci efectiu.",
+    es: "La administración registrará el cobro por Bizum cuando se haga efectivo.",
+    en: "The admin will record the Bizum payout when it is completed.",
+  },
+
 } satisfies Record<string, Dict>;
+
 
 
 

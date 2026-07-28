@@ -16,20 +16,14 @@ import type { MessageKey } from "@/lib/i18n";
 import type { ComercAdmin, ComercEstat } from "@/types/backoffice";
 
 export const estatLabelKey = (e: ComercEstat): MessageKey =>
-  e === "actiu"
-    ? "comercos.estat.actiu"
-    : e === "pendent"
-      ? "comercos.estat.pendent"
-      : "comercos.estat.inactiu";
+  e === "actiu" ? "comercos.estat.actiu" : "comercos.estat.inactiu";
 
 function EstatBadge({ estat }: { estat: ComercEstat }) {
   const { t } = useLang();
   const cls =
     estat === "actiu"
       ? "bg-km0-teal-100 text-km0-teal-700 border-km0-teal-200"
-      : estat === "pendent"
-        ? "bg-km0-yellow-100 text-km0-blue-800 border-km0-yellow-300"
-        : "bg-muted text-muted-foreground border-border";
+      : "bg-muted text-muted-foreground border-border";
   return (
     <Badge variant="outline" className={cn("font-medium", cls)}>
       {t(estatLabelKey(estat))}
@@ -132,10 +126,10 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
                     <Switch
                       checked={c.estat === "actiu"}
                       onCheckedChange={(v) => onToggle(c, v)}
-                      disabled={c.estat === "pendent"}
                       aria-label={t(estatLabelKey(c.estat))}
                     />
                   </div>
+                  
                   <Button
                     variant="ghost"
                     size="icon"
@@ -218,7 +212,6 @@ export function ComercoCards({ comercos, onEdit, onToggle }: Props) {
               <Switch
                 checked={c.estat === "actiu"}
                 onCheckedChange={(v) => onToggle(c, v)}
-                disabled={c.estat === "pendent"}
                 aria-label={t(estatLabelKey(c.estat))}
               />
               <Button

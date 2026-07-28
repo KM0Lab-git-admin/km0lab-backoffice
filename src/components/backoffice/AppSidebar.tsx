@@ -41,6 +41,7 @@ type NavItem = {
 const comercNav: NavItem[] = [
   { to: "/comerc/el-meu-qr", labelKey: "nav.elMeuQR", icon: QrCode },
   { to: "/comerc/promocions", labelKey: "nav.promocions", icon: Tag },
+  { to: "/comerc/vals", labelKey: "nav.vals", icon: Ticket },
   { to: "/comerc/estadistiques", labelKey: "nav.estadistiques", icon: BarChart3 },
   { to: "/comerc/la-meva-fitxa", labelKey: "nav.laMevaFitxa", icon: Store },
 ];

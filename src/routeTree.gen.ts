@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComercIndexRouteImport } from './routes/comerc.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ComercValsRouteImport } from './routes/comerc.vals'
 import { Route as ComercPromocionsRouteImport } from './routes/comerc.promocions'
 import { Route as ComercLaMevaFitxaRouteImport } from './routes/comerc.la-meva-fitxa'
 import { Route as ComercEstadistiquesRouteImport } from './routes/comerc.estadistiques'
@@ -63,6 +64,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ComercValsRoute = ComercValsRouteImport.update({
+  id: '/vals',
+  path: '/vals',
+  getParentRoute: () => ComercRoute,
 } as any)
 const ComercPromocionsRoute = ComercPromocionsRouteImport.update({
   id: '/promocions',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/comerc/estadistiques': typeof ComercEstadistiquesRoute
   '/comerc/la-meva-fitxa': typeof ComercLaMevaFitxaRoute
   '/comerc/promocions': typeof ComercPromocionsRoute
+  '/comerc/vals': typeof ComercValsRoute
   '/admin/': typeof AdminIndexRoute
   '/comerc/': typeof ComercIndexRoute
 }
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/comerc/estadistiques': typeof ComercEstadistiquesRoute
   '/comerc/la-meva-fitxa': typeof ComercLaMevaFitxaRoute
   '/comerc/promocions': typeof ComercPromocionsRoute
+  '/comerc/vals': typeof ComercValsRoute
   '/admin': typeof AdminIndexRoute
   '/comerc': typeof ComercIndexRoute
 }
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/comerc/estadistiques': typeof ComercEstadistiquesRoute
   '/comerc/la-meva-fitxa': typeof ComercLaMevaFitxaRoute
   '/comerc/promocions': typeof ComercPromocionsRoute
+  '/comerc/vals': typeof ComercValsRoute
   '/admin/': typeof AdminIndexRoute
   '/comerc/': typeof ComercIndexRoute
 }
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/comerc/estadistiques'
     | '/comerc/la-meva-fitxa'
     | '/comerc/promocions'
+    | '/comerc/vals'
     | '/admin/'
     | '/comerc/'
   fileRoutesByTo: FileRoutesByTo
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/comerc/estadistiques'
     | '/comerc/la-meva-fitxa'
     | '/comerc/promocions'
+    | '/comerc/vals'
     | '/admin'
     | '/comerc'
   id:
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/comerc/estadistiques'
     | '/comerc/la-meva-fitxa'
     | '/comerc/promocions'
+    | '/comerc/vals'
     | '/admin/'
     | '/comerc/'
   fileRoutesById: FileRoutesById
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/comerc/vals': {
+      id: '/comerc/vals'
+      path: '/vals'
+      fullPath: '/comerc/vals'
+      preLoaderRoute: typeof ComercValsRouteImport
+      parentRoute: typeof ComercRoute
     }
     '/comerc/promocions': {
       id: '/comerc/promocions'
@@ -427,6 +446,7 @@ interface ComercRouteChildren {
   ComercEstadistiquesRoute: typeof ComercEstadistiquesRoute
   ComercLaMevaFitxaRoute: typeof ComercLaMevaFitxaRoute
   ComercPromocionsRoute: typeof ComercPromocionsRoute
+  ComercValsRoute: typeof ComercValsRoute
   ComercIndexRoute: typeof ComercIndexRoute
 }
 
@@ -436,6 +456,7 @@ const ComercRouteChildren: ComercRouteChildren = {
   ComercEstadistiquesRoute: ComercEstadistiquesRoute,
   ComercLaMevaFitxaRoute: ComercLaMevaFitxaRoute,
   ComercPromocionsRoute: ComercPromocionsRoute,
+  ComercValsRoute: ComercValsRoute,
   ComercIndexRoute: ComercIndexRoute,
 }
 
