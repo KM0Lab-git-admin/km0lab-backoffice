@@ -1,10 +1,8 @@
-import type { Bescanvi } from "@/types/backoffice";
-import { useAdminBescanvisStore } from "@/stores/useAdminBescanvisStore";
-import { useAdminComercosStore } from "@/stores/useAdminComercosStore";
+import { api } from "@/lib/apiClient";
+import { bescanviFromApi, recompensaFromApi } from "@/lib/mappers/admin";
 import { useSessionStore } from "@/stores/useSessionStore";
-
-const delay = (ms: number) =>
-  new Promise((r) => setTimeout(r, ms + Math.random() * 200));
+import type { Bescanvi, RecompensaTipus } from "@/types/backoffice";
+import type { ApiRedemption, ApiResident, ApiReward, ApiShop } from "@/types/api";
 
 export type ValidarResult =
   | { ok: true; bescanvi: Bescanvi }
@@ -25,79 +23,97 @@ export type ResumCobrament = {
   importCobrat: number;
 };
 
-function currentComerc(): { poblacioId: string; comercId: string; comercNom: string } {
-  const { poblacioId, comercId } = useSessionStore.getState();
-  const id = comercId ?? "";
-  const comerc = useAdminComercosStore
-    .getState()
-    .comercos.find((c) => c.id === id);
-  return { poblacioId, comercId: id, comercNom: comerc?.nom ?? id };
+async function enrichOne(r: ApiRedemption): Promise<Bescanvi> {
+  const [residents, rewards, myShop] = await Promise.all([
+    api.get<ApiResident[]>("/residents").catch(() => [] as ApiResident[]),
+    api.get<ApiReward[]>("/rewards").catch(() => [] as ApiReward[]),
+    api.get<ApiShop>("/shops/me").catch(() => null),
+  ]);
+  const user = residents.find((u) => u.id === r.user_id);
+  const reward = rewards.find((rw) => rw.id === r.reward_id);
+  const shopName =
+    myShop && r.shop_id === myShop.id
+      ? myShop.name
+      : undefined;
+  return bescanviFromApi(r, {
+    usuariNom:
+      user?.name ??
+      ([user?.first_name, user?.last_name].filter(Boolean).join(" ") || undefined),
+    recompensaNom: reward?.name,
+    recompensaTipus: reward
+      ? (recompensaFromApi(reward).tipus as RecompensaTipus)
+      : undefined,
+    comercNom: shopName,
+  });
+}
+
+function currentComercId(): string {
+  return useSessionStore.getState().comercId ?? "";
 }
 
 export const valsComercService = {
   async validarCodi(codiRaw: string): Promise<ValidarResult> {
-    await delay(400);
     const codi = codiRaw.trim();
-    const { poblacioId, comercId, comercNom } = currentComerc();
-    const bescanvis = useAdminBescanvisStore.getState().bescanvis;
-    const match = bescanvis.find(
+    const rows = await api.get<ApiRedemption[]>("/redemptions");
+    const match = rows.find(
       (b) =>
-        b.poblacioId === poblacioId &&
-        b.flux === "val_qr" &&
-        b.codi === codi,
+        b.flow === "voucher_qr" &&
+        (b.id === codi ||
+          b.id.endsWith(codi) ||
+          b.id.slice(-5).toUpperCase() === codi.toUpperCase()),
     );
     if (!match) return { ok: false, motiu: "no_trobat" };
-    if (match.estat === "cancel·lat")
-      return { ok: false, motiu: "cancelat", bescanvi: match };
-    if (match.estat === "utilitzat")
-      return { ok: false, motiu: "ja_utilitzat", bescanvi: match };
-    useAdminBescanvisStore
-      .getState()
-      .consumirVal(match.id, comercId, comercNom);
-    const updated = useAdminBescanvisStore
-      .getState()
-      .bescanvis.find((b) => b.id === match.id)!;
-    return { ok: true, bescanvi: updated };
+    if (match.status === "cancelled") {
+      return { ok: false, motiu: "cancelat", bescanvi: await enrichOne(match) };
+    }
+    if (match.status === "used") {
+      return {
+        ok: false,
+        motiu: "ja_utilitzat",
+        bescanvi: await enrichOne(match),
+      };
+    }
+    if (match.status !== "pending_use") {
+      return { ok: false, motiu: "no_trobat", bescanvi: await enrichOne(match) };
+    }
+    const used = await api.post<ApiRedemption>(`/redemptions/${match.id}/use`, {});
+    return { ok: true, bescanvi: await enrichOne(used) };
   },
 
   async list(filtres?: ValsFiltres): Promise<Bescanvi[]> {
-    await delay(250);
-    const { poblacioId, comercId } = currentComerc();
+    const comercId = currentComercId();
+    const rows = await api.get<ApiRedemption[]>("/redemptions");
     const q = filtres?.query?.trim().toLowerCase();
     const cobrament = filtres?.cobrament ?? "tots";
-    return useAdminBescanvisStore
-      .getState()
-      .bescanvis.filter((b) => {
-        if (b.poblacioId !== poblacioId) return false;
-        if (b.flux !== "val_qr") return false;
-        if (b.estat !== "utilitzat") return false;
-        if (b.comercId !== comercId) return false;
-        if (cobrament === "pendent" && b.pagamentEstat !== "pendent")
-          return false;
+    const filtered = rows.filter((b) => {
+      if (b.flow !== "voucher_qr") return false;
+      if (b.status !== "used") return false;
+      if (comercId && b.shop_id !== comercId) return false;
+      if (q) {
+        const ref = b.id.toLowerCase();
+        const codi = b.id.slice(-5).toLowerCase();
+        if (!ref.includes(q) && !codi.includes(q)) return false;
+      }
+      return true;
+    });
+    const mapped = await Promise.all(filtered.map(enrichOne));
+    return mapped
+      .filter((b) => {
+        if (cobrament === "pendent" && b.pagamentEstat !== "pendent") return false;
         if (cobrament === "pagat" && b.pagamentEstat !== "pagat") return false;
-        if (q) {
-          const ref = b.id.toLowerCase();
-          const codi = (b.codi ?? "").toLowerCase();
-          if (!ref.includes(q) && !codi.includes(q)) return false;
-        }
         return true;
       })
       .sort((a, b) => (b.dataUs ?? "").localeCompare(a.dataUs ?? ""));
   },
 
   async resum(): Promise<ResumCobrament> {
-    await delay(200);
-    const { poblacioId, comercId } = currentComerc();
+    const list = await valsComercService.list({ cobrament: "tots" });
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     let nMes = 0;
     let importPendent = 0;
     let importCobrat = 0;
-    for (const b of useAdminBescanvisStore.getState().bescanvis) {
-      if (b.poblacioId !== poblacioId) continue;
-      if (b.flux !== "val_qr") continue;
-      if (b.estat !== "utilitzat") continue;
-      if (b.comercId !== comercId) continue;
+    for (const b of list) {
       const imp = b.importPagatNum ?? 0;
       if ((b.dataUs ?? "") >= monthStart) nMes += 1;
       if (b.pagamentEstat === "pagat") importCobrat += imp;

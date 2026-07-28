@@ -7,18 +7,22 @@ type SessionState = {
   poblacioId: string;
   comercId?: string;
   setRol: (rol: Rol) => void;
-  setSession: (session: { rol: Rol; poblacioId: string; comercId?: string }) => void;
+  setSession: (session: {
+    rol: Rol;
+    poblacioId: string;
+    comercId?: string;
+  }) => void;
 };
 
 export const useSessionStore = create<SessionState>()(
   persist(
     (set) => ({
       rol: "comerc",
-      poblacioId: "malgrat",
-      comercId: "forn-rovira",
+      poblacioId: "",
+      comercId: undefined,
       setRol: (rol) => set({ rol }),
       setSession: (session) => set(session),
     }),
-    { name: "km0lab.backoffice.session" },
+    { name: "km0lab.backoffice.session.v2" },
   ),
 );

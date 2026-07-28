@@ -17,6 +17,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLang } from "@/contexts/LangContext";
 import { authService, MOCK_OTP_CODE } from "@/services/authService";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useSessionStore } from "@/stores/useSessionStore";
+import { homePathForRol, rolFromRoles } from "@/lib/roles";
 import { translate, type MessageKey } from "@/lib/i18n";
 
 const emailSchema = z.object({
@@ -29,6 +31,7 @@ export function LoginPage() {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const signIn = useAuthStore((s) => s.signIn);
+  const setSession = useSessionStore((s) => s.setSession);
 
   const [step, setStep] = useState<"email" | "otp">("email");
   const [email, setEmail] = useState("");
@@ -61,10 +64,16 @@ export function LoginPage() {
     setSubmitting(true);
     setOtpError(null);
     try {
-      const user = await authService.verifyLoginCode(email, otp);
-      signIn(user);
+      const session = await authService.verifyLoginCode(email, otp);
+      const rol = rolFromRoles(session.user.roles);
+      signIn(session);
+      setSession({
+        rol,
+        poblacioId: session.user.townId ?? "",
+        comercId: session.user.shopId ?? undefined,
+      });
       toast.success(t("login.toast.welcome"));
-      navigate({ to: "/comerc/el-meu-qr" });
+      navigate({ to: homePathForRol(rol) });
     } catch {
       setOtpError("auth.otp.invalid");
     } finally {
@@ -154,7 +163,10 @@ export function LoginPage() {
       footer={
         <>
           {t("login.toRegister.text")}{" "}
-          <Link to="/registre" className="font-medium text-foreground underline underline-offset-4">
+          <Link
+            to="/registre"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
             {t("login.toRegister.cta")}
           </Link>
         </>

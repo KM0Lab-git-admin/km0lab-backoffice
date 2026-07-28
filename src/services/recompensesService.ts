@@ -1,57 +1,50 @@
+import { api } from "@/lib/apiClient";
+import {
+  recompensaFromApi,
+  recompensaToApi,
+  recompensaEstatToApi,
+} from "@/lib/mappers/admin";
 import type { Recompensa, RecompensaInput } from "@/types/backoffice";
-import { useAdminRecompensesStore } from "@/stores/useAdminRecompensesStore";
-import { useSessionStore } from "@/stores/useSessionStore";
-import { comercosOptionsFixture } from "@/data/fixtures/accions";
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms + Math.random() * 250));
-
-function newId(): string {
-  return `r-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
-}
+import type { ApiReward, ApiShop } from "@/types/api";
 
 export const recompensesService = {
   async list(): Promise<Recompensa[]> {
-    await delay(400);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminRecompensesStore
-      .getState()
-      .recompenses.filter((r) => r.poblacioId === poblacioId);
+    const rows = await api.get<ApiReward[]>("/rewards");
+    return rows.map(recompensaFromApi);
   },
 
   async get(id: string): Promise<Recompensa | undefined> {
-    await delay(200);
-    return useAdminRecompensesStore.getState().recompenses.find((r) => r.id === id);
+    try {
+      const reward = await api.get<ApiReward>(`/rewards/${id}`);
+      return recompensaFromApi(reward);
+    } catch {
+      return undefined;
+    }
   },
 
   async create(input: RecompensaInput): Promise<Recompensa> {
-    await delay(500);
-    const { poblacioId } = useSessionStore.getState();
-    const r: Recompensa = { ...input, id: newId(), poblacioId };
-    useAdminRecompensesStore.getState().upsert(r);
-    return r;
+    const created = await api.post<ApiReward>("/rewards", recompensaToApi(input));
+    return recompensaFromApi(created);
   },
 
   async update(id: string, input: RecompensaInput): Promise<Recompensa> {
-    await delay(500);
-    const current = useAdminRecompensesStore.getState().recompenses.find((r) => r.id === id);
-    const poblacioId = current?.poblacioId ?? useSessionStore.getState().poblacioId;
-    const r: Recompensa = { ...input, id, poblacioId };
-    useAdminRecompensesStore.getState().upsert(r);
-    return r;
+    const updated = await api.patch<ApiReward>(
+      `/rewards/${id}`,
+      recompensaToApi(input),
+    );
+    return recompensaFromApi(updated);
   },
 
   async setEstat(id: string, estat: Recompensa["estat"]): Promise<void> {
-    await delay(250);
-    useAdminRecompensesStore.getState().setEstat(id, estat);
+    await api.patch(`/rewards/${id}`, { status: recompensaEstatToApi(estat) });
   },
 
   async remove(id: string): Promise<void> {
-    await delay(300);
-    useAdminRecompensesStore.getState().remove(id);
+    await api.patch(`/rewards/${id}`, { status: "inactive" });
   },
 
   async getComercosOptions() {
-    await delay(150);
-    return comercosOptionsFixture;
+    const shops = await api.get<ApiShop[]>("/shops");
+    return shops.map((s) => ({ id: s.id, nom: s.name }));
   },
 };

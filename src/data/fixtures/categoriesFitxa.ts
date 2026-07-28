@@ -1,17 +1,3 @@
-// Static catalog of merchant categories available on the fitxa multi-select.
-// Kept in fixtures so producció pugui substituir-ho pel catàleg real sense tocar UI.
+// Labels aligned with API shop category slugs (see lib/mappers/categories.ts).
 
-export const CATEGORIES_FITXA: readonly string[] = [
-  "Alimentació",
-  "Fleca",
-  "Restauració",
-  "Moda",
-  "Serveis",
-  "Cultura",
-  "Salut i bellesa",
-  "Llar",
-  "Esport",
-  "Tecnologia",
-  "Oci",
-  "Educació",
-] as const;
+export { CATEGORY_LABELS as CATEGORIES_FITXA } from "@/lib/mappers/categories";

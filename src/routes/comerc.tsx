@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { AppLayout } from "@/components/backoffice/AppLayout";
+import { homePathForRol } from "@/lib/roles";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSessionStore } from "@/stores/useSessionStore";
 
@@ -8,8 +9,9 @@ export const Route = createFileRoute("/comerc")({
     if (!useAuthStore.getState().isAuthenticated) {
       throw redirect({ to: "/login" });
     }
-    if (useSessionStore.getState().rol !== "comerc") {
-      useSessionStore.getState().setRol("comerc");
+    const { rol } = useSessionStore.getState();
+    if (rol !== "comerc") {
+      throw redirect({ to: homePathForRol(rol) });
     }
   },
   component: ComercLayout,

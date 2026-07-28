@@ -1,44 +1,44 @@
-import type { PoblacioConfig, PoblacioConfigInput } from "@/types/backoffice";
-import { useAdminConfigStore } from "@/stores/useAdminConfigStore";
+import { api } from "@/lib/apiClient";
+import { configFromTown, configToTownUpdate } from "@/lib/mappers/admin";
 import { useSessionStore } from "@/stores/useSessionStore";
-import { poblacioConfigFixture } from "@/data/fixtures/configuracio";
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms + Math.random() * 200));
+import type { PoblacioConfig, PoblacioConfigInput } from "@/types/backoffice";
+import type { ApiTown } from "@/types/api";
 
 export const configService = {
-  async get(poblacioId?: string): Promise<PoblacioConfig> {
-    await delay(300);
-    const id = poblacioId ?? useSessionStore.getState().poblacioId;
-    const existing = useAdminConfigStore.getState().configs[id];
-    if (existing) return existing;
-    // Fall back to fixture, scoped to the requested població.
-    return { ...poblacioConfigFixture, poblacioId: id };
+  async get(_poblacioId?: string): Promise<PoblacioConfig> {
+    const town = await api.get<ApiTown>("/towns/me");
+    return configFromTown(town);
   },
 
-  async update(poblacioId: string, input: PoblacioConfigInput): Promise<PoblacioConfig> {
-    await delay(500);
-    const current =
-      useAdminConfigStore.getState().configs[poblacioId] ?? {
-        ...poblacioConfigFixture,
-        poblacioId,
-      };
-    const next: PoblacioConfig = { ...current, ...input, poblacioId };
-    useAdminConfigStore.getState().upsert(next);
-    return next;
+  async update(
+    poblacioId: string,
+    input: PoblacioConfigInput,
+  ): Promise<PoblacioConfig> {
+    const town = await api.patch<ApiTown>(
+      `/towns/${poblacioId}`,
+      configToTownUpdate(input),
+    );
+    useSessionStore.getState().setSession({
+      ...useSessionStore.getState(),
+      poblacioId: town.id,
+    });
+    return configFromTown(town);
   },
 
   async exportData(poblacioId: string): Promise<{ ok: true; poblacioId: string }> {
-    await delay(700);
+    // Not implemented in API yet.
     return { ok: true, poblacioId };
   },
 
-  async regenerateCredentials(poblacioId: string): Promise<{ ok: true; poblacioId: string }> {
-    await delay(600);
+  async regenerateCredentials(
+    poblacioId: string,
+  ): Promise<{ ok: true; poblacioId: string }> {
     return { ok: true, poblacioId };
   },
 
-  async deactivateProgram(poblacioId: string): Promise<{ ok: true; poblacioId: string }> {
-    await delay(800);
+  async deactivateProgram(
+    poblacioId: string,
+  ): Promise<{ ok: true; poblacioId: string }> {
     return { ok: true, poblacioId };
   },
 };
