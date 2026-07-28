@@ -1,0 +1,598 @@
+<title>KM0 LAB · Backoffice del gestor — accions de punts i recompenses</title>
+<style>
+  :root {
+    --chrome-bg: #ece8e1;
+    --chrome-panel: #f6f3ee;
+    --chrome-ink: #2c2a27;
+    --chrome-muted: #6f6a61;
+    --chrome-line: #d9d3c8;
+    --chrome-accent: #174094;
+    --km0-beige-50: #fff9f0;
+    --km0-beige-100: #ffecd2;
+    --km0-beige-200: #fdeea9;
+    --km0-blue-50: #f0f4fd;
+    --km0-blue-400: #6b8fd0;
+    --km0-blue-500: #4674b8;
+    --km0-blue-700: #174094;
+    --km0-blue-800: #132a50;
+    --km0-yellow-300: #f9dd8e;
+    --km0-yellow-400: #f7d168;
+    --km0-teal-400: #00c7bc;
+    --km0-teal-500: #00b8a9;
+    --km0-coral-400: #ff664d;
+    --km0-coral-500: #f0492e;
+    --km0-green-500: #22a06b;
+    --font-ui: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-brand: "Antique Olive", "Arial Black", "Helvetica Neue", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --chrome-bg: #201e1b; --chrome-panel: #2a2723; --chrome-ink: #efeae1;
+      --chrome-muted: #a49d90; --chrome-line: #3a352e; --chrome-accent: #8fb0ea;
+    }
+  }
+  :root[data-theme="light"] {
+    --chrome-bg: #ece8e1; --chrome-panel: #f6f3ee; --chrome-ink: #2c2a27;
+    --chrome-muted: #6f6a61; --chrome-line: #d9d3c8; --chrome-accent: #174094;
+  }
+  :root[data-theme="dark"] {
+    --chrome-bg: #201e1b; --chrome-panel: #2a2723; --chrome-ink: #efeae1;
+    --chrome-muted: #a49d90; --chrome-line: #3a352e; --chrome-accent: #8fb0ea;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--chrome-bg); color: var(--chrome-ink); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 56px; }
+  header.page { margin-bottom: 28px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--chrome-muted); font-weight: 600; margin: 0 0 8px; }
+  header.page h1 { font-size: clamp(22px, 4vw, 30px); margin: 0 0 10px; text-wrap: balance; font-weight: 800; letter-spacing: -0.01em; }
+  header.page p { margin: 0; color: var(--chrome-muted); max-width: 68ch; line-height: 1.5; font-size: 14.5px; }
+  .meta { display: inline-flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .meta span { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--chrome-panel); border: 1px solid var(--chrome-line); color: var(--chrome-muted); }
+
+  /* ── Screen grouping ─────────────────────────────────────────── */
+  .screen-block { margin-top: 44px; border-top: 1px solid var(--chrome-line); padding-top: 30px; }
+  .screen-block > .sb-head { margin-bottom: 20px; }
+  .sb-head .num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: var(--chrome-accent); color: #fff; font-size: 13px; font-weight: 800; margin-right: 10px; vertical-align: middle; }
+  .sb-head h2 { display: inline; font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+  .sb-head p { margin: 10px 0 0; color: var(--chrome-muted); font-size: 14px; line-height: 1.5; max-width: 78ch; }
+  .stage { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start; margin-top: 22px; }
+
+  /* ── Desktop / backoffice ────────────────────────────────────── */
+  .desktop { width: 100%; max-width: 1000px; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 26px 60px -24px rgba(0,0,0,0.5), 0 0 0 1px var(--chrome-line); }
+  .browserbar { height: 42px; background: var(--chrome-panel); border-bottom: 1px solid var(--chrome-line); display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+  .browserbar .dots { display: flex; gap: 6px; }
+  .browserbar .dots i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .browserbar .url { flex: 1; background: #fff; border: 1px solid var(--chrome-line); border-radius: 8px; height: 24px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: var(--chrome-muted); }
+  .bo { display: grid; grid-template-columns: 216px 1fr; min-height: 580px; background: var(--km0-beige-50); }
+  .bo-side { background: var(--km0-blue-800); color: #fff; padding: 18px 14px; }
+  .bo-side .brand { font-family: var(--font-brand); font-weight: 900; background: var(--km0-blue-700); color: var(--km0-beige-100); padding: 5px 10px; border-radius: 8px; font-size: 14px; display: inline-block; }
+  .bo-side .role-tag { margin-top: 12px; font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--km0-yellow-300); }
+  .bo-side .who { margin-top: 8px; display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.06); border-radius: 12px; }
+  .bo-side .who .av { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#f9dd8e,#f7d168); display: grid; place-items: center; font-size: 18px; }
+  .bo-side .who b { font-size: 13px; display: block; }
+  .bo-side .who span { font-size: 11px; opacity: 0.7; }
+  .bo-nav { margin-top: 20px; display: flex; flex-direction: column; gap: 3px; }
+  .bo-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 11px; border-radius: 10px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); }
+  .bo-nav a.on { background: rgba(255,255,255,0.12); color: #fff; font-weight: 700; }
+  .bo-main { padding: 26px 30px; }
+  .bo-main h1 { font-size: 22px; font-weight: 800; color: var(--km0-blue-800); margin: 0 0 4px; }
+  .bo-main .lead { font-size: 13.5px; color: var(--km0-blue-500); margin: 0 0 22px; line-height: 1.5; }
+  .bo-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .bo-stats.four { grid-template-columns: repeat(4, 1fr); }
+  .stat { background: #fff; border: 1px solid var(--km0-beige-200); border-radius: 14px; padding: 14px 16px; box-shadow: 0 4px 12px -9px rgba(19,42,80,0.3); }
+  .stat .n { font-size: 24px; font-weight: 800; color: var(--km0-blue-800); }
+  .stat .l { font-size: 12px; color: var(--km0-blue-500); margin-top: 2px; }
+  .stat .n .up { font-size: 12px; color: var(--km0-green-500); font-weight: 700; }
+  .stat .n .sm { font-size: 13px; color: var(--km0-blue-400); font-weight: 700; }
+
+  /* ── Toolbar / add / tables / forms (shell) ──────────────────── */
+  .bo-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .bo-toolbar h1 { margin-bottom: 4px; }
+  .bo-toolbar .lead { margin-bottom: 0; max-width: 62ch; }
+  .bo-addbtn { display: inline-flex; align-items: center; gap: 8px; background: var(--km0-blue-700); color: #fff; font-size: 13px; font-weight: 700; padding: 10px 15px; border-radius: 11px; white-space: nowrap; }
+  .bo-table { background: #fff; border: 1px solid var(--km0-beige-200); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px -12px rgba(19,42,80,0.3); }
+  .bo-trow { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--km0-beige-100); }
+  .bo-trow:last-child { border-bottom: 0; }
+  .bo-trow .disc { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; background: var(--km0-blue-50); font-size: 22px; }
+  .bo-trow .bmeta { flex: 1; min-width: 0; }
+  .bo-trow .bmeta b { font-size: 14px; font-weight: 800; color: var(--km0-blue-800); display: block; }
+  .bo-trow .bmeta span { font-size: 12px; color: var(--km0-blue-500); }
+  .bo-trow.off { opacity: 0.55; }
+  .type-pill { font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--km0-blue-700); background: var(--km0-blue-50); border: 1px solid #dbe6fb; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pts-pill { font-size: 12px; font-weight: 800; color: var(--km0-coral-500); background: #ffe7e1; padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+  .toggle { width: 42px; height: 24px; border-radius: 999px; background: var(--km0-teal-500); position: relative; flex-shrink: 0; }
+  .toggle::after { content: ""; position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+  .toggle.off { background: #c9d3e2; }
+  .toggle.off::after { right: auto; left: 3px; }
+  .icon-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--km0-beige-200); display: grid; place-items: center; color: var(--km0-blue-700); background: #fff; flex-shrink: 0; }
+  .bo-form { margin-top: 20px; background: #fff; border: 1px solid var(--km0-beige-200); border-radius: 16px; padding: 22px; box-shadow: 0 6px 18px -12px rgba(19,42,80,0.3); }
+  .bo-form h1 { margin-bottom: 4px; }
+  .field { margin-bottom: 15px; }
+  .field > label { display: block; font-size: 12px; font-weight: 700; color: var(--km0-blue-800); margin-bottom: 6px; }
+  .field .inp { display: block; border: 1px solid var(--km0-beige-200); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--km0-blue-500); background: var(--km0-beige-50); line-height: 1.45; }
+  .field .inp.textarea { min-height: 62px; }
+  .seg { display: inline-flex; flex-wrap: wrap; background: var(--km0-beige-50); border: 1px solid var(--km0-beige-200); border-radius: 10px; padding: 3px; gap: 3px; }
+  .seg span { font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 8px; color: var(--km0-blue-500); }
+  .seg span.on { background: var(--km0-blue-700); color: #fff; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .field-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .bo-form .save { display: inline-flex; align-items: center; gap: 8px; background: var(--km0-teal-500); color: #fff; font-size: 13.5px; font-weight: 800; padding: 11px 20px; border-radius: 11px; }
+  .switch-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .switch-row .st { font-size: 12.5px; font-weight: 700; color: var(--km0-blue-800); }
+
+  /* ── Resum panels ────────────────────────────────────────────── */
+  .resum-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .panel { background: #fff; border: 1px solid var(--km0-beige-200); border-radius: 16px; padding: 18px 20px; box-shadow: 0 6px 18px -12px rgba(19,42,80,0.3); }
+  .panel h3 { font-size: 14.5px; font-weight: 800; color: var(--km0-blue-800); margin: 0 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .panel h3 a { font-size: 12px; font-weight: 700; color: var(--km0-blue-500); }
+  .prow { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid var(--km0-beige-100); }
+  .prow:last-child { border-bottom: 0; }
+  .prow .pav { width: 34px; height: 34px; border-radius: 9px; background: var(--km0-blue-50); display: grid; place-items: center; font-size: 16px; flex-shrink: 0; }
+  .prow .pmeta { flex: 1; min-width: 0; }
+  .prow .pmeta b { display: block; font-size: 12.5px; font-weight: 800; color: var(--km0-blue-800); }
+  .prow .pmeta span { font-size: 11px; color: var(--km0-blue-500); }
+  .prow .pval { font-weight: 800; color: var(--km0-coral-500); font-size: 12.5px; white-space: nowrap; }
+  .prow .pval.n { color: var(--km0-blue-700); }
+
+  /* ── Acció · selector de tipus ───────────────────────────────── */
+  .type-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tcard { border: 1.5px solid var(--km0-beige-200); border-radius: 12px; padding: 12px; background: var(--km0-beige-50); display: flex; flex-direction: column; gap: 6px; }
+  .tcard.on { border-color: var(--km0-blue-700); background: #fff; box-shadow: 0 4px 12px -8px rgba(23,64,148,0.5); }
+  .tcard .ti { width: 34px; height: 34px; border-radius: 10px; background: var(--km0-blue-50); color: var(--km0-blue-700); display: grid; place-items: center; font-size: 17px; }
+  .tcard.on .ti { background: var(--km0-blue-700); color: #fff; }
+  .tcard b { font-size: 12.5px; font-weight: 800; color: var(--km0-blue-800); }
+  .tcard span { font-size: 11px; color: var(--km0-blue-500); line-height: 1.35; }
+  .type-fields { margin: 4px 0 15px; border: 1px dashed var(--km0-blue-400); background: var(--km0-blue-50); border-radius: 12px; padding: 15px 16px; }
+  .type-fields .tf-h { font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--km0-blue-700); margin-bottom: 12px; }
+  .type-fields .field:last-child { margin-bottom: 0; }
+
+  /* ── Recompenses · catàleg ───────────────────────────────────── */
+  .reward-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .reward-card { background: #fff; border: 1px solid var(--km0-beige-200); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px -12px rgba(19,42,80,0.3); display: flex; flex-direction: column; }
+  .reward-card.off { opacity: 0.62; }
+  .rimg { height: 104px; display: grid; place-items: center; font-size: 40px; background: linear-gradient(135deg, var(--km0-beige-100), var(--km0-yellow-300)); position: relative; }
+  .rbadge { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
+  .badge-act { background: var(--km0-green-500); color: #fff; }
+  .badge-inact { background: #c9d3e2; color: var(--km0-blue-800); }
+  .badge-out { background: var(--km0-coral-500); color: #fff; }
+  .rbody { padding: 13px 14px; flex: 1; display: flex; flex-direction: column; }
+  .rbody .rtype { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--km0-teal-500); }
+  .rbody b { font-size: 14px; font-weight: 800; color: var(--km0-blue-800); margin: 2px 0 3px; }
+  .rbody .rdesc { font-size: 11.5px; color: var(--km0-blue-500); line-height: 1.4; flex: 1; }
+  .rfoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--km0-beige-100); }
+  .rfoot .rcost { font-size: 14px; font-weight: 900; color: var(--km0-blue-700); }
+  .rfoot .rcost span { font-size: 10.5px; color: var(--km0-blue-400); font-weight: 700; }
+  .rfoot .rstock { font-size: 11px; font-weight: 700; color: var(--km0-blue-500); }
+  .rfoot .ractions { display: flex; gap: 6px; }
+  .rfoot .icon-btn { width: 30px; height: 30px; }
+
+  /* ── Chips (multi-select) i imatge ───────────────────────────── */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--km0-beige-200); background: var(--km0-beige-50); color: var(--km0-blue-500); display: inline-flex; align-items: center; gap: 6px; }
+  .chip.on { background: var(--km0-blue-700); color: #fff; border-color: var(--km0-blue-700); }
+  .chip.add { border-style: dashed; border-color: var(--km0-blue-400); color: var(--km0-blue-700); background: #fff; }
+  .img-upload { display: flex; gap: 16px; align-items: center; }
+  .img-preview { width: 116px; height: 116px; border-radius: 14px; background: linear-gradient(135deg, var(--km0-beige-100), var(--km0-yellow-300)); display: grid; place-items: center; font-size: 44px; flex-shrink: 0; }
+  .img-drop { flex: 1; min-height: 116px; border-radius: 14px; border: 1.5px dashed var(--km0-blue-400); background: var(--km0-blue-50); display: grid; place-items: center; color: var(--km0-blue-500); text-align: center; font-size: 12px; line-height: 1.6; padding: 12px; }
+
+  .flow-note { margin: 16px 0 0; padding: 11px 14px; border-radius: 12px; font-size: 12px; line-height: 1.5; background: var(--km0-blue-50); color: var(--km0-blue-700); border: 1px dashed var(--km0-blue-400); }
+  footer.page { margin-top: 44px; text-align: center; color: var(--chrome-muted); font-size: 12.5px; line-height: 1.7; border-top: 1px solid var(--chrome-line); padding-top: 24px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; margin-top: 10px; }
+  .legend b { color: var(--chrome-ink); }
+  svg { display: block; }
+</style>
+
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow">KM0 LAB · Backoffice del gestor · Ronda 1</p>
+    <h1>Gestió de punts i recompenses · Malgrat de Mar</h1>
+    <p>Backoffice del <b>gestor de la població</b> (ajuntament o entitat gestora, per definir). Hi ha <b>un únic gestor per població</b> — Malgrat de Mar, Blanes i Lloret de Mar tenen el seu, cadascun només veu el propi. Té dues funcions: configurar les <b>accions que atorguen punts</b> als veïns i administrar el <b>catàleg de recompenses</b> bescanviables per punts. Comparteix el <b>mateix shell</b> que el backoffice del comerç (canvia el rol i la navegació). Web <b>responsiva desktop + mòbil</b>. Tokens KM0 reals · català.</p>
+    <div class="meta"><span>Desktop + mòbil</span><span>1 gestor / població</span><span>Mateix shell · rol gestor</span><span>català</span><span>Tokens KM0</span></div>
+  </header>
+
+  <!-- ============================================================ 1 · Resum -->
+  <div class="screen-block">
+    <div class="sb-head">
+      <span class="num">1</span><h2>Resum del gestor</h2>
+      <p>Panell d'entrada: estat del programa de punts al municipi (usuaris, punts en circulació, bescanvis) i accés ràpid a les accions més utilitzades i als últims bescanvis. La població està <b>fixada</b> al gestor; no hi ha selector.</p>
+    </div>
+    <div class="stage">
+      <div class="desktop">
+        <div class="browserbar">
+          <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+          <div class="url">🔒 backoffice.km0lab.com/gestor/resum</div>
+        </div>
+        <div class="bo">
+          <aside class="bo-side">
+            <div class="brand">KM0 LAB</div>
+            <div class="role-tag">Gestor de població</div>
+            <div class="who"><div class="av">🏛️</div><div><b>Malgrat de Mar</b><span>Entitat gestora</span></div></div>
+            <nav class="bo-nav">
+              <a class="on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Resum</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Accions de punts</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 1 1 0-5C11 3 12 8 12 8M16.5 8a2.5 2.5 0 1 0 0-5C13 3 12 8 12 8"/></svg>Recompenses</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg>Comerços</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Usuaris</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3.9a7 7 0 0 0-1.7-1l-.4-2.4h-4l-.4 2.4a7 7 0 0 0-1.7 1L4 5l-2 3.4L4 10a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-.9a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7 7 0 0 0 1.7-1l2.3.9 2-3.4-2-1.6a7 7 0 0 0 .1-1Z"/></svg>Configuració</a>
+            </nav>
+          </aside>
+          <main class="bo-main">
+            <h1>Resum</h1>
+            <p class="lead">Estat del programa de punts a Malgrat de Mar.</p>
+
+            <div class="bo-stats four">
+              <div class="stat"><div class="n">1.240</div><div class="l">Usuaris actius</div></div>
+              <div class="stat"><div class="n">84.500</div><div class="l">Punts en circulació</div></div>
+              <div class="stat"><div class="n">312</div><div class="l">Bescanvis aquest mes</div></div>
+              <div class="stat"><div class="n">18 <span class="sm">/ 24 recomp.</span></div><div class="l">Accions actives</div></div>
+            </div>
+
+            <div class="resum-cols">
+              <div class="panel">
+                <h3>Accions més utilitzades <a>Veure totes ›</a></h3>
+                <div class="prow"><div class="pav">⚡</div><div class="pmeta"><b>Primer registre a l'app</b><span>Registre · +100 pts</span></div><div class="pval n">640 usos</div></div>
+                <div class="prow"><div class="pav">🏪</div><div class="pmeta"><b>Primer escaneig d'un comerç</b><span>Escaneig QR · +50 pts</span></div><div class="pval n">512 usos</div></div>
+                <div class="prow"><div class="pav">🌐</div><div class="pmeta"><b>Visita la web de turisme</b><span>Visita web · +20 pts</span></div><div class="pval n">210 usos</div></div>
+                <div class="prow"><div class="pav">🎟️</div><div class="pmeta"><b>Inscripció a la Festa Major</b><span>Esdeveniment · +40 pts</span></div><div class="pval n">98 usos</div></div>
+              </div>
+              <div class="panel">
+                <h3>Últims bescanvis <a>Veure tots ›</a></h3>
+                <div class="prow"><div class="pav">🎫</div><div class="pmeta"><b>Val de 5€</b><span>Marc P. · fa 2 h</span></div><div class="pval">−1.000 pts</div></div>
+                <div class="prow"><div class="pav">🎬</div><div class="pmeta"><b>Entrada de cinema</b><span>Laia R. · fa 5 h</span></div><div class="pval">−1.500 pts</div></div>
+                <div class="prow"><div class="pav">🧢</div><div class="pmeta"><b>Gorra KM0 LAB</b><span>Joan S. · ahir</span></div><div class="pval">−600 pts</div></div>
+                <div class="prow"><div class="pav">🎫</div><div class="pmeta"><b>Val de 10€</b><span>Núria T. · ahir</span></div><div class="pval">−2.000 pts</div></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ 2 · Accions · llistat -->
+  <div class="screen-block">
+    <div class="sb-head">
+      <span class="num">2</span><h2>Accions de punts — llistat</h2>
+      <p>Totes les accions per les quals els veïns guanyen punts. Cada acció es pot <b>activar/desactivar</b>, editar o eliminar. Les accions se sumen entre elles (p. ex. escanejar el QR d'un comerç dona els punts del QR <b>més</b> la bonificació de "primer escaneig").</p>
+    </div>
+    <div class="stage">
+      <div class="desktop">
+        <div class="browserbar">
+          <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+          <div class="url">🔒 backoffice.km0lab.com/gestor/accions</div>
+        </div>
+        <div class="bo">
+          <aside class="bo-side">
+            <div class="brand">KM0 LAB</div>
+            <div class="role-tag">Gestor de població</div>
+            <div class="who"><div class="av">🏛️</div><div><b>Malgrat de Mar</b><span>Entitat gestora</span></div></div>
+            <nav class="bo-nav">
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Resum</a>
+              <a class="on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Accions de punts</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 1 1 0-5C11 3 12 8 12 8M16.5 8a2.5 2.5 0 1 0 0-5C13 3 12 8 12 8"/></svg>Recompenses</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg>Comerços</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Usuaris</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3.9a7 7 0 0 0-1.7-1l-.4-2.4h-4l-.4 2.4a7 7 0 0 0-1.7 1L4 5l-2 3.4L4 10a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-.9a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7 7 0 0 0 1.7-1l2.3.9 2-3.4-2-1.6a7 7 0 0 0 .1-1Z"/></svg>Configuració</a>
+            </nav>
+          </aside>
+          <main class="bo-main">
+            <div class="bo-toolbar">
+              <div>
+                <h1>Accions de punts</h1>
+                <p class="lead">Configura per què guanyen punts els veïns a Malgrat de Mar.</p>
+              </div>
+              <span class="bo-addbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Afegir acció</span>
+            </div>
+
+            <div class="bo-table">
+              <div class="bo-trow">
+                <div class="disc">⚡</div>
+                <div class="bmeta"><b>Primer registre a l'app</b><span>Un cop per usuari · sense caducitat</span></div>
+                <span class="type-pill">Registre</span>
+                <span class="pts-pill">+100 pts</span>
+                <div class="toggle"></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div>
+              </div>
+              <div class="bo-trow">
+                <div class="disc">🏪</div>
+                <div class="bmeta"><b>Primer escaneig d'un comerç</b><span>Bonificació · un cop per usuari (a més dels punts del QR)</span></div>
+                <span class="type-pill">Escaneig QR</span>
+                <span class="pts-pill">+50 pts</span>
+                <div class="toggle"></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div>
+              </div>
+              <div class="bo-trow">
+                <div class="disc">🌐</div>
+                <div class="bmeta"><b>Visita la web de turisme</b><span>Límit 1/usuari · turisme.malgrat.cat</span></div>
+                <span class="type-pill">Visita web</span>
+                <span class="pts-pill">+20 pts</span>
+                <div class="toggle"></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div>
+              </div>
+              <div class="bo-trow">
+                <div class="disc">📩</div>
+                <div class="bmeta"><b>Registre al butlletí municipal</b><span>Un cop per usuari</span></div>
+                <span class="type-pill">Registre web</span>
+                <span class="pts-pill">+30 pts</span>
+                <div class="toggle"></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div>
+              </div>
+              <div class="bo-trow">
+                <div class="disc">🎟️</div>
+                <div class="bmeta"><b>Inscripció a la Festa Major</b><span>Vigència 01/06 – 31/07/2026 · límit 1/usuari</span></div>
+                <span class="type-pill">Esdeveniment</span>
+                <span class="pts-pill">+40 pts</span>
+                <div class="toggle"></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div>
+              </div>
+              <div class="bo-trow off">
+                <div class="disc">📝</div>
+                <div class="bmeta"><b>Enquesta de satisfacció</b><span>Desactivada</span></div>
+                <span class="type-pill">Visita web</span>
+                <span class="pts-pill">+15 pts</span>
+                <div class="toggle off"></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ 3 · Acció · nova/editar -->
+  <div class="screen-block">
+    <div class="sb-head">
+      <span class="num">3</span><h2>Accions de punts — nova / editar acció</h2>
+      <p>Formulari d'alta i edició. Primer es tria el <b>tipus d'acció</b> (llista predefinida) i el formulari mostra els <b>camps específics</b> d'aquell tipus (URL, selector d'esdeveniment, comerç…) a més dels camps comuns: nom, descripció, punts, condicions, període i límit d'usos.</p>
+    </div>
+    <div class="stage">
+      <div class="desktop">
+        <div class="browserbar">
+          <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+          <div class="url">🔒 backoffice.km0lab.com/gestor/accions/nova</div>
+        </div>
+        <div class="bo">
+          <aside class="bo-side">
+            <div class="brand">KM0 LAB</div>
+            <div class="role-tag">Gestor de població</div>
+            <div class="who"><div class="av">🏛️</div><div><b>Malgrat de Mar</b><span>Entitat gestora</span></div></div>
+            <nav class="bo-nav">
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Resum</a>
+              <a class="on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Accions de punts</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 1 1 0-5C11 3 12 8 12 8M16.5 8a2.5 2.5 0 1 0 0-5C13 3 12 8 12 8"/></svg>Recompenses</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg>Comerços</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Usuaris</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3.9a7 7 0 0 0-1.7-1l-.4-2.4h-4l-.4 2.4a7 7 0 0 0-1.7 1L4 5l-2 3.4L4 10a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-.9a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7 7 0 0 0 1.7-1l2.3.9 2-3.4-2-1.6a7 7 0 0 0 .1-1Z"/></svg>Configuració</a>
+            </nav>
+          </aside>
+          <main class="bo-main">
+            <h1>Nova acció de punts</h1>
+            <p class="lead">Defineix una acció per la qual els veïns guanyaran punts.</p>
+
+            <div class="bo-form">
+              <div class="field">
+                <label>Tipus d'acció</label>
+                <div class="type-cards">
+                  <div class="tcard"><div class="ti">⚡</div><b>Primer registre</b><span>En completar l'alta a l'app</span></div>
+                  <div class="tcard"><div class="ti">🏪</div><b>Primer escaneig QR</b><span>El primer QR de comerç escanejat</span></div>
+                  <div class="tcard on"><div class="ti">🌐</div><b>Visita web</b><span>En visitar una URL concreta</span></div>
+                  <div class="tcard"><div class="ti">📩</div><b>Registre web</b><span>En registrar-se en una web</span></div>
+                  <div class="tcard"><div class="ti">🎟️</div><b>Inscripció a esdeveniment</b><span>En apuntar-se a un event</span></div>
+                  <div class="tcard"><div class="ti">🧩</div><b>Personalitzada</b><span>Altres condicions</span></div>
+                </div>
+              </div>
+
+              <div class="field"><label>Nom de l'acció</label><div class="inp">Visita la web de turisme de Malgrat</div></div>
+              <div class="field"><label>Descripció</label><div class="inp textarea">Guanya punts visitant la pàgina oficial de turisme del municipi i descobrint què s'hi pot fer.</div></div>
+
+              <div class="type-fields">
+                <div class="tf-h">Camps específics · Visita web</div>
+                <div class="field"><label>URL de destí</label><div class="inp">https://turisme.malgrat.cat</div></div>
+                <div class="switch-row" style="margin-bottom:0"><div class="toggle"></div><span class="st">Requereix mantenir la pàgina oberta uns segons per validar la visita</span></div>
+              </div>
+
+              <div class="field-grid three">
+                <div class="field"><label>Punts atorgats</label><div class="inp">20</div></div>
+                <div class="field"><label>Límit d'usos per usuari</label><div class="inp">1</div></div>
+                <div class="field"><label>Límit d'usos total</label><div class="inp">Sense límit</div></div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field"><label>Vàlida des de</label><div class="inp">01/06/2026</div></div>
+                <div class="field"><label>Vàlida fins (opcional)</label><div class="inp">31/12/2026</div></div>
+              </div>
+
+              <div class="field"><label>Condicions (lletra petita)</label><div class="inp">Només per a usuaris registrats. No acumulable amb ella mateixa.</div></div>
+
+              <div class="switch-row"><div class="toggle"></div><span class="st">Acció activa i visible per als veïns</span></div>
+              <span class="save"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Desar acció</span>
+            </div>
+
+            <div class="flow-note">Els <b>camps específics</b> canvien segons el tipus: «Visita web» i «Registre web» demanen una URL; «Inscripció a esdeveniment» mostra un selector d'esdeveniment; «Primer escaneig QR» permet limitar-ho a un comerç concret o a qualsevol; «Primer registre» no necessita camps extra.</div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ 4 · Recompenses · catàleg -->
+  <div class="screen-block">
+    <div class="sb-head">
+      <span class="num">4</span><h2>Recompenses — catàleg</h2>
+      <p>Catàleg de productes, serveis o avantatges que els veïns poden bescanviar pels seus punts. Cada targeta mostra imatge, tipus, punts necessaris, valor, estoc i <b>estat</b> (activa / inactiva / esgotada).</p>
+    </div>
+    <div class="stage">
+      <div class="desktop">
+        <div class="browserbar">
+          <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+          <div class="url">🔒 backoffice.km0lab.com/gestor/recompenses</div>
+        </div>
+        <div class="bo">
+          <aside class="bo-side">
+            <div class="brand">KM0 LAB</div>
+            <div class="role-tag">Gestor de població</div>
+            <div class="who"><div class="av">🏛️</div><div><b>Malgrat de Mar</b><span>Entitat gestora</span></div></div>
+            <nav class="bo-nav">
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Resum</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Accions de punts</a>
+              <a class="on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 1 1 0-5C11 3 12 8 12 8M16.5 8a2.5 2.5 0 1 0 0-5C13 3 12 8 12 8"/></svg>Recompenses</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg>Comerços</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Usuaris</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3.9a7 7 0 0 0-1.7-1l-.4-2.4h-4l-.4 2.4a7 7 0 0 0-1.7 1L4 5l-2 3.4L4 10a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-.9a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7 7 0 0 0 1.7-1l2.3.9 2-3.4-2-1.6a7 7 0 0 0 .1-1Z"/></svg>Configuració</a>
+            </nav>
+          </aside>
+          <main class="bo-main">
+            <div class="bo-toolbar">
+              <div>
+                <h1>Recompenses</h1>
+                <p class="lead">Catàleg de recompenses que els veïns poden bescanviar per punts.</p>
+              </div>
+              <span class="bo-addbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Afegir recompensa</span>
+            </div>
+
+            <div class="reward-grid">
+              <div class="reward-card">
+                <div class="rimg">🎫<span class="rbadge badge-act">Activa</span></div>
+                <div class="rbody"><span class="rtype">Saldo</span><b>Val de 5€</b><span class="rdesc">Bescanvia per 5€ a qualsevol comerç o servei adherit.</span>
+                  <div class="rfoot"><div class="rcost">1.000 <span>pts</span></div><div class="rstock">Stock ∞</div></div>
+                </div>
+              </div>
+              <div class="reward-card">
+                <div class="rimg">💶<span class="rbadge badge-act">Activa</span></div>
+                <div class="rbody"><span class="rtype">Saldo</span><b>Val de 10€</b><span class="rdesc">Bescanvia per 10€ a qualsevol comerç o servei adherit.</span>
+                  <div class="rfoot"><div class="rcost">2.000 <span>pts</span></div><div class="rstock">Stock ∞</div></div>
+                </div>
+              </div>
+              <div class="reward-card">
+                <div class="rimg">🎬<span class="rbadge badge-act">Activa</span></div>
+                <div class="rbody"><span class="rtype">Experiència</span><b>Entrada de cinema</b><span class="rdesc">Una entrada al Cinema Catalunya de Malgrat.</span>
+                  <div class="rfoot"><div class="rcost">1.500 <span>pts</span></div><div class="rstock">20 u.</div></div>
+                </div>
+              </div>
+              <div class="reward-card">
+                <div class="rimg">🧢<span class="rbadge badge-act">Activa</span></div>
+                <div class="rbody"><span class="rtype">Merchandising</span><b>Gorra KM0 LAB</b><span class="rdesc">Gorra de cotó amb el logo del programa.</span>
+                  <div class="rfoot"><div class="rcost">600 <span>pts</span></div><div class="rstock">45 u.</div></div>
+                </div>
+              </div>
+              <div class="reward-card off">
+                <div class="rimg">👕<span class="rbadge badge-out">Esgotada</span></div>
+                <div class="rbody"><span class="rtype">Merchandising</span><b>Samarreta KM0 LAB</b><span class="rdesc">Samarreta de cotó orgànic amb el logo.</span>
+                  <div class="rfoot"><div class="rcost">800 <span>pts</span></div><div class="rstock">0 u.</div></div>
+                </div>
+              </div>
+              <div class="reward-card off">
+                <div class="rimg">📚<span class="rbadge badge-inact">Inactiva</span></div>
+                <div class="rbody"><span class="rtype">Descompte</span><b>10% a la llibreria Robafaves</b><span class="rdesc">Descompte en compres a la llibreria adherida.</span>
+                  <div class="rfoot"><div class="rcost">500 <span>pts</span></div><div class="rstock">Stock ∞</div></div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ 5 · Recompensa · nova/editar -->
+  <div class="screen-block">
+    <div class="sb-head">
+      <span class="num">5</span><h2>Recompenses — nova / editar recompensa</h2>
+      <p>Formulari d'alta i edició d'una recompensa amb tots els seus camps: imatge, nom, descripció, tipus, punts necessaris, valor, comerços on es pot fer servir, estoc, dates, condicions i estat.</p>
+    </div>
+    <div class="stage">
+      <div class="desktop">
+        <div class="browserbar">
+          <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+          <div class="url">🔒 backoffice.km0lab.com/gestor/recompenses/nova</div>
+        </div>
+        <div class="bo">
+          <aside class="bo-side">
+            <div class="brand">KM0 LAB</div>
+            <div class="role-tag">Gestor de població</div>
+            <div class="who"><div class="av">🏛️</div><div><b>Malgrat de Mar</b><span>Entitat gestora</span></div></div>
+            <nav class="bo-nav">
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Resum</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Accions de punts</a>
+              <a class="on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 1 1 0-5C11 3 12 8 12 8M16.5 8a2.5 2.5 0 1 0 0-5C13 3 12 8 12 8"/></svg>Recompenses</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg>Comerços</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Usuaris</a>
+              <a><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3.9a7 7 0 0 0-1.7-1l-.4-2.4h-4l-.4 2.4a7 7 0 0 0-1.7 1L4 5l-2 3.4L4 10a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-.9a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7 7 0 0 0 1.7-1l2.3.9 2-3.4-2-1.6a7 7 0 0 0 .1-1Z"/></svg>Configuració</a>
+            </nav>
+          </aside>
+          <main class="bo-main">
+            <h1>Nova recompensa</h1>
+            <p class="lead">Afegeix una recompensa al catàleg de bescanvi.</p>
+
+            <div class="bo-form">
+              <div class="field">
+                <label>Imatge</label>
+                <div class="img-upload">
+                  <div class="img-preview">🎫</div>
+                  <div class="img-drop">Arrossega una imatge aquí<br>o fes clic per pujar-la<br><b>PNG · JPG · màx. 2 MB</b></div>
+                </div>
+              </div>
+
+              <div class="field"><label>Nom</label><div class="inp">Val de 5€</div></div>
+              <div class="field"><label>Descripció</label><div class="inp textarea">Bescanvia 1.000 punts per un val de 5€ per gastar a qualsevol comerç o servei adherit del municipi.</div></div>
+
+              <div class="field">
+                <label>Tipus de recompensa</label>
+                <div class="seg"><span>Descompte</span><span class="on">Saldo</span><span>Producte</span><span>Servei</span><span>Merchandising</span><span>Experiència</span></div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field"><label>Punts necessaris</label><div class="inp">1.000</div></div>
+                <div class="field"><label>Valor / import</label><div class="inp">5 €</div></div>
+              </div>
+
+              <div class="field">
+                <label>Comerços / serveis on es pot fer servir</label>
+                <div class="chips">
+                  <span class="chip on">✓ Tots els adherits</span>
+                  <span class="chip">Forn Rovira</span>
+                  <span class="chip">Cafè del Mar</span>
+                  <span class="chip">Cal Sastre</span>
+                  <span class="chip add">+ afegir</span>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field"><label>Estoc disponible</label><div class="inp">Il·limitat</div></div>
+                <div class="field"><label>&nbsp;</label><div class="switch-row" style="margin-bottom:0;padding-top:6px"><div class="toggle"></div><span class="st">Estoc il·limitat</span></div></div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field"><label>Data d'inici</label><div class="inp">01/06/2026</div></div>
+                <div class="field"><label>Data de fi (opcional)</label><div class="inp">Sense data de fi</div></div>
+              </div>
+
+              <div class="field"><label>Condicions d'ús</label><div class="inp textarea">Vàlid durant 3 mesos des del bescanvi. No reemborsable. Un val per compra.</div></div>
+
+              <div class="field"><label>Estat</label><div class="seg"><span class="on">Activa</span><span>Inactiva</span><span>Esgotada</span></div></div>
+
+              <span class="save"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Desar recompensa</span>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page">
+    <div>Maqueta del <b>backoffice del gestor</b> · mateix shell que el backoffice de comerç (rol gestor). Els estats (loading / empty / error) i la responsivitat (desktop → tauleta → mòbil: sidebar a drawer, taules a targetes, formularis a una columna) es construeixen a Lovable seguint el sistema de disseny.</div>
+    <div class="legend">
+      <span><b>Resum</b> — estat del programa</span>
+      <span><b>Accions de punts</b> — què atorga punts</span>
+      <span><b>Recompenses</b> — catàleg de bescanvi</span>
+      <span><b>1 gestor / població</b> — Malgrat · Blanes · Lloret</span>
+    </div>
+  </footer>
+</div>

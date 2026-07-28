@@ -1,0 +1,41 @@
+{
+  "$docs": "Contrato Lovable → km0lab-backoffice. Ver docs/SYNC-FROM-LOVABLE.md. include: globs relativos al repo Lovable. exclude: nunca se copian. locked: destinos de producto (API real, env, auth); el sync se niega a sobrescribirlos. Un path acabado en / bloquea el directorio entero. Al conectar un service real a km0lab-api, añádelo a locked en el mismo commit.",
+  "sourceRepo": "KM0Lab-git-admin/km0lab-backoffice-lovable",
+  "sourceRef": "main",
+  "defaultSourceDir": "../km0lab-backoffice-lovable",
+  "include": [
+    "src/components/**",
+    "src/pages/**",
+    "src/routes/**",
+    "src/services/**",
+    "src/stores/**",
+    "src/data/**",
+    "src/hooks/**",
+    "src/contexts/**",
+    "src/types/**",
+    "src/lib/**",
+    "src/styles.css",
+    "src/router.tsx",
+    "src/server.ts",
+    "src/start.ts",
+    "src/routeTree.gen.ts",
+    "public/**",
+    "components.json"
+  ],
+  "exclude": [
+    "src/lib/lovable-error-reporting.ts",
+    ".lovable/**",
+    "src/integrations/**",
+    "supabase/**"
+  ],
+  "locked": [
+    "src/lib/env.ts",
+    "src/services/apiClient.ts",
+    "src/services/km0labApiClient.ts",
+    "src/services/auth.ts",
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.production"
+  ]
+}

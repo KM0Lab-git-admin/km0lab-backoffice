@@ -1,0 +1,23 @@
+# AGENTS — km0lab-backoffice
+
+Front de producto del backoffice KM0 LAB. La UI nace en Lovable
+(`km0lab-backoffice-lovable`) y se trae aquí con `bun run sync:lovable`
+(ver `docs/SYNC-FROM-LOVABLE.md`).
+
+## Frontera
+
+- **Este repo**: UI, rutas, i18n, cliente HTTP hacia `km0lab-api`.
+- **`km0lab-api`**: autenticación, dominio y base de datos.
+- **`events-query`**: noticias/agenda (no aplica a este panel salvo
+  lecturas puntuales si se acuerdan).
+
+## Sync Lovable
+
+- No sobrescribe rutas en `locked` del manifest.
+- Tras sync: revisar `git diff`, tipado y pantallas afectadas.
+- Fixes visuales van primero a Lovable `main`; luego sync a `develop`.
+
+## Ramas
+
+- `develop` — integración diaria
+- `main` — estable / deploy

@@ -1,0 +1,90 @@
+import type {
+  AccioPunts,
+  ComercOption,
+  EsdevenimentOption,
+} from "@/types/backoffice";
+
+export const comercosOptionsFixture: ComercOption[] = [
+  { id: "forn-rovira", nom: "Forn Rovira" },
+  { id: "fleca-casals", nom: "Fleca Casals" },
+  { id: "carnisseria-marti", nom: "Carnisseria Martí" },
+  { id: "llibreria-pages", nom: "Llibreria Pagès" },
+  { id: "floristeria-arrels", nom: "Floristeria Arrels" },
+];
+
+export const esdevenimentsOptionsFixture: EsdevenimentOption[] = [
+  { id: "festa-major", nom: "Festa Major" },
+  { id: "cursa-popular", nom: "Cursa Popular" },
+  { id: "mercat-nadal", nom: "Mercat de Nadal" },
+  { id: "diada-sant-jordi", nom: "Diada de Sant Jordi" },
+];
+
+export const accionsPuntsFixture: AccioPunts[] = [
+  {
+    id: "ap-1",
+    poblacioId: "malgrat",
+    tipus: "registre",
+    nom: "Primer registre a l'app",
+    descripcio: "Els veïns reben un impuls inicial en donar-se d'alta.",
+    punts: 100,
+    limitPerUsuari: 1,
+    condicions: "Un únic ús per usuari.",
+    activa: true,
+  },
+  {
+    id: "ap-2",
+    poblacioId: "malgrat",
+    tipus: "escaneig_qr",
+    nom: "Primer escaneig d'un comerç",
+    descripcio: "Bonificació la primera vegada que s'escaneja un QR de comerç.",
+    punts: 50,
+    limitPerUsuari: 1,
+    condicions: "S'atorga a més dels punts del QR del comerç.",
+    activa: true,
+  },
+  {
+    id: "ap-3",
+    poblacioId: "malgrat",
+    tipus: "visita_web",
+    nom: "Visita la web de turisme",
+    descripcio: "Descobreix els punts d'interès de Malgrat.",
+    punts: 20,
+    limitPerUsuari: 1,
+    url: "https://turisme.malgrat.cat",
+    activa: true,
+  },
+  {
+    id: "ap-4",
+    poblacioId: "malgrat",
+    tipus: "registre_web",
+    nom: "Registre al butlletí municipal",
+    descripcio: "Rep les novetats del teu ajuntament al correu.",
+    punts: 30,
+    limitPerUsuari: 1,
+    url: "https://www.malgrat.cat/butlleti",
+    activa: true,
+  },
+  {
+    id: "ap-5",
+    poblacioId: "malgrat",
+    tipus: "esdeveniment",
+    nom: "Inscripció a la Festa Major",
+    descripcio: "Inscriu-te a les activitats oficials de la Festa Major.",
+    punts: 40,
+    esdevenimentId: "festa-major",
+    vigenciaInici: "2026-06-01",
+    vigenciaFi: "2026-07-31",
+    activa: true,
+  },
+  {
+    id: "ap-6",
+    poblacioId: "malgrat",
+    tipus: "visita_web",
+    nom: "Enquesta de satisfacció",
+    descripcio: "Respon una enquesta breu sobre el programa KM0 LAB.",
+    punts: 15,
+    url: "https://www.malgrat.cat/enquesta-km0",
+    limitPerUsuari: 1,
+    activa: false,
+  },
+];
