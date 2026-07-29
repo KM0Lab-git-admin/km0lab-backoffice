@@ -71,7 +71,7 @@ export function AppLayout({ children }: Props) {
                 {headerTitle}
               </p>
             </div>
-            <RoleSwitcher />
+            {import.meta.env.DEV ? <RoleSwitcher /> : null}
             <LangSwitcher />
           </header>
 

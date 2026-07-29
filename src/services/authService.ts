@@ -6,10 +6,10 @@ import type { ApiAuthOut, ApiUser } from "@/types/api";
 export const MOCK_OTP_CODE = "123456";
 
 /**
- * TEMP: one-click demo login on /login (skips OTP step for admin/merchant).
- * When real OTP ships: set to `false` and remove/comment the quick-access UI in Login.tsx.
+ * One-click demo login on /login (skips OTP for admin/merchant).
+ * Only enabled in local Vite (`import.meta.env.DEV`). Production/UAT builds require real OTP.
  */
-export const DEV_SKIP_OTP = true;
+export const DEV_SKIP_OTP = import.meta.env.DEV;
 
 export const DEMO_ADMIN_EMAIL = "admin@km0lab.com";
 export const DEMO_MERCHANT_EMAIL = "merchant@km0lab.com";

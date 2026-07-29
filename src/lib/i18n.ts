@@ -534,6 +534,21 @@ export const messages = {
   },
   "login.toRegister.cta": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
   "login.toast.welcome": { ca: "Sessió iniciada", es: "Sesión iniciada", en: "Signed in" },
+  "login.dev.hint": {
+    ca: "Accés ràpid (només local — OTP desactivat)",
+    es: "Acceso rápido (solo local — OTP desactivado)",
+    en: "Quick access (local only — OTP disabled)",
+  },
+  "login.dev.admin": {
+    ca: "Entrar com a Admin (demo)",
+    es: "Entrar como Admin (demo)",
+    en: "Sign in as Admin (demo)",
+  },
+  "login.dev.merchant": {
+    ca: "Entrar com a Merchant (demo)",
+    es: "Entrar como Merchant (demo)",
+    en: "Sign in as Merchant (demo)",
+  },
 
   // Register
   "register.title": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
