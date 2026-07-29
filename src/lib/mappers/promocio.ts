@@ -1,4 +1,4 @@
-import type { PromoTipus, Promocio, PromocioInput } from "@/types/comerc";
+import type { PromoTipus, Promocio, PromocioInput } from "@/types/merchant";
 import type { ApiPromotion } from "@/types/api";
 import { promoBadgeLabelForStorage } from "@/lib/promoBadge";
 

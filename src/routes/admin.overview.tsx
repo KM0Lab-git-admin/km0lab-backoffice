@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import AdminResumPage from "@/pages/AdminResum";
 
-export const Route = createFileRoute("/admin/resum")({
+export const Route = createFileRoute("/admin/overview")({
   head: () => ({
     meta: [
       { title: "Resum · KM0 LAB" },

@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useLang } from "@/contexts/LangContext";
 import { recompensesService } from "@/services/recompensesService";
 import { ImageUploader } from "@/components/backoffice/ImageUploader";
+import { RecompensaTipusIcon } from "@/components/backoffice/recompensaTipusIcon";
 import {
   estatLabelKey,
   tipusLabelKey,
@@ -182,6 +183,12 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
         hint={t("recompenses.form.imatge.hint")}
         recommendation={t("recompenses.form.imatge.recommendation")}
         placeholderLabel={t("recompenses.form.imatge.placeholder")}
+        placeholderNode={
+          <div className="flex flex-col items-center gap-2 bg-gradient-to-br from-km0-yellow-300/40 to-km0-yellow-400/50 px-6 py-8 text-km0-blue-800">
+            <RecompensaTipusIcon tipus={tipus} className="h-14 w-14" />
+            <span className="text-xs font-medium">{t(tipusLabelKey(tipus))}</span>
+          </div>
+        }
       />
 
       {/* Nom */}

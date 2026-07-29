@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Bescanvis from "@/pages/Bescanvis";
 
-export const Route = createFileRoute("/admin/bescanvis")({
+export const Route = createFileRoute("/admin/redemptions")({
   head: () => ({
     meta: [
       { title: "Bescanvis · KM0 LAB" },

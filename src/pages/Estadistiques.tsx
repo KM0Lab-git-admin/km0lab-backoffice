@@ -24,7 +24,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import { useLang } from "@/contexts/LangContext";
 import { statsService } from "@/services/statsService";
-import type { StatsRang } from "@/types/comerc";
+import type { StatsRang } from "@/types/merchant";
 import { Mail, Phone, TrendingDown, TrendingUp } from "lucide-react";
 
 const RANGES: StatsRang[] = ["7d", "30d", "90d", "any"];
@@ -366,7 +366,7 @@ function PromoTable({
   labels,
   locale,
 }: {
-  rows: import("@/types/comerc").StatsPromoRendiment[];
+  rows: import("@/types/merchant").StatsPromoRendiment[];
   labels: { promo: string; views: string; opens: string; state: string; active: string; inactive: string };
   locale: string;
 }) {
@@ -427,7 +427,7 @@ function Heatmap({
   lowLabel,
   highLabel,
 }: {
-  cells: import("@/types/comerc").StatsHeatmapCel[];
+  cells: import("@/types/merchant").StatsHeatmapCel[];
   dayLabels: string[];
   lowLabel: string;
   highLabel: string;
@@ -488,7 +488,7 @@ function VisitorsTable({
   labels,
   locale,
 }: {
-  rows: import("@/types/comerc").StatsVisitant[];
+  rows: import("@/types/merchant").StatsVisitant[];
   labels: { name: string; visits: string; last: string; points: string; contact: string; notShared: string };
   locale: string;
 }) {

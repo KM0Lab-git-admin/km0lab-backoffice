@@ -1,5 +1,5 @@
 import type { MessageKey } from "@/lib/i18n";
-import type { PromoTipus, Promocio } from "@/types/comerc";
+import type { PromoTipus, Promocio } from "@/types/merchant";
 
 /** Short yellow-badge label from type (+ discount %). Never the promo title. */
 export function formatDiscountBadge(valor?: string): string {

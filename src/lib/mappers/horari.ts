@@ -1,4 +1,4 @@
-import type { DiaSetmana, Horari, HorariDia } from "@/types/comerc";
+import type { DiaSetmana, Horari, HorariDia } from "@/types/merchant";
 import type { ApiDayHours, ApiOpeningHours } from "@/types/api";
 
 export const DIAS_CA_TO_EN: Record<

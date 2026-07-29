@@ -1,6 +1,6 @@
 import { useLang } from "@/contexts/LangContext";
 import { categoryLabelToSlug } from "@/lib/mappers/categories";
-import type { ComercFitxa } from "@/types/comerc";
+import type { ComercFitxa } from "@/types/merchant";
 import type { MessageKey } from "@/lib/i18n";
 
 type Props = {

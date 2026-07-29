@@ -59,12 +59,16 @@ export type BescanviResum = {
 // Admin · Accions de punts (llistat + alta/edició)
 export type AccioPuntsTipus =
   | "registre"
-  | "aniversari"
+  | "primer_escaneig"
   | "escaneig_qr"
+  | "aniversari"
   | "visita_web"
   | "registre_web"
   | "esdeveniment"
   | "personalitzada";
+
+
+export type CooldownUnitat = "dies" | "setmanes" | "mesos";
 
 export type AccioPunts = {
   id: string;
@@ -79,11 +83,17 @@ export type AccioPunts = {
   vigenciaFi?: string;
   condicions?: string;
   activa: boolean;
+  // Si l'acció apareix destacada a la home de l'app dels veïns.
+  // Algunes accions (aniversari, primer registre) no tenen sentit a la home.
+  visibleAHome?: boolean;
   url?: string;
   esdevenimentId?: string;
   comercId?: string;
-  /** Días hasta que el mismo usuario puede volver a ganar puntos en ese comercio. */
-  cooldownDies?: number;
+  // Només per a `escaneig_qr`: interval abans que el mateix usuari pugui
+  // tornar a escanejar el QR del mateix comerç i rebre punts.
+  // undefined = sense cooldown (comportament actual).
+  cooldownValor?: number;
+  cooldownUnitat?: CooldownUnitat;
 };
 
 export type AccioPuntsInput = Omit<AccioPunts, "id" | "poblacioId">;

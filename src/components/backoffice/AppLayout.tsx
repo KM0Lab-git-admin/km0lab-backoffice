@@ -39,7 +39,7 @@ export function AppLayout({ children }: Props) {
       title: comercQuery.data.nom,
       subtitleKey: "app.merchantSubtitle",
       emoji: comercQuery.data.emoji ?? "🏪",
-      editHref: "/comerc/la-meva-fitxa",
+      editHref: "/merchant/my-profile",
     };
     headerTitle = comercQuery.data.nom;
   } else if (rol === "admin" && adminQuery.data) {

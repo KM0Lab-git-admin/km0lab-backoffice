@@ -1,7 +1,7 @@
 import { api, absoluteMediaUrl } from "@/lib/apiClient";
 import { qrFromApi, qrMetricsFromApi } from "@/lib/mappers/shop";
 import { useAuthStore } from "@/stores/useAuthStore";
-import type { ComercQR, QRMetrics } from "@/types/comerc";
+import type { ComercQR, QRMetrics } from "@/types/merchant";
 import type { ApiQr } from "@/types/api";
 
 async function fetchAuthorizedBlob(url: string): Promise<Blob> {

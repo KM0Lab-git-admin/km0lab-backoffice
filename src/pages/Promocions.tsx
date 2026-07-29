@@ -26,7 +26,7 @@ import { promocionsService } from "@/services/promocionsService";
 import { PromocioForm } from "@/components/backoffice/PromocioForm";
 import { PromocioCards, PromocioTable } from "@/components/backoffice/PromocioList";
 import { ErrorState } from "@/components/backoffice/ErrorState";
-import type { Promocio, PromocioInput } from "@/types/comerc";
+import type { Promocio, PromocioInput } from "@/types/merchant";
 
 export default function PromocionsPage() {
   const { t } = useLang();

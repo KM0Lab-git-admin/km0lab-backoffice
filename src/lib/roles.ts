@@ -6,6 +6,6 @@ export function rolFromRoles(roles: string[]): Rol {
   return "comerc";
 }
 
-export function homePathForRol(rol: Rol): "/admin/resum" | "/comerc/el-meu-qr" {
-  return rol === "admin" ? "/admin/resum" : "/comerc/el-meu-qr";
+export function homePathForRol(rol: Rol): "/admin/overview" | "/merchant/my-qr" {
+  return rol === "admin" ? "/admin/overview" : "/merchant/my-qr";
 }

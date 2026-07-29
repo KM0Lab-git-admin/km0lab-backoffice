@@ -237,9 +237,9 @@ export const messages = {
     en: "Small square image. Shown in summaries and the merchant list.",
   },
   "fitxa.logo.recommendation": {
-    ca: "512×512 px (PNG amb fons transparent, si és possible). Mínim acceptable: 256×256 px. Relació d'aspecte preferida: 1:1 (quadrat). També val 4:3 o 16:9, perquè el component usa object-contain i no retalla la imatge.",
-    es: "512×512 px (PNG con fondo transparente, si es posible). Mínimo aceptable: 256×256 px. Relación de aspecto preferida: 1:1 (cuadrado). También vale 4:3 o 16:9, porque el componente usa object-contain y no recorta la imagen.",
-    en: "512×512 px (PNG with transparent background, if possible). Minimum acceptable: 256×256 px. Preferred aspect ratio: 1:1 (square). 4:3 or 16:9 also work, because the component uses object-contain and does not crop the image.",
+    ca: "Recomanat: 512 × 512 px (quadrat, PNG o JPG, màx. 5 MB).",
+    es: "Recomendado: 512 × 512 px (cuadrado, PNG o JPG, máx. 5 MB).",
+    en: "Recommended: 512 × 512 px (square, PNG or JPG, max. 5 MB).",
   },
   "fitxa.hero.label": { ca: "Imatge de portada", es: "Imagen de portada", en: "Cover image" },
   "fitxa.hero.hint": {
@@ -248,9 +248,9 @@ export const messages = {
     en: "Large landscape image. Shown at the top of the profile.",
   },
   "fitxa.hero.recommendation": {
-    ca: "1200×750 px (proporció 16:10) per cobrir pantalles d'alta densitat. Mínim acceptable: 800×500 px. Format: PNG amb fons transparent o JPG amb fons clar.",
-    es: "1200×750 px (ratio 16:10) para cubrir pantallas de alta densidad. Mínimo aceptable: 800×500 px. Formato: PNG con fondo transparente o JPG con fondo claro.",
-    en: "1200×750 px (16:10 ratio) for high-density screens. Minimum acceptable: 800×500 px. Format: PNG with transparent background or JPG with light background.",
+    ca: "Recomanat: 1600 × 900 px (proporció 16:9, PNG o JPG, màx. 5 MB).",
+    es: "Recomendado: 1600 × 900 px (proporción 16:9, PNG o JPG, máx. 5 MB).",
+    en: "Recommended: 1600 × 900 px (16:9 ratio, PNG or JPG, max. 5 MB).",
   },
   "fitxa.upload": { ca: "Pujar imatge", es: "Subir imagen", en: "Upload image" },
   "fitxa.replace": { ca: "Canviar imatge", es: "Cambiar imagen", en: "Replace image" },
@@ -534,21 +534,6 @@ export const messages = {
   },
   "login.toRegister.cta": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
   "login.toast.welcome": { ca: "Sessió iniciada", es: "Sesión iniciada", en: "Signed in" },
-  "login.dev.hint": {
-    ca: "Accés ràpid (dev — OTP desactivat temporalment)",
-    es: "Acceso rápido (dev — OTP desactivado temporalmente)",
-    en: "Quick access (dev — OTP temporarily disabled)",
-  },
-  "login.dev.admin": {
-    ca: "Entrar com a Admin (demo)",
-    es: "Entrar como Admin (demo)",
-    en: "Sign in as Admin (demo)",
-  },
-  "login.dev.merchant": {
-    ca: "Entrar com a Merchant (demo)",
-    es: "Entrar como Merchant (demo)",
-    en: "Sign in as Merchant (demo)",
-  },
 
   // Register
   "register.title": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
@@ -776,16 +761,23 @@ export const messages = {
     es: "Registro en la app",
     en: "App sign-up",
   },
-  "accions.tipus.aniversari": {
-    ca: "Aniversari",
-    es: "Cumpleaños",
-    en: "Birthday",
+  "accions.tipus.primer_escaneig": {
+    ca: "Primer escaneig d'un comerç",
+    es: "Primer escaneo de un comercio",
+    en: "First merchant scan",
   },
   "accions.tipus.escaneig_qr": {
     ca: "Escaneig d'un comerç",
     es: "Escaneo de un comercio",
     en: "Merchant scan",
   },
+  "accions.tipus.aniversari": {
+    ca: "Aniversari",
+    es: "Aniversario",
+    en: "Birthday",
+  },
+
+
   "accions.tipus.visita_web": {
     ca: "Visita web",
     es: "Visita web",
@@ -833,29 +825,6 @@ export const messages = {
     es: "Introduce un número de puntos válido.",
     en: "Enter a valid number of points.",
   },
-  "accions.form.cooldown.label": {
-    ca: "Reactivació del QR",
-    es: "Reactivación del QR",
-    en: "QR reactivation",
-  },
-  "accions.form.cooldown.hint": {
-    ca: "Després d'un escaneig amb punts, el mateix veí no pot tornar a guanyar punts en aquell comerç fins que passi aquest interval.",
-    es: "Tras un escaneo con puntos, el mismo vecino no puede volver a ganar puntos en ese comercio hasta que pase este intervalo.",
-    en: "After a points scan, the same resident cannot earn points again at that shop until this interval elapses.",
-  },
-  "accions.form.cooldown.1m": { ca: "1 mes", es: "1 mes", en: "1 month" },
-  "accions.form.cooldown.2m": { ca: "2 mesos", es: "2 meses", en: "2 months" },
-  "accions.form.cooldown.3m": { ca: "3 mesos", es: "3 meses", en: "3 months" },
-  "accions.form.cooldown.custom": {
-    ca: "Dies personalitzats",
-    es: "Días personalizados",
-    en: "Custom days",
-  },
-  "accions.form.cooldown.summary": {
-    ca: "Reactivació: {n} dies",
-    es: "Reactivación: {n} días",
-    en: "Reactivation: {n} days",
-  },
   "accions.form.limitPerUsuari.label": {
     ca: "Límit d'usos per usuari",
     es: "Límite de usos por usuario",
@@ -888,6 +857,21 @@ export const messages = {
     es: "Si la desactivas, la acción dejará de otorgar puntos.",
     en: "If disabled, the action will stop granting points.",
   },
+  "accions.form.visibleHome.label": {
+    ca: "Mostra aquesta acció a la home de l'app",
+    es: "Muestra esta acción en la home de la app",
+    en: "Show this action on the app home",
+  },
+  "accions.form.visibleHome.hint": {
+    ca: "Si està desactivat, l'acció continua atorgant punts però no apareix destacada a la pàgina principal dels veïns.",
+    es: "Si está desactivado, la acción sigue otorgando puntos pero no aparece destacada en la página principal de los vecinos.",
+    en: "If disabled, the action still grants points but is not featured on the residents' home page.",
+  },
+  "accions.badge.hiddenHome": {
+    ca: "Amagada a la home",
+    es: "Oculta en la home",
+    en: "Hidden on home",
+  },
   "accions.form.url.label": { ca: "URL de destí", es: "URL de destino", en: "Target URL" },
   "accions.form.url.placeholder": {
     ca: "https://…",
@@ -900,13 +884,94 @@ export const messages = {
     es: "Elige un evento",
     en: "Choose an event",
   },
+  "accions.form.esdevenimentUrl.label": {
+    ca: "URL de l'esdeveniment",
+    es: "URL del evento",
+    en: "Event URL",
+  },
+  "accions.form.esdevenimentUrl.placeholder": {
+    ca: "https://…",
+    es: "https://…",
+    en: "https://…",
+  },
+  "accions.form.esdevenimentUrl.hint": {
+    ca: "Enllaç a la pàgina de l'esdeveniment on el veí es pot inscriure.",
+    es: "Enlace a la página del evento donde el vecino puede inscribirse.",
+    en: "Link to the event page where residents can register.",
+  },
   "accions.form.comerc.label": { ca: "Comerç", es: "Comercio", en: "Merchant" },
   "accions.form.comerc.any": {
     ca: "Qualsevol comerç",
     es: "Cualquier comercio",
     en: "Any merchant",
   },
+  "accions.form.cooldown.label": {
+    ca: "Interval de reactivació del QR",
+    es: "Intervalo de reactivación del QR",
+    en: "QR reactivation interval",
+  },
+  "accions.form.cooldown.hint": {
+    ca: "Temps que ha de passar perquè el mateix veí pugui tornar a escanejar el QR d'aquest comerç i rebre punts. Deixa-ho buit per no aplicar cap límit temporal.",
+    es: "Tiempo que debe pasar para que el mismo vecino pueda volver a escanear el QR de este comercio y recibir puntos. Déjalo vacío para no aplicar límite temporal.",
+    en: "Time that must pass before the same resident can scan this merchant's QR again and earn points. Leave empty to apply no time limit.",
+  },
+  "accions.form.cooldown.valor": { ca: "Cada", es: "Cada", en: "Every" },
+  "accions.form.cooldown.unitat": { ca: "Unitat", es: "Unidad", en: "Unit" },
+  "accions.form.cooldown.unit.dies": { ca: "Dies", es: "Días", en: "Days" },
+  "accions.form.cooldown.unit.setmanes": { ca: "Setmanes", es: "Semanas", en: "Weeks" },
+  "accions.form.cooldown.unit.mesos": { ca: "Mesos", es: "Meses", en: "Months" },
+  "accions.form.cooldown.none": {
+    ca: "Sense límit temporal",
+    es: "Sin límite temporal",
+    en: "No time limit",
+  },
   "accions.form.submit": { ca: "Desar acció", es: "Guardar acción", en: "Save action" },
+  "accions.registre.fixedNom": {
+    ca: "Registre a l'aplicació",
+    es: "Registro en la aplicación",
+    en: "App registration",
+  },
+  "accions.registre.fixedDescripcio": {
+    ca: "Punts de benvinguda en donar-se d'alta a l'app KM0 LAB.",
+    es: "Puntos de bienvenida al darse de alta en la app KM0 LAB.",
+    en: "Welcome points for signing up to the KM0 LAB app.",
+  },
+  "accions.registre.info": {
+    ca: "El nom i la descripció d'aquesta acció són fixos i es mostren automàticament als veïns segons el seu idioma.",
+    es: "El nombre y la descripción de esta acción son fijos y se muestran automáticamente a los vecinos según su idioma.",
+    en: "Name and description for this action are fixed and shown to residents in their language.",
+  },
+  "accions.primerEscaneig.fixedNom": {
+    ca: "Primer escaneig d'un comerç",
+    es: "Primer escaneo de un comercio",
+    en: "First merchant scan",
+  },
+  "accions.primerEscaneig.fixedDescripcio": {
+    ca: "Bonificació única la primera vegada que el veí escaneja el QR d'un comerç KM0 LAB.",
+    es: "Bonificación única la primera vez que el vecino escanea el QR de un comercio KM0 LAB.",
+    en: "One-time bonus the first time a resident scans a KM0 LAB merchant QR.",
+  },
+  "accions.primerEscaneig.info": {
+    ca: "S'atorga un únic cop per veí, independentment del comerç. Es suma als punts del QR del comerç escanejat.",
+    es: "Se otorga una única vez por vecino, sea cual sea el comercio. Se suma a los puntos del QR del comercio escaneado.",
+    en: "Granted once per resident, regardless of which merchant. Added on top of that merchant's QR points.",
+  },
+  "accions.escaneigQr.fixedNom": {
+    ca: "Escaneig del QR d'un comerç",
+    es: "Escaneo del QR de un comercio",
+    en: "Merchant QR scan",
+  },
+  "accions.escaneigQr.fixedDescripcio": {
+    ca: "Punts en escanejar el QR d'un comerç KM0 LAB adherit.",
+    es: "Puntos al escanear el QR de un comercio KM0 LAB adherido.",
+    en: "Points for scanning a participating KM0 LAB merchant QR.",
+  },
+  "accions.escaneigQr.info": {
+    ca: "El nom i la descripció són fixos. Els límits es gestionen amb l'interval de reactivació del QR.",
+    es: "El nombre y la descripción son fijos. Los límites se gestionan con el intervalo de reactivación del QR.",
+    en: "Name and description are fixed. Limits are managed via the QR reactivation interval.",
+  },
+
 
   "toast.accio.saved": { ca: "Acció desada", es: "Acción guardada", en: "Action saved" },
   "toast.accio.activated": { ca: "Acció activada", es: "Acción activada", en: "Action activated" },

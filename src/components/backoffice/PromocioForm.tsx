@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLang } from "@/contexts/LangContext";
 import type { MessageKey } from "@/lib/i18n";
-import type { Promocio, PromocioInput, PromoTipus } from "@/types/comerc";
+import type { Promocio, PromocioInput, PromoTipus } from "@/types/merchant";
 import { promoTipusList } from "@/services/promocionsService";
 
 const promoSchema = z

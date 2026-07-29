@@ -1,8 +1,9 @@
-import { Gift, Pencil, Trash2, Package } from "lucide-react";
+import { Pencil, Trash2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
+import { RecompensaTipusIcon } from "@/components/backoffice/recompensaTipusIcon";
 import type { MessageKey } from "@/lib/i18n";
 import type { Recompensa, RecompensaEstat, RecompensaTipus } from "@/types/backoffice";
 
@@ -100,7 +101,7 @@ export function RecompensaGrid({ recompenses, onEdit, onDelete }: Props) {
                 />
               ) : (
                 <div className="grid h-full w-full place-items-center bg-gradient-to-br from-km0-yellow-300/40 to-km0-yellow-400/50 text-km0-blue-800">
-                  <Gift className="h-10 w-10" aria-hidden />
+                  <RecompensaTipusIcon tipus={r.tipus} className="h-12 w-12" />
                 </div>
               )}
               <div className="absolute left-3 top-3">

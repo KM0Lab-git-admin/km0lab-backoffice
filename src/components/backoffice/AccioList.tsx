@@ -2,12 +2,13 @@ import {
   Pencil,
   Trash2,
   UserPlus,
-  Cake,
   QrCode,
   Globe,
   Mail,
   CalendarDays,
   Sparkles,
+  Star,
+  Cake,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,8 +29,9 @@ import type { AccioPunts, AccioPuntsTipus } from "@/types/backoffice";
 
 const TIPUS_ICON: Record<AccioPuntsTipus, LucideIcon> = {
   registre: UserPlus,
-  aniversari: Cake,
+  primer_escaneig: Star,
   escaneig_qr: QrCode,
+  aniversari: Cake,
   visita_web: Globe,
   registre_web: Mail,
   esdeveniment: CalendarDays,
@@ -40,10 +42,12 @@ export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
   switch (tp) {
     case "registre":
       return "accions.tipus.registre";
-    case "aniversari":
-      return "accions.tipus.aniversari";
+    case "primer_escaneig":
+      return "accions.tipus.primer_escaneig";
     case "escaneig_qr":
       return "accions.tipus.escaneig_qr";
+    case "aniversari":
+      return "accions.tipus.aniversari";
     case "visita_web":
       return "accions.tipus.visita_web";
     case "registre_web":
@@ -54,6 +58,7 @@ export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
       return "accions.tipus.personalitzada";
   }
 }
+
 
 function TipusIcon({ tipus }: { tipus: AccioPuntsTipus }) {
   const Icon = TIPUS_ICON[tipus];
@@ -105,19 +110,18 @@ export function AccioTable({ accions, onEdit, onDelete, onToggle }: Props) {
                     <p className="truncate text-xs text-muted-foreground">
                       {a.descripcio}
                     </p>
-                    {a.tipus === "escaneig_qr" && a.cooldownDies ? (
-                      <p className="truncate text-xs text-muted-foreground">
-                        {t("accions.form.cooldown.summary").replace(
-                          "{n}",
-                          String(a.cooldownDies),
-                        )}
-                      </p>
-                    ) : null}
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="secondary">{t(tipusLabelKey(a.tipus))}</Badge>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge variant="secondary">{t(tipusLabelKey(a.tipus))}</Badge>
+                  {a.visibleAHome === false ? (
+                    <Badge variant="outline" className="text-xs">
+                      {t("accions.badge.hiddenHome")}
+                    </Badge>
+                  ) : null}
+                </div>
               </TableCell>
               <TableCell>
                 <PuntsBadge punts={a.punts} />
@@ -180,19 +184,16 @@ export function AccioCards({ accions, onEdit, onDelete, onToggle }: Props) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{a.nom}</p>
               <p className="text-xs text-muted-foreground">{a.descripcio}</p>
-              {a.tipus === "escaneig_qr" && a.cooldownDies ? (
-                <p className="text-xs text-muted-foreground">
-                  {t("accions.form.cooldown.summary").replace(
-                    "{n}",
-                    String(a.cooldownDies),
-                  )}
-                </p>
-              ) : null}
             </div>
             <PuntsBadge punts={a.punts} />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">{t(tipusLabelKey(a.tipus))}</Badge>
+            {a.visibleAHome === false ? (
+              <Badge variant="outline" className="text-xs">
+                {t("accions.badge.hiddenHome")}
+              </Badge>
+            ) : null}
           </div>
           <div className="flex items-center justify-between border-t pt-3">
             <div className="flex items-center gap-2">

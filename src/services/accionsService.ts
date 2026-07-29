@@ -5,8 +5,9 @@ import type { ApiPointAction, ApiShop } from "@/types/api";
 
 export const accioTipusList: AccioPuntsTipus[] = [
   "registre",
-  "aniversari",
+  "primer_escaneig",
   "escaneig_qr",
+  "aniversari",
   "visita_web",
   "registre_web",
   "esdeveniment",
@@ -49,10 +50,5 @@ export const accionsService = {
   async getComercosOptions() {
     const shops = await api.get<ApiShop[]>("/shops");
     return shops.map((s) => ({ id: s.id, nom: s.name }));
-  },
-
-  async getEsdevenimentsOptions() {
-    // No events API yet.
-    return [] as { id: string; nom: string }[];
   },
 };

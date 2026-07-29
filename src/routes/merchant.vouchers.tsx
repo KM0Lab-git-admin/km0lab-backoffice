@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Vals from "@/pages/Vals";
 
-export const Route = createFileRoute("/comerc/vals")({
+export const Route = createFileRoute("/merchant/vouchers")({
   head: () => ({
     meta: [
       { title: "Validar vals · KM0 LAB Backoffice" },

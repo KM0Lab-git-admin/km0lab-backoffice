@@ -1,6 +1,6 @@
 import { api } from "@/lib/apiClient";
 import { comercMeFromShop } from "@/lib/mappers/shop";
-import type { ComercMe } from "@/types/comerc";
+import type { ComercMe } from "@/types/merchant";
 import type { ApiShop } from "@/types/api";
 
 export const comercService = {

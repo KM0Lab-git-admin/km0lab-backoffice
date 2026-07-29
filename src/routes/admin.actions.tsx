@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import AccionsPage from "@/pages/Accions";
 
-export const Route = createFileRoute("/admin/accions")({
+export const Route = createFileRoute("/admin/actions")({
   head: () => ({
     meta: [
       { title: "Accions de punts · KM0 LAB" },

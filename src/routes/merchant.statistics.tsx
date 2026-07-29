@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Estadistiques from "@/pages/Estadistiques";
 
-export const Route = createFileRoute("/comerc/estadistiques")({
+export const Route = createFileRoute("/merchant/statistics")({
   head: () => ({
     meta: [
       { title: "Estadístiques · KM0 LAB Backoffice" },

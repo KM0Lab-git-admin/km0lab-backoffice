@@ -1,7 +1,7 @@
 import { api, absoluteMediaUrl } from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { fitxaFromShop, fitxaToProfileUpdate } from "@/lib/mappers/shop";
-import type { ComercFitxa, ComercFitxaInput } from "@/types/comerc";
+import type { ComercFitxa, ComercFitxaInput } from "@/types/merchant";
 import type { ApiShop } from "@/types/api";
 
 function dataUrlToBlob(dataUrl: string): { blob: Blob; filename: string } {

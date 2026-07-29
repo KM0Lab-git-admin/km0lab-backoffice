@@ -4,7 +4,7 @@ import type {
   StatsPromoRendiment,
   StatsSeriePunt,
   StatsVisitant,
-} from "@/types/comerc";
+} from "@/types/merchant";
 
 export const statsKPIFixture: StatsKPI = {
   escanejosTotals: 428,

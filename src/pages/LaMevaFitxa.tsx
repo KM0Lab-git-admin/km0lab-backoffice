@@ -8,7 +8,7 @@ import { FitxaListingPreview } from "@/components/backoffice/FitxaListingPreview
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import { fitxaService } from "@/services/fitxaService";
 import { useLang } from "@/contexts/LangContext";
-import type { ComercFitxa, ComercFitxaInput } from "@/types/comerc";
+import type { ComercFitxa, ComercFitxaInput } from "@/types/merchant";
 
 export default function LaMevaFitxa() {
   const { t } = useLang();

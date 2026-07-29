@@ -1,7 +1,7 @@
 import { absoluteMediaUrl } from "@/lib/apiClient";
 import { categoriesFromApi, categoriesToApi } from "@/lib/mappers/categories";
 import { horariFromApi, horariToApi } from "@/lib/mappers/horari";
-import type { ComercFitxa, ComercFitxaInput, ComercMe, ComercQR, QRMetrics } from "@/types/comerc";
+import type { ComercFitxa, ComercFitxaInput, ComercMe, ComercQR, QRMetrics } from "@/types/merchant";
 import type { ApiQr, ApiShop } from "@/types/api";
 
 export function comercMeFromShop(shop: ApiShop): ComercMe {

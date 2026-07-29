@@ -11,18 +11,11 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
-import { promoBadgeLabel } from "@/lib/promoBadge";
-import type { Promocio } from "@/types/comerc";
+import type { Promocio } from "@/types/merchant";
 
 function DiscBadge({ label }: { label: string }) {
-  const compact = label.length > 4;
   return (
-    <div
-      className={cn(
-        "grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-km0-yellow-300 to-km0-yellow-400 px-0.5 text-center font-black leading-tight text-km0-blue-800",
-        compact ? "text-2xs" : "text-xs",
-      )}
-    >
+    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-km0-yellow-300 to-km0-yellow-400 px-1 text-center text-xs font-black leading-none text-km0-blue-800">
       {label}
     </div>
   );
@@ -54,7 +47,7 @@ export function PromocioTable({ promocions, onEdit, onDelete, onToggle }: Props)
             <TableRow key={p.id} className={cn(!p.activa && "opacity-60")}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <DiscBadge label={promoBadgeLabel(p, t)} />
+                  <DiscBadge label={p.etiqueta} />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{p.titol}</p>
                     <p className="truncate text-xs text-muted-foreground">
@@ -118,7 +111,7 @@ export function PromocioCards({ promocions, onEdit, onDelete, onToggle }: Props)
           )}
         >
           <div className="flex items-start gap-3">
-            <DiscBadge label={promoBadgeLabel(p, t)} />
+            <DiscBadge label={p.etiqueta} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{p.titol}</p>
               <p className="text-xs text-muted-foreground">

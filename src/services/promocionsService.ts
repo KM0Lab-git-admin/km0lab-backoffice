@@ -4,7 +4,7 @@ import {
   promocioToCreate,
   promocioToUpdate,
 } from "@/lib/mappers/promocio";
-import type { Promocio, PromocioInput, PromoTipus } from "@/types/comerc";
+import type { Promocio, PromocioInput, PromoTipus } from "@/types/merchant";
 import type { ApiPromotion } from "@/types/api";
 
 export const promocionsService = {

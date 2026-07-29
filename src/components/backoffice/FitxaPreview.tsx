@@ -1,7 +1,7 @@
 import { Bell, ChevronLeft, Globe, MapPin, Phone, ScanLine } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import { categoryLabelToSlug } from "@/lib/mappers/categories";
-import type { ComercFitxa, DiaSetmana } from "@/types/comerc";
+import type { ComercFitxa, DiaSetmana } from "@/types/merchant";
 import type { MessageKey } from "@/lib/i18n";
 
 const dayOrder: DiaSetmana[] = [

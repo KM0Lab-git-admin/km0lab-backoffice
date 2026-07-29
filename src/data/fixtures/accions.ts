@@ -21,6 +21,16 @@ export const esdevenimentsOptionsFixture: EsdevenimentOption[] = [
 
 export const accionsPuntsFixture: AccioPunts[] = [
   {
+    id: "ap-aniversari",
+    poblacioId: "malgrat",
+    tipus: "aniversari",
+    nom: "Perque avui és el teu aniversari!",
+    descripcio: "Perque avui és el teu aniversari!",
+    punts: 10,
+    activa: true,
+    visibleAHome: false,
+  },
+  {
     id: "ap-1",
     poblacioId: "malgrat",
     tipus: "registre",
@@ -30,17 +40,34 @@ export const accionsPuntsFixture: AccioPunts[] = [
     limitPerUsuari: 1,
     condicions: "Un únic ús per usuari.",
     activa: true,
+    visibleAHome: false,
   },
+  {
+    id: "ap-primer-escaneig",
+    poblacioId: "malgrat",
+    tipus: "primer_escaneig",
+    nom: "Primer escaneig d'un comerç",
+    descripcio:
+      "Bonificació única la primera vegada que el veí escaneja el QR d'un comerç KM0 LAB.",
+    punts: 75,
+    limitPerUsuari: 1,
+    activa: true,
+    visibleAHome: true,
+  },
+
   {
     id: "ap-2",
     poblacioId: "malgrat",
     tipus: "escaneig_qr",
-    nom: "Escaneig d'un comerç",
-    descripcio: "Punts cada vegada que un veí escaneja el QR d'un comerç.",
-    punts: 20,
-    cooldownDies: 90,
-    condicions: "El mateix veí no pot tornar a guanyar punts en aquell comerç fins que passi l'interval.",
+    nom: "Primer escaneig d'un comerç",
+    descripcio: "Bonificació la primera vegada que s'escaneja un QR de comerç.",
+    punts: 50,
+    limitPerUsuari: 1,
+    condicions: "S'atorga a més dels punts del QR del comerç.",
     activa: true,
+    visibleAHome: true,
+    cooldownValor: 1,
+    cooldownUnitat: "mesos",
   },
   {
     id: "ap-3",
@@ -52,6 +79,7 @@ export const accionsPuntsFixture: AccioPunts[] = [
     limitPerUsuari: 1,
     url: "https://turisme.malgrat.cat",
     activa: true,
+    visibleAHome: true,
   },
   {
     id: "ap-4",
@@ -63,6 +91,7 @@ export const accionsPuntsFixture: AccioPunts[] = [
     limitPerUsuari: 1,
     url: "https://www.malgrat.cat/butlleti",
     activa: true,
+    visibleAHome: true,
   },
   {
     id: "ap-5",
@@ -75,6 +104,7 @@ export const accionsPuntsFixture: AccioPunts[] = [
     vigenciaInici: "2026-06-01",
     vigenciaFi: "2026-07-31",
     activa: true,
+    visibleAHome: true,
   },
   {
     id: "ap-6",
@@ -86,5 +116,6 @@ export const accionsPuntsFixture: AccioPunts[] = [
     url: "https://www.malgrat.cat/enquesta-km0",
     limitPerUsuari: 1,
     activa: false,
+    visibleAHome: true,
   },
 ];

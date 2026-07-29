@@ -1,13 +1,15 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { LoginPage } from "@/pages/Login";
-import { homePathForRol } from "@/lib/roles";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSessionStore } from "@/stores/useSessionStore";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: () => {
     if (useAuthStore.getState().isAuthenticated) {
-      throw redirect({ to: homePathForRol(useSessionStore.getState().rol) });
+      if (useSessionStore.getState().rol === "admin") {
+        throw redirect({ to: "/admin/overview" });
+      }
+      throw redirect({ to: "/merchant/my-qr" });
     }
   },
   head: () => ({
@@ -15,8 +17,7 @@ export const Route = createFileRoute("/login")({
       { title: "Inicia sessió · KM0 LAB" },
       {
         name: "description",
-        content:
-          "Accedeix al backoffice del teu comerç KM0 LAB per gestionar el QR i les promocions.",
+        content: "Accedeix al backoffice del teu comerç KM0 LAB per gestionar el QR i les promocions.",
       },
       { property: "og:title", content: "Inicia sessió · KM0 LAB" },
       {

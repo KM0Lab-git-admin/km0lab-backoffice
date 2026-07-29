@@ -31,7 +31,7 @@ import type {
   ComercFitxaInput,
   DiaSetmana,
   HorariDia,
-} from "@/types/comerc";
+} from "@/types/merchant";
 
 const dayOrder: DiaSetmana[] = [
   "dilluns",

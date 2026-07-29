@@ -4,7 +4,7 @@ import type {
   ComercQR,
   Promocio,
   QRMetrics,
-} from "@/types/comerc";
+} from "@/types/merchant";
 
 export const comercMeFixture: ComercMe = {
   id: "km0-mlg-00427",

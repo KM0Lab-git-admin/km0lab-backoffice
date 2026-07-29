@@ -18,8 +18,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLang } from "@/contexts/LangContext";
 import { authService, MOCK_OTP_CODE, type RegisterInput } from "@/services/authService";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useSessionStore } from "@/stores/useSessionStore";
-import { homePathForRol, rolFromRoles } from "@/lib/roles";
 import { translate, type MessageKey } from "@/lib/i18n";
 
 const registerSchema = z.object({
@@ -36,7 +34,6 @@ export function RegistrePage() {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const signIn = useAuthStore((s) => s.signIn);
-  const setSession = useSessionStore((s) => s.setSession);
 
   const [step, setStep] = useState<"form" | "otp">("form");
   const [pending, setPending] = useState<RegisterInput | null>(null);
@@ -81,16 +78,10 @@ export function RegistrePage() {
     setSubmitting(true);
     setOtpError(null);
     try {
-      const session = await authService.verifyRegistration(pending.email, otp);
-      const rol = rolFromRoles(session.user.roles);
-      signIn(session);
-      setSession({
-        rol,
-        poblacioId: session.user.townId ?? "",
-        comercId: session.user.shopId ?? undefined,
-      });
+      const user = await authService.verifyRegistration(pending.email, otp);
+      signIn(user);
       toast.success(t("register.toast.welcome"));
-      navigate({ to: homePathForRol(rol) });
+      navigate({ to: "/merchant/my-qr" });
     } catch {
       setOtpError("auth.otp.invalid");
     } finally {

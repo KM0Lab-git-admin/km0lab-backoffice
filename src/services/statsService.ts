@@ -6,7 +6,7 @@ import type {
   StatsRang,
   StatsSeriePunt,
   StatsVisitant,
-} from "@/types/comerc";
+} from "@/types/merchant";
 import type { ApiMerchantStats, ApiPromotion } from "@/types/api";
 import {
   statsHeatmapFixture,

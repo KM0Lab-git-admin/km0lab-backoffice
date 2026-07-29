@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Usuaris from "@/pages/Usuaris";
 
-export const Route = createFileRoute("/admin/usuaris")({
+export const Route = createFileRoute("/admin/users")({
   head: () => ({
     meta: [
       { title: "Usuaris · KM0 LAB" },

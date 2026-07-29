@@ -11,6 +11,7 @@ import type {
   BescanviFlux,
   BescanviHist,
   BescanviResum,
+  CooldownUnitat,
   ComercAdmin,
   ComercAdminInput,
   ComercEstat,
@@ -46,6 +47,7 @@ import type {
 
 const ACCIO_TIPUS_TO_API: Record<AccioPuntsTipus, string> = {
   registre: "signup",
+  primer_escaneig: "first_scan",
   aniversari: "birthday",
   escaneig_qr: "qr_scan",
   visita_web: "web_visit",
@@ -56,6 +58,7 @@ const ACCIO_TIPUS_TO_API: Record<AccioPuntsTipus, string> = {
 
 const ACCIO_TIPUS_FROM_API: Record<string, AccioPuntsTipus> = {
   signup: "registre",
+  first_scan: "primer_escaneig",
   birthday: "aniversari",
   qr_scan: "escaneig_qr",
   web_visit: "visita_web",
@@ -85,7 +88,34 @@ function toIsoDateTime(value: string | undefined): string | null {
   return `${value}T00:00:00Z`;
 }
 
+const COOLDOWN_FACTOR: Record<CooldownUnitat, number> = {
+  dies: 1,
+  setmanes: 7,
+  mesos: 30,
+};
+
+/** cooldown_days (int) → { valor, unitat } amb preferència mesos > setmanes > dies. */
+function cooldownDaysToValorUnitat(
+  days: number | null | undefined,
+): { cooldownValor: number; cooldownUnitat: CooldownUnitat } | undefined {
+  if (!days || days <= 0) return undefined;
+  if (days % 30 === 0) return { cooldownValor: days / 30, cooldownUnitat: "mesos" };
+  if (days % 7 === 0) return { cooldownValor: days / 7, cooldownUnitat: "setmanes" };
+  return { cooldownValor: days, cooldownUnitat: "dies" };
+}
+
+/** { valor, unitat } → cooldown_days (int). */
+function cooldownValorUnitatToDays(
+  valor: number | undefined,
+  unitat: CooldownUnitat | undefined,
+): number | null {
+  if (!valor || !unitat) return null;
+  const days = Math.round(valor * COOLDOWN_FACTOR[unitat]);
+  return days > 0 ? days : null;
+}
+
 export function accioFromApi(a: ApiPointAction): AccioPunts {
+  const cooldown = cooldownDaysToValorUnitat(a.cooldown_days);
   return {
     id: a.id,
     poblacioId: a.town_id,
@@ -99,10 +129,13 @@ export function accioFromApi(a: ApiPointAction): AccioPunts {
     vigenciaFi: isoDate(a.valid_until),
     condicions: a.conditions ?? undefined,
     activa: a.active,
+    // TODO backend: km0lab-api no exposa encara visible_home; per defecte true.
+    visibleAHome: true,
     url: a.url ?? undefined,
     esdevenimentId: a.event_id ?? undefined,
     comercId: a.shop_id ?? undefined,
-    cooldownDies: a.cooldown_days ?? undefined,
+    cooldownValor: cooldown?.cooldownValor,
+    cooldownUnitat: cooldown?.cooldownUnitat,
   };
 }
 
@@ -121,8 +154,11 @@ export function accioToApi(input: AccioPuntsInput): Record<string, unknown> {
     url: input.url ?? null,
     event_id: input.esdevenimentId ?? null,
     shop_id: input.comercId ?? null,
+    // TODO backend: km0lab-api no accepta visible_home; s'omet per ara.
     cooldown_days:
-      input.tipus === "escaneig_qr" ? (input.cooldownDies ?? null) : null,
+      input.tipus === "escaneig_qr"
+        ? cooldownValorUnitatToDays(input.cooldownValor, input.cooldownUnitat)
+        : null,
   };
 }
 

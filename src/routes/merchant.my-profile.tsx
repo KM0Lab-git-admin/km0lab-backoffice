@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LaMevaFitxa from "@/pages/LaMevaFitxa";
 
-export const Route = createFileRoute("/comerc/la-meva-fitxa")({
+export const Route = createFileRoute("/merchant/my-profile")({
   head: () => ({
     meta: [
       { title: "La meva fitxa · KM0 LAB Backoffice" },

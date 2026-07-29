@@ -69,9 +69,6 @@
   --color-km0-coral-400: var(--km0-coral-400);
   --color-km0-coral-500: var(--km0-coral-500);
   --color-km0-green-500: var(--km0-green-500);
-
-  --text-2xs: 0.625rem;
-  --text-2xs--line-height: 0.75rem;
 }
 
 :root {
