@@ -149,14 +149,36 @@ export type ApiRedemption = {
   flow: string;
   points_spent: number;
   status: string;
+  code: string | null;
   amount: string | null;
   shop_id: string | null;
   used_at: string | null;
   amount_applied: string | null;
+  payment_id: string | null;
   delivered_at: string | null;
   requested_at: string;
   is_fake: boolean;
   events: ApiRedemptionEvent[];
+};
+
+export type ApiShopDebt = {
+  shop_id: string;
+  shop_name: string;
+  pending_count: number;
+  pending_amount: number;
+  paid_total: number;
+};
+
+export type ApiShopPayment = {
+  id: string;
+  town_id: string;
+  shop_id: string;
+  shop_name: string;
+  total_amount: number;
+  note: string | null;
+  redemption_ids: string[];
+  is_fake: boolean;
+  created_at: string;
 };
 
 export type ApiPointAction = {

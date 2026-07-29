@@ -14,7 +14,9 @@ import type {
   ComercAdmin,
   ComercAdminInput,
   ComercEstat,
+  DeuteComerc,
   EntitatTipus,
+  PagamentComerc,
   PoblacioConfig,
   PoblacioConfigInput,
   Recompensa,
@@ -34,6 +36,8 @@ import type {
   ApiResident,
   ApiReward,
   ApiShop,
+  ApiShopDebt,
+  ApiShopPayment,
   ApiTown,
   ApiUser,
 } from "@/types/api";
@@ -333,6 +337,15 @@ export function bescanviEstatToApi(estat: BescanviEstat): string {
   return ESTAT_BESCANVI_TO_API[estat];
 }
 
+/** "5€" / "3,50 €" → 5 / 3.5 */
+function parseImport(value: string | null | undefined): number | undefined {
+  if (!value) return undefined;
+  const match = value.match(/\d+(?:[.,]\d+)?/);
+  if (!match) return undefined;
+  const num = Number.parseFloat(match[0].replace(",", "."));
+  return Number.isFinite(num) ? num : undefined;
+}
+
 export function bescanviFromApi(
   r: ApiRedemption,
   opts?: {
@@ -363,17 +376,46 @@ export function bescanviFromApi(
     estat: ESTAT_BESCANVI_FROM_API[r.status] ?? "solicitat",
     import: r.amount ?? undefined,
     qrGenerat: flux === "val_qr",
-    codi: r.id.slice(-5).toUpperCase(),
+    codi: r.code ?? undefined,
     comercId: r.shop_id ?? undefined,
     comercNom: opts?.comercNom,
     dataUs: r.used_at ?? undefined,
     importAplicat: r.amount_applied ?? undefined,
-    importPagatNum: r.amount_applied
-      ? Number.parseFloat(r.amount_applied.replace(",", ".")) || undefined
-      : undefined,
-    pagamentEstat: flux === "val_qr" && r.status === "used" ? "pendent" : undefined,
+    importPagatNum: parseImport(r.amount_applied) ?? parseImport(r.amount),
+    pagamentEstat:
+      flux === "val_qr" && r.status === "used"
+        ? r.payment_id
+          ? "pagat"
+          : "pendent"
+        : undefined,
+    pagamentId: r.payment_id ?? undefined,
     dataLliurament: r.delivered_at ?? undefined,
     historial,
+  };
+}
+
+// —— Pagaments als comerços ——
+
+export function deuteFromApi(d: ApiShopDebt): DeuteComerc {
+  return {
+    comercId: d.shop_id,
+    comercNom: d.shop_name,
+    nBescanvisPendents: d.pending_count,
+    importPendent: d.pending_amount,
+    importPagatHistoric: d.paid_total,
+  };
+}
+
+export function pagamentFromApi(p: ApiShopPayment): PagamentComerc {
+  return {
+    id: p.id,
+    poblacioId: p.town_id,
+    comercId: p.shop_id,
+    comercNom: p.shop_name,
+    data: p.created_at,
+    bescanviIds: p.redemption_ids,
+    importTotal: p.total_amount,
+    nota: p.note ?? undefined,
   };
 }
 

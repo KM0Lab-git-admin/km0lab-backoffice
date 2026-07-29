@@ -1,4 +1,4 @@
-import { api } from "@/lib/apiClient";
+import { ApiError, api } from "@/lib/apiClient";
 import { bescanviFromApi, recompensaFromApi } from "@/lib/mappers/admin";
 import { useSessionStore } from "@/stores/useSessionStore";
 import type { Bescanvi, RecompensaTipus } from "@/types/backoffice";
@@ -53,31 +53,27 @@ function currentComercId(): string {
 
 export const valsComercService = {
   async validarCodi(codiRaw: string): Promise<ValidarResult> {
-    const codi = codiRaw.trim();
-    const rows = await api.get<ApiRedemption[]>("/redemptions");
-    const match = rows.find(
-      (b) =>
-        b.flow === "voucher_qr" &&
-        (b.id === codi ||
-          b.id.endsWith(codi) ||
-          b.id.slice(-5).toUpperCase() === codi.toUpperCase()),
-    );
-    if (!match) return { ok: false, motiu: "no_trobat" };
-    if (match.status === "cancelled") {
-      return { ok: false, motiu: "cancelat", bescanvi: await enrichOne(match) };
+    const code = codiRaw.trim();
+    try {
+      const used = await api.post<ApiRedemption>("/redemptions/validate", {
+        code,
+      });
+      return { ok: true, bescanvi: await enrichOne(used) };
+    } catch (err) {
+      if (!(err instanceof ApiError)) throw err;
+      if (err.status === 404) return { ok: false, motiu: "no_trobat" };
+      if (err.status === 400) {
+        const detail = err.message;
+        if (detail === "already_used") {
+          return { ok: false, motiu: "ja_utilitzat" };
+        }
+        if (detail === "cancelled") {
+          return { ok: false, motiu: "cancelat" };
+        }
+      }
+      if (err.status === 403) return { ok: false, motiu: "no_trobat" };
+      throw err;
     }
-    if (match.status === "used") {
-      return {
-        ok: false,
-        motiu: "ja_utilitzat",
-        bescanvi: await enrichOne(match),
-      };
-    }
-    if (match.status !== "pending_use") {
-      return { ok: false, motiu: "no_trobat", bescanvi: await enrichOne(match) };
-    }
-    const used = await api.post<ApiRedemption>(`/redemptions/${match.id}/use`, {});
-    return { ok: true, bescanvi: await enrichOne(used) };
   },
 
   async list(filtres?: ValsFiltres): Promise<Bescanvi[]> {
@@ -91,7 +87,7 @@ export const valsComercService = {
       if (comercId && b.shop_id !== comercId) return false;
       if (q) {
         const ref = b.id.toLowerCase();
-        const codi = b.id.slice(-5).toLowerCase();
+        const codi = (b.code ?? "").toLowerCase();
         if (!ref.includes(q) && !codi.includes(q)) return false;
       }
       return true;

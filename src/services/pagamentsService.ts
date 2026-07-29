@@ -1,86 +1,43 @@
+import { api } from "@/lib/apiClient";
+import { deuteFromApi, pagamentFromApi } from "@/lib/mappers/admin";
+import { bescanvisService } from "@/services/bescanvisService";
+import type { ApiShopDebt, ApiShopPayment } from "@/types/api";
 import type {
   Bescanvi,
   DeuteComerc,
   PagamentComerc,
 } from "@/types/backoffice";
-import { useAdminBescanvisStore } from "@/stores/useAdminBescanvisStore";
-import { useAdminPagamentsStore } from "@/stores/useAdminPagamentsStore";
-import { useSessionStore } from "@/stores/useSessionStore";
-
-const delay = (ms: number) =>
-  new Promise((r) => setTimeout(r, ms + Math.random() * 150));
-
-function isValReimborsable(b: Bescanvi): boolean {
-  return b.flux === "val_qr" && b.estat === "utilitzat" && !!b.comercId;
-}
 
 export const pagamentsService = {
   async listDeutes(): Promise<DeuteComerc[]> {
-    await delay(300);
-    const { poblacioId } = useSessionStore.getState();
-    const bescanvis = useAdminBescanvisStore
-      .getState()
-      .bescanvis.filter((b) => b.poblacioId === poblacioId && isValReimborsable(b));
-
-    const map = new Map<string, DeuteComerc>();
-    for (const b of bescanvis) {
-      const key = b.comercId!;
-      const cur =
-        map.get(key) ??
-        ({
-          comercId: key,
-          comercNom: b.comercNom ?? key,
-          nBescanvisPendents: 0,
-          importPendent: 0,
-          importPagatHistoric: 0,
-        } satisfies DeuteComerc);
-      const imp = b.importPagatNum ?? 0;
-      if (b.pagamentEstat === "pagat") {
-        cur.importPagatHistoric += imp;
-      } else {
-        cur.nBescanvisPendents += 1;
-        cur.importPendent += imp;
-      }
-      map.set(key, cur);
-    }
-    return Array.from(map.values()).sort((a, b) =>
-      b.importPendent - a.importPendent || a.comercNom.localeCompare(b.comercNom),
-    );
+    const rows = await api.get<ApiShopDebt[]>("/payments/debts");
+    return rows.map(deuteFromApi);
   },
 
+  /** Used vouchers of a shop still pending settlement. */
   async listBescanvisPendents(comercId: string): Promise<Bescanvi[]> {
-    await delay(200);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminBescanvisStore
-      .getState()
-      .bescanvis.filter(
+    const bescanvis = await bescanvisService.list();
+    return bescanvis
+      .filter(
         (b) =>
-          b.poblacioId === poblacioId &&
-          isValReimborsable(b) &&
+          b.flux === "val_qr" &&
+          b.estat === "utilitzat" &&
           b.comercId === comercId &&
-          b.pagamentEstat !== "pagat",
+          b.pagamentEstat === "pendent",
       )
       .sort((a, b) => (a.dataUs ?? "").localeCompare(b.dataUs ?? ""));
   },
 
   async listPagamentsComerc(comercId: string): Promise<PagamentComerc[]> {
-    await delay(200);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminPagamentsStore
-      .getState()
-      .pagaments.filter(
-        (p) => p.poblacioId === poblacioId && p.comercId === comercId,
-      )
-      .sort((a, b) => b.data.localeCompare(a.data));
+    const rows = await api.get<ApiShopPayment[]>(
+      `/payments?shop_id=${encodeURIComponent(comercId)}`,
+    );
+    return rows.map(pagamentFromApi);
   },
 
   async list(): Promise<PagamentComerc[]> {
-    await delay(200);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminPagamentsStore
-      .getState()
-      .pagaments.filter((p) => p.poblacioId === poblacioId)
-      .sort((a, b) => b.data.localeCompare(a.data));
+    const rows = await api.get<ApiShopPayment[]>("/payments");
+    return rows.map(pagamentFromApi);
   },
 
   async registrar(input: {
@@ -89,22 +46,11 @@ export const pagamentsService = {
     bescanviIds: string[];
     nota?: string;
   }): Promise<PagamentComerc> {
-    await delay(400);
-    const { poblacioId } = useSessionStore.getState();
-    const bescanvis = useAdminBescanvisStore
-      .getState()
-      .bescanvis.filter((b) => input.bescanviIds.includes(b.id));
-    const importTotal = bescanvis.reduce(
-      (acc, b) => acc + (b.importPagatNum ?? 0),
-      0,
-    );
-    return useAdminPagamentsStore.getState().registrar({
-      comercId: input.comercId,
-      comercNom: input.comercNom,
-      poblacioId,
-      bescanviIds: input.bescanviIds,
-      importTotal,
-      nota: input.nota,
+    const created = await api.post<ApiShopPayment>("/payments", {
+      shop_id: input.comercId,
+      redemption_ids: input.bescanviIds,
+      note: input.nota ?? null,
     });
+    return pagamentFromApi(created);
   },
 };
