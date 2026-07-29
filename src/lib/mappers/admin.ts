@@ -42,6 +42,7 @@ import type {
 
 const ACCIO_TIPUS_TO_API: Record<AccioPuntsTipus, string> = {
   registre: "signup",
+  aniversari: "birthday",
   escaneig_qr: "qr_scan",
   visita_web: "web_visit",
   registre_web: "web_signup",
@@ -51,6 +52,7 @@ const ACCIO_TIPUS_TO_API: Record<AccioPuntsTipus, string> = {
 
 const ACCIO_TIPUS_FROM_API: Record<string, AccioPuntsTipus> = {
   signup: "registre",
+  birthday: "aniversari",
   qr_scan: "escaneig_qr",
   web_visit: "visita_web",
   web_signup: "registre_web",
@@ -60,6 +62,7 @@ const ACCIO_TIPUS_FROM_API: Record<string, AccioPuntsTipus> = {
 
 const ACCIO_TOP_TIPUS: Record<string, AccioTipus> = {
   signup: "registre",
+  birthday: "altre",
   qr_scan: "escaneig",
   web_visit: "web",
   web_signup: "web",
@@ -95,6 +98,7 @@ export function accioFromApi(a: ApiPointAction): AccioPunts {
     url: a.url ?? undefined,
     esdevenimentId: a.event_id ?? undefined,
     comercId: a.shop_id ?? undefined,
+    cooldownDies: a.cooldown_days ?? undefined,
   };
 }
 
@@ -113,6 +117,8 @@ export function accioToApi(input: AccioPuntsInput): Record<string, unknown> {
     url: input.url ?? null,
     event_id: input.esdevenimentId ?? null,
     shop_id: input.comercId ?? null,
+    cooldown_days:
+      input.tipus === "escaneig_qr" ? (input.cooldownDies ?? null) : null,
   };
 }
 
@@ -165,7 +171,7 @@ export function recompensaFromApi(r: ApiReward): Recompensa {
     poblacioId: r.town_id,
     nom: r.name,
     descripcio: r.description,
-    imatgeUrl: r.image_url ?? undefined,
+    imatgeUrl: absoluteMediaUrl(r.image_url) ?? undefined,
     tipus: RECOMPENSA_TIPUS_FROM_API[r.type] ?? "producte",
     puntsNecessaris: r.points_required,
     valor: r.value ?? undefined,
@@ -182,7 +188,7 @@ export function recompensaToApi(input: RecompensaInput): Record<string, unknown>
   return {
     name: input.nom,
     description: input.descripcio ?? "",
-    image_url: input.imatgeUrl ?? null,
+    // Image via PUT /rewards/{id}/media — do not send data URLs in image_url
     type: RECOMPENSA_TIPUS_TO_API[input.tipus],
     points_required: input.puntsNecessaris,
     value: input.valor ?? null,

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
+import { categoryLabelToSlug } from "@/lib/mappers/categories";
 import type { MessageKey } from "@/lib/i18n";
 import type { ComercAdmin, ComercEstat } from "@/types/backoffice";
 
@@ -59,6 +60,8 @@ type Props = {
 
 export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
   const { t, lang } = useLang();
+  const categoryLabel = (value: string) =>
+    t(`shopCategories.${categoryLabelToSlug(value)}` as MessageKey);
 
   return (
     <div className="hidden overflow-hidden rounded-lg border md:block">
@@ -96,7 +99,7 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
                 <div className="flex flex-wrap gap-1">
                   {c.categories.map((cat) => (
                     <Badge key={cat} variant="secondary" className="font-normal">
-                      {cat}
+                      {categoryLabel(cat)}
                     </Badge>
                   ))}
                 </div>
@@ -150,6 +153,8 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
 
 export function ComercoCards({ comercos, onEdit, onToggle }: Props) {
   const { t, lang } = useLang();
+  const categoryLabel = (value: string) =>
+    t(`shopCategories.${categoryLabelToSlug(value)}` as MessageKey);
 
   return (
     <div className="flex flex-col gap-3 md:hidden">
@@ -174,7 +179,7 @@ export function ComercoCards({ comercos, onEdit, onToggle }: Props) {
               <div className="mt-2 flex flex-wrap gap-1">
                 {c.categories.map((cat) => (
                   <Badge key={cat} variant="secondary" className="font-normal">
-                    {cat}
+                    {categoryLabel(cat)}
                   </Badge>
                 ))}
               </div>

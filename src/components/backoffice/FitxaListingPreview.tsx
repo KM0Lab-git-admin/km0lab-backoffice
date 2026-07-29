@@ -1,5 +1,7 @@
 import { useLang } from "@/contexts/LangContext";
+import { categoryLabelToSlug } from "@/lib/mappers/categories";
 import type { ComercFitxa } from "@/types/comerc";
+import type { MessageKey } from "@/lib/i18n";
 
 type Props = {
   fitxa: ComercFitxa;
@@ -7,7 +9,10 @@ type Props = {
 
 export function FitxaListingPreview({ fitxa }: Props) {
   const { t } = useLang();
-  const categoriesLine = fitxa.categories.filter(Boolean).join(" · ");
+  const categoriesLine = fitxa.categories
+    .filter(Boolean)
+    .map((c) => t(`shopCategories.${categoryLabelToSlug(c)}` as MessageKey))
+    .join(" · ");
 
   return (
     <div className="rounded-2xl border border-km0-beige-200 bg-white p-3 shadow-sm">

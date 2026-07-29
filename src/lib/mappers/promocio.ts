@@ -1,5 +1,6 @@
 import type { PromoTipus, Promocio, PromocioInput } from "@/types/comerc";
 import type { ApiPromotion } from "@/types/api";
+import { promoBadgeLabelForStorage } from "@/lib/promoBadge";
 
 const TIPUS_TO_API: Record<PromoTipus, string> = {
   descompte: "discount",
@@ -43,10 +44,15 @@ export function promocioFromApi(p: ApiPromotion): Promocio {
 }
 
 export function promocioToCreate(input: PromocioInput): Record<string, unknown> {
+  const type = TIPUS_TO_API[input.tipus];
+  const title = input.titol.trim();
+  const label =
+    input.etiqueta?.trim() ||
+    promoBadgeLabelForStorage(input.tipus, input.valor);
   return {
-    type: TIPUS_TO_API[input.tipus],
-    label: input.etiqueta?.trim() || null,
-    title: input.titol,
+    type,
+    label,
+    title,
     detail: input.detall ?? "",
     value: input.valor ?? null,
     min_purchase: input.compraMinima ?? null,

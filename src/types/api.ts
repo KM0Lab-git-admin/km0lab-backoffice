@@ -175,6 +175,7 @@ export type ApiPointAction = {
   url: string | null;
   event_id: string | null;
   shop_id: string | null;
+  cooldown_days: number | null;
   is_fake: boolean;
   created_at: string;
   updated_at: string;
@@ -186,6 +187,7 @@ export type ApiReward = {
   name: string;
   description: string;
   image_url: string | null;
+  has_image?: boolean;
   type: string;
   points_required: number;
   value: string | null;

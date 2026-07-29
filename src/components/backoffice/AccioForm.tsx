@@ -20,12 +20,20 @@ import { accionsService, accioTipusList } from "@/services/accionsService";
 import { tipusLabelKey } from "@/components/backoffice/AccioList";
 import type { AccioPunts, AccioPuntsInput, AccioPuntsTipus } from "@/types/backoffice";
 
+
+const COOLDOWN_PRESETS = [
+  { days: 30, labelKey: "accions.form.cooldown.1m" as const },
+  { days: 60, labelKey: "accions.form.cooldown.2m" as const },
+  { days: 90, labelKey: "accions.form.cooldown.3m" as const },
+];
+
 const schema = z
   .object({
     nom: z.string().min(1),
     descripcio: z.string().min(1),
     tipus: z.enum([
       "registre",
+      "aniversari",
       "escaneig_qr",
       "visita_web",
       "registre_web",
@@ -46,6 +54,9 @@ const schema = z
     url: z.string().optional().or(z.literal("")),
     esdevenimentId: z.string().optional().or(z.literal("")),
     comercId: z.string().optional().or(z.literal("")),
+    cooldownDies: z
+      .union([z.coerce.number().int().positive(), z.literal("")])
+      .optional(),
   })
   .refine(
     (v) =>
@@ -64,6 +75,12 @@ const schema = z
     if (v.tipus === "personalitzada" && !v.condicions) {
       ctx.addIssue({ code: "custom", path: ["condicions"], message: "required" });
     }
+    if (
+      v.tipus === "escaneig_qr" &&
+      (v.cooldownDies === "" || v.cooldownDies == null || Number(v.cooldownDies) < 1)
+    ) {
+      ctx.addIssue({ code: "custom", path: ["cooldownDies"], message: "required" });
+    }
   });
 
 type FormValues = z.infer<typeof schema>;
@@ -75,15 +92,9 @@ type Props = {
   submitting?: boolean;
 };
 
-const COMERC_ANY = "__any__";
-
 export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
   const { t } = useLang();
 
-  const comercosQ = useQuery({
-    queryKey: ["accions", "comercos-options"],
-    queryFn: () => accionsService.getComercosOptions(),
-  });
   const esdevenimentsQ = useQuery({
     queryKey: ["accions", "esdeveniments-options"],
     queryFn: () => accionsService.getEsdevenimentsOptions(),
@@ -111,7 +122,8 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
       activa: initial?.activa ?? true,
       url: initial?.url ?? "",
       esdevenimentId: initial?.esdevenimentId ?? "",
-      comercId: initial?.comercId ?? "",
+      comercId: "",
+      cooldownDies: initial?.cooldownDies ?? 30,
     },
   });
 
@@ -130,15 +142,16 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
         activa: initial.activa,
         url: initial.url ?? "",
         esdevenimentId: initial.esdevenimentId ?? "",
-        comercId: initial.comercId ?? "",
+        comercId: "",
+        cooldownDies: initial.cooldownDies ?? 30,
       });
     }
   }, [initial, reset]);
 
   const tipus = watch("tipus");
   const activa = watch("activa");
-  const comercId = watch("comercId");
   const esdevenimentId = watch("esdevenimentId");
+  const cooldownDies = watch("cooldownDies");
 
   return (
     <form
@@ -166,11 +179,11 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
               : undefined,
           esdevenimentId:
             values.tipus === "esdeveniment" ? values.esdevenimentId || undefined : undefined,
-          comercId:
+          // Escaneo QR: mismos puntos para todos los comercios (sin shop_id).
+          comercId: undefined,
+          cooldownDies:
             values.tipus === "escaneig_qr"
-              ? values.comercId && values.comercId !== COMERC_ANY
-                ? values.comercId
-                : undefined
+              ? Number(values.cooldownDies)
               : undefined,
         };
         return onSubmit(input);
@@ -187,7 +200,12 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
               <button
                 key={tp}
                 type="button"
-                onClick={() => setValue("tipus", tp as AccioPuntsTipus, { shouldDirty: true })}
+                onClick={() => {
+                  setValue("tipus", tp as AccioPuntsTipus, { shouldDirty: true });
+                  if (tp === "escaneig_qr" && !watch("cooldownDies")) {
+                    setValue("cooldownDies", 30, { shouldDirty: true });
+                  }
+                }}
                 className={
                   selected
                     ? "rounded-md border-2 border-primary bg-primary/10 px-3 py-2 text-left text-sm font-medium"
@@ -200,6 +218,55 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
           })}
         </div>
       </div>
+
+      {tipus === "escaneig_qr" && (
+        <div className="flex flex-col gap-2">
+          <Label>{t("accions.form.cooldown.label")}</Label>
+          <p className="text-xs text-muted-foreground">
+            {t("accions.form.cooldown.hint")}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {COOLDOWN_PRESETS.map((p) => {
+              const selected = Number(cooldownDies) === p.days;
+              return (
+                <button
+                  key={p.days}
+                  type="button"
+                  onClick={() =>
+                    setValue("cooldownDies", p.days, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  className={
+                    selected
+                      ? "rounded-md border-2 border-primary bg-primary/10 px-3 py-2 text-sm font-medium"
+                      : "rounded-md border bg-background px-3 py-2 text-sm hover:bg-muted"
+                  }
+                >
+                  {t(p.labelKey)}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex flex-col gap-2 pt-1">
+            <Label htmlFor="cooldownDies">
+              {t("accions.form.cooldown.custom")}
+            </Label>
+            <Input
+              id="cooldownDies"
+              type="number"
+              min={1}
+              step={1}
+              aria-invalid={!!errors.cooldownDies}
+              {...register("cooldownDies")}
+            />
+            {errors.cooldownDies ? (
+              <p className="text-xs text-destructive">{t("form.error.required")}</p>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       {/* Camps específics per tipus */}
       {(tipus === "visita_web" || tipus === "registre_web") && (
@@ -238,28 +305,6 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
           {errors.esdevenimentId ? (
             <p className="text-xs text-destructive">{t("form.error.required")}</p>
           ) : null}
-        </div>
-      )}
-
-      {tipus === "escaneig_qr" && (
-        <div className="flex flex-col gap-2">
-          <Label>{t("accions.form.comerc.label")}</Label>
-          <Select
-            value={comercId || COMERC_ANY}
-            onValueChange={(v) => setValue("comercId", v, { shouldDirty: true })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={COMERC_ANY}>{t("accions.form.comerc.any")}</SelectItem>
-              {comercosQ.data?.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.nom}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       )}
 

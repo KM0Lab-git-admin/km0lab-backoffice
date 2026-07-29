@@ -1,10 +1,28 @@
 import { api } from "@/lib/apiClient";
-import { rolFromRoles } from "@/lib/roles";
 import type { AuthUser } from "@/stores/useAuthStore";
 import type { ApiAuthOut, ApiUser } from "@/types/api";
 
 /** Demo OTP accepted by km0lab-api in development/staging. */
 export const MOCK_OTP_CODE = "123456";
+
+/**
+ * TEMP: one-click demo login on /login (skips OTP step for admin/merchant).
+ * When real OTP ships: set to `false` and remove/comment the quick-access UI in Login.tsx.
+ */
+export const DEV_SKIP_OTP = true;
+
+export const DEMO_ADMIN_EMAIL = "admin@km0lab.com";
+export const DEMO_MERCHANT_EMAIL = "merchant@km0lab.com";
+
+const DEMO_EMAILS = new Set([
+  "resident@km0lab.com",
+  DEMO_MERCHANT_EMAIL,
+  DEMO_ADMIN_EMAIL,
+]);
+
+export function isDemoEmail(email: string): boolean {
+  return DEMO_EMAILS.has(email.trim().toLowerCase());
+}
 
 export type RegisterInput = {
   nomComerc: string;
@@ -51,6 +69,8 @@ let pendingRegister: RegisterInput | null = null;
 
 export const authService = {
   async requestLoginCode(email: string): Promise<{ ok: true }> {
+    // Demo accounts use fixed OTP — no need to hit the rate-limited endpoint.
+    if (isDemoEmail(email)) return { ok: true };
     await api.post("/auth/request-otp", { email }, { auth: false });
     return { ok: true };
   },
@@ -62,6 +82,12 @@ export const authService = {
       { auth: false },
     );
     return mapAuth(out);
+  },
+
+  /** Direct verify with fixed demo OTP (no request-otp / no UI code step). */
+  async loginAsDemo(kind: "admin" | "merchant"): Promise<AuthSession> {
+    const email = kind === "admin" ? DEMO_ADMIN_EMAIL : DEMO_MERCHANT_EMAIL;
+    return authService.verifyLoginCode(email, MOCK_OTP_CODE);
   },
 
   async requestRegistration(input: RegisterInput): Promise<{ ok: true }> {
@@ -87,5 +113,3 @@ export const authService = {
     return mapAuth(out, fallback);
   },
 };
-
-export { rolFromRoles };

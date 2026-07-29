@@ -237,9 +237,9 @@ export const messages = {
     en: "Small square image. Shown in summaries and the merchant list.",
   },
   "fitxa.logo.recommendation": {
-    ca: "Recomanat: 512 × 512 px (quadrat, PNG o JPG, màx. 5 MB).",
-    es: "Recomendado: 512 × 512 px (cuadrado, PNG o JPG, máx. 5 MB).",
-    en: "Recommended: 512 × 512 px (square, PNG or JPG, max. 5 MB).",
+    ca: "512×512 px (PNG amb fons transparent, si és possible). Mínim acceptable: 256×256 px. Relació d'aspecte preferida: 1:1 (quadrat). També val 4:3 o 16:9, perquè el component usa object-contain i no retalla la imatge.",
+    es: "512×512 px (PNG con fondo transparente, si es posible). Mínimo aceptable: 256×256 px. Relación de aspecto preferida: 1:1 (cuadrado). También vale 4:3 o 16:9, porque el componente usa object-contain y no recorta la imagen.",
+    en: "512×512 px (PNG with transparent background, if possible). Minimum acceptable: 256×256 px. Preferred aspect ratio: 1:1 (square). 4:3 or 16:9 also work, because the component uses object-contain and does not crop the image.",
   },
   "fitxa.hero.label": { ca: "Imatge de portada", es: "Imagen de portada", en: "Cover image" },
   "fitxa.hero.hint": {
@@ -248,9 +248,9 @@ export const messages = {
     en: "Large landscape image. Shown at the top of the profile.",
   },
   "fitxa.hero.recommendation": {
-    ca: "Recomanat: 1600 × 900 px (proporció 16:9, PNG o JPG, màx. 5 MB).",
-    es: "Recomendado: 1600 × 900 px (proporción 16:9, PNG o JPG, máx. 5 MB).",
-    en: "Recommended: 1600 × 900 px (16:9 ratio, PNG or JPG, max. 5 MB).",
+    ca: "1200×750 px (proporció 16:10) per cobrir pantalles d'alta densitat. Mínim acceptable: 800×500 px. Format: PNG amb fons transparent o JPG amb fons clar.",
+    es: "1200×750 px (ratio 16:10) para cubrir pantallas de alta densidad. Mínimo aceptable: 800×500 px. Formato: PNG con fondo transparente o JPG con fondo claro.",
+    en: "1200×750 px (16:10 ratio) for high-density screens. Minimum acceptable: 800×500 px. Format: PNG with transparent background or JPG with light background.",
   },
   "fitxa.upload": { ca: "Pujar imatge", es: "Subir imagen", en: "Upload image" },
   "fitxa.replace": { ca: "Canviar imatge", es: "Cambiar imagen", en: "Replace image" },
@@ -299,6 +299,36 @@ export const messages = {
     es: "{{count}} seleccionadas",
     en: "{{count}} selected",
   },
+  "shopCategories.bakery": { ca: "Fleca", es: "Panadería", en: "Bakery" },
+  "shopCategories.food": { ca: "Alimentació", es: "Alimentación", en: "Food" },
+  "shopCategories.cafe": { ca: "Cafeteria", es: "Cafetería", en: "Café" },
+  "shopCategories.restaurant": {
+    ca: "Restauració",
+    es: "Restauración",
+    en: "Restaurant",
+  },
+  "shopCategories.bar": { ca: "Bar", es: "Bar", en: "Bar" },
+  "shopCategories.butcher": { ca: "Carnisseria", es: "Carnicería", en: "Butcher" },
+  "shopCategories.greengrocer": {
+    ca: "Fruiteria",
+    es: "Frutería",
+    en: "Greengrocer",
+  },
+  "shopCategories.fishmonger": {
+    ca: "Peixateria",
+    es: "Pescadería",
+    en: "Fishmonger",
+  },
+  "shopCategories.pharmacy": { ca: "Farmàcia", es: "Farmacia", en: "Pharmacy" },
+  "shopCategories.bookstore": { ca: "Llibreria", es: "Librería", en: "Bookstore" },
+  "shopCategories.clothing": { ca: "Moda", es: "Moda", en: "Clothing" },
+  "shopCategories.hairdresser": {
+    ca: "Perruqueria",
+    es: "Peluquería",
+    en: "Hairdresser",
+  },
+  "shopCategories.services": { ca: "Serveis", es: "Servicios", en: "Services" },
+  "shopCategories.other": { ca: "Altres", es: "Otros", en: "Other" },
   "fitxa.descripcio.label": { ca: "Descripció", es: "Descripción", en: "Description" },
   "fitxa.descripcio.hint": {
     ca: "Text curt que veuran els veïns a la fitxa.",
@@ -504,6 +534,21 @@ export const messages = {
   },
   "login.toRegister.cta": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
   "login.toast.welcome": { ca: "Sessió iniciada", es: "Sesión iniciada", en: "Signed in" },
+  "login.dev.hint": {
+    ca: "Accés ràpid (dev — OTP desactivat temporalment)",
+    es: "Acceso rápido (dev — OTP desactivado temporalmente)",
+    en: "Quick access (dev — OTP temporarily disabled)",
+  },
+  "login.dev.admin": {
+    ca: "Entrar com a Admin (demo)",
+    es: "Entrar como Admin (demo)",
+    en: "Sign in as Admin (demo)",
+  },
+  "login.dev.merchant": {
+    ca: "Entrar com a Merchant (demo)",
+    es: "Entrar como Merchant (demo)",
+    en: "Sign in as Merchant (demo)",
+  },
 
   // Register
   "register.title": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
@@ -731,6 +776,11 @@ export const messages = {
     es: "Registro en la app",
     en: "App sign-up",
   },
+  "accions.tipus.aniversari": {
+    ca: "Aniversari",
+    es: "Cumpleaños",
+    en: "Birthday",
+  },
   "accions.tipus.escaneig_qr": {
     ca: "Escaneig d'un comerç",
     es: "Escaneo de un comercio",
@@ -782,6 +832,29 @@ export const messages = {
     ca: "Introdueix un nombre de punts vàlid.",
     es: "Introduce un número de puntos válido.",
     en: "Enter a valid number of points.",
+  },
+  "accions.form.cooldown.label": {
+    ca: "Reactivació del QR",
+    es: "Reactivación del QR",
+    en: "QR reactivation",
+  },
+  "accions.form.cooldown.hint": {
+    ca: "Després d'un escaneig amb punts, el mateix veí no pot tornar a guanyar punts en aquell comerç fins que passi aquest interval.",
+    es: "Tras un escaneo con puntos, el mismo vecino no puede volver a ganar puntos en ese comercio hasta que pase este intervalo.",
+    en: "After a points scan, the same resident cannot earn points again at that shop until this interval elapses.",
+  },
+  "accions.form.cooldown.1m": { ca: "1 mes", es: "1 mes", en: "1 month" },
+  "accions.form.cooldown.2m": { ca: "2 mesos", es: "2 meses", en: "2 months" },
+  "accions.form.cooldown.3m": { ca: "3 mesos", es: "3 meses", en: "3 months" },
+  "accions.form.cooldown.custom": {
+    ca: "Dies personalitzats",
+    es: "Días personalizados",
+    en: "Custom days",
+  },
+  "accions.form.cooldown.summary": {
+    ca: "Reactivació: {n} dies",
+    es: "Reactivación: {n} días",
+    en: "Reactivation: {n} days",
   },
   "accions.form.limitPerUsuari.label": {
     ca: "Límit d'usos per usuari",

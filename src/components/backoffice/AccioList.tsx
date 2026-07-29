@@ -2,6 +2,7 @@ import {
   Pencil,
   Trash2,
   UserPlus,
+  Cake,
   QrCode,
   Globe,
   Mail,
@@ -27,6 +28,7 @@ import type { AccioPunts, AccioPuntsTipus } from "@/types/backoffice";
 
 const TIPUS_ICON: Record<AccioPuntsTipus, LucideIcon> = {
   registre: UserPlus,
+  aniversari: Cake,
   escaneig_qr: QrCode,
   visita_web: Globe,
   registre_web: Mail,
@@ -38,6 +40,8 @@ export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
   switch (tp) {
     case "registre":
       return "accions.tipus.registre";
+    case "aniversari":
+      return "accions.tipus.aniversari";
     case "escaneig_qr":
       return "accions.tipus.escaneig_qr";
     case "visita_web":
@@ -101,6 +105,14 @@ export function AccioTable({ accions, onEdit, onDelete, onToggle }: Props) {
                     <p className="truncate text-xs text-muted-foreground">
                       {a.descripcio}
                     </p>
+                    {a.tipus === "escaneig_qr" && a.cooldownDies ? (
+                      <p className="truncate text-xs text-muted-foreground">
+                        {t("accions.form.cooldown.summary").replace(
+                          "{n}",
+                          String(a.cooldownDies),
+                        )}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               </TableCell>
@@ -168,6 +180,14 @@ export function AccioCards({ accions, onEdit, onDelete, onToggle }: Props) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{a.nom}</p>
               <p className="text-xs text-muted-foreground">{a.descripcio}</p>
+              {a.tipus === "escaneig_qr" && a.cooldownDies ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("accions.form.cooldown.summary").replace(
+                    "{n}",
+                    String(a.cooldownDies),
+                  )}
+                </p>
+              ) : null}
             </div>
             <PuntsBadge punts={a.punts} />
           </div>

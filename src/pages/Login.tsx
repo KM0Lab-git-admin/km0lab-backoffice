@@ -15,7 +15,11 @@ import {
 } from "@/components/ui/input-otp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLang } from "@/contexts/LangContext";
-import { authService, MOCK_OTP_CODE } from "@/services/authService";
+import {
+  authService,
+  DEV_SKIP_OTP,
+  MOCK_OTP_CODE,
+} from "@/services/authService";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { homePathForRol, rolFromRoles } from "@/lib/roles";
@@ -44,16 +48,42 @@ export function LoginPage() {
     defaultValues: { email: "" },
   });
 
+  function applySession(
+    session: Awaited<ReturnType<typeof authService.verifyLoginCode>>,
+  ) {
+    const rol = rolFromRoles(session.user.roles);
+    signIn(session);
+    setSession({
+      rol,
+      poblacioId: session.user.townId ?? "",
+      comercId: session.user.shopId ?? undefined,
+    });
+    toast.success(t("login.toast.welcome"));
+    navigate({ to: homePathForRol(rol) });
+  }
+
   const onEmailSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true);
     try {
+      // TEMP: with DEV_SKIP_OTP, demo emails enter in one step (no OTP screen).
+      if (DEV_SKIP_OTP) {
+        const session = await authService.verifyLoginCode(
+          values.email,
+          MOCK_OTP_CODE,
+        );
+        applySession(session);
+        return;
+      }
       await authService.requestLoginCode(values.email);
       setEmail(values.email);
       setOtp("");
       setStep("otp");
       toast.success(t("auth.otp.sent"));
-    } catch {
-      toast.error(t("login.error.generic"));
+    } catch (err) {
+      console.error("[login] request-otp failed", err);
+      const detail =
+        err instanceof Error && err.message ? err.message : null;
+      toast.error(detail ?? t("login.error.generic"));
     } finally {
       setSubmitting(false);
     }
@@ -65,15 +95,7 @@ export function LoginPage() {
     setOtpError(null);
     try {
       const session = await authService.verifyLoginCode(email, otp);
-      const rol = rolFromRoles(session.user.roles);
-      signIn(session);
-      setSession({
-        rol,
-        poblacioId: session.user.townId ?? "",
-        comercId: session.user.shopId ?? undefined,
-      });
-      toast.success(t("login.toast.welcome"));
-      navigate({ to: homePathForRol(rol) });
+      applySession(session);
     } catch {
       setOtpError("auth.otp.invalid");
     } finally {
@@ -87,6 +109,19 @@ export function LoginPage() {
       toast.success(t("auth.otp.sent"));
     } catch {
       toast.error(t("login.error.generic"));
+    }
+  }
+
+  async function onDemoLogin(kind: "admin" | "merchant") {
+    setSubmitting(true);
+    try {
+      const session = await authService.loginAsDemo(kind);
+      applySession(session);
+    } catch (err) {
+      console.error("[login] demo bypass failed", err);
+      toast.error(t("login.error.generic"));
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -188,9 +223,38 @@ export function LoginPage() {
         </div>
 
         <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? t("login.submitting") : t("login.submit")}
+          {submitting
+            ? t("login.verifying")
+            : DEV_SKIP_OTP
+              ? t("login.verify")
+              : t("login.submit")}
         </Button>
       </form>
+
+      {/* TEMP: comment out / gate with DEV_SKIP_OTP=false when real OTP ships */}
+      {DEV_SKIP_OTP ? (
+        <div className="mt-6 space-y-2 border-t pt-4">
+          <p className="text-xs text-muted-foreground">{t("login.dev.hint")}</p>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onDemoLogin("admin")}
+          >
+            {t("login.dev.admin")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onDemoLogin("merchant")}
+          >
+            {t("login.dev.merchant")}
+          </Button>
+        </div>
+      ) : null}
     </AuthShell>
   );
 }

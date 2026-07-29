@@ -1,4 +1,4 @@
-import { api } from "@/lib/apiClient";
+import { api, absoluteMediaUrl } from "@/lib/apiClient";
 import {
   recompensaFromApi,
   recompensaToApi,
@@ -6,6 +6,37 @@ import {
 } from "@/lib/mappers/admin";
 import type { Recompensa, RecompensaInput } from "@/types/backoffice";
 import type { ApiReward, ApiShop } from "@/types/api";
+
+function dataUrlToBlob(dataUrl: string): { blob: Blob; filename: string } {
+  const [header, data] = dataUrl.split(",");
+  const mime = /data:([^;]+)/.exec(header)?.[1] ?? "image/png";
+  const binary = atob(data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const ext = mime.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+  return { blob: new Blob([bytes], { type: mime }), filename: `upload.${ext}` };
+}
+
+async function uploadImageIfDataUrl(
+  rewardId: string,
+  value: string | undefined,
+): Promise<void> {
+  if (!value?.startsWith("data:")) return;
+  const { blob, filename } = dataUrlToBlob(value);
+  const form = new FormData();
+  form.append("file", blob, filename);
+  await api.put(`/rewards/${rewardId}/media`, form, { rawBody: true });
+}
+
+async function deleteImageIfCleared(
+  rewardId: string,
+  value: string | undefined,
+  hadImage: boolean,
+): Promise<void> {
+  if (hadImage && !value) {
+    await api.delete(`/rewards/${rewardId}/media`);
+  }
+}
 
 export const recompensesService = {
   async list(): Promise<Recompensa[]> {
@@ -24,15 +55,22 @@ export const recompensesService = {
 
   async create(input: RecompensaInput): Promise<Recompensa> {
     const created = await api.post<ApiReward>("/rewards", recompensaToApi(input));
-    return recompensaFromApi(created);
+    await uploadImageIfDataUrl(created.id, input.imatgeUrl);
+    const fresh = await api.get<ApiReward>(`/rewards/${created.id}`);
+    return recompensaFromApi(fresh);
   },
 
   async update(id: string, input: RecompensaInput): Promise<Recompensa> {
-    const updated = await api.patch<ApiReward>(
-      `/rewards/${id}`,
-      recompensaToApi(input),
-    );
-    return recompensaFromApi(updated);
+    const before = await api.get<ApiReward>(`/rewards/${id}`);
+    await api.patch<ApiReward>(`/rewards/${id}`, recompensaToApi(input));
+    await uploadImageIfDataUrl(id, input.imatgeUrl);
+    await deleteImageIfCleared(id, input.imatgeUrl, Boolean(before.has_image));
+    const fresh = await api.get<ApiReward>(`/rewards/${id}`);
+    const mapped = recompensaFromApi(fresh);
+    if (input.imatgeUrl?.startsWith("data:") && !mapped.imatgeUrl) {
+      mapped.imatgeUrl = absoluteMediaUrl(fresh.image_url) ?? input.imatgeUrl;
+    }
+    return mapped;
   },
 
   async setEstat(id: string, estat: Recompensa["estat"]): Promise<void> {
@@ -40,7 +78,7 @@ export const recompensesService = {
   },
 
   async remove(id: string): Promise<void> {
-    await api.patch(`/rewards/${id}`, { status: "inactive" });
+    await api.delete(`/rewards/${id}`);
   },
 
   async getComercosOptions() {

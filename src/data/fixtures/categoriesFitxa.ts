@@ -1,3 +1,3 @@
-// Labels aligned with API shop category slugs (see lib/mappers/categories.ts).
+// Slugs aligned with API shop categories (labels via i18n shopCategories.*).
 
-export { CATEGORY_LABELS as CATEGORIES_FITXA } from "@/lib/mappers/categories";
+export { CATEGORY_SLUGS as CATEGORIES_FITXA } from "@/lib/mappers/categories";

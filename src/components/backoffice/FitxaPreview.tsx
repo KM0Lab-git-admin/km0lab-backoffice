@@ -1,5 +1,6 @@
 import { Bell, ChevronLeft, Globe, MapPin, Phone, ScanLine } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
+import { categoryLabelToSlug } from "@/lib/mappers/categories";
 import type { ComercFitxa, DiaSetmana } from "@/types/comerc";
 import type { MessageKey } from "@/lib/i18n";
 
@@ -29,7 +30,11 @@ export function FitxaPreview({ fitxa }: Props) {
   const today = dayOrder[todayIndex()];
   const horariAvui = fitxa.horari[today];
   const obertAra = !horariAvui.tancat;
-  const categoriesLine = fitxa.categories.filter(Boolean).join(" · ").toUpperCase();
+  const categoriesLine = fitxa.categories
+    .filter(Boolean)
+    .map((c) => t(`shopCategories.${categoryLabelToSlug(c)}` as MessageKey))
+    .join(" · ")
+    .toUpperCase();
 
   return (
     <div className="mx-auto w-full max-w-[380px] overflow-hidden rounded-[32px] border-2 border-km0-blue-800/80 bg-km0-beige-50 shadow-xl">

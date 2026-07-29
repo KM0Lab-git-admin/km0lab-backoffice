@@ -9,40 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RegistreRouteImport } from './routes/registre'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ComercRouteImport } from './routes/comerc'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ComercIndexRouteImport } from './routes/comerc.index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ComercRouteImport } from './routes/comerc'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegistreRouteImport } from './routes/registre'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ComercValsRouteImport } from './routes/comerc.vals'
-import { Route as ComercPromocionsRouteImport } from './routes/comerc.promocions'
-import { Route as ComercLaMevaFitxaRouteImport } from './routes/comerc.la-meva-fitxa'
-import { Route as ComercEstadistiquesRouteImport } from './routes/comerc.estadistiques'
-import { Route as ComercElMeuQrRouteImport } from './routes/comerc.el-meu-qr'
-import { Route as ComercConfiguracioRouteImport } from './routes/comerc.configuracio'
-import { Route as AdminUsuarisRouteImport } from './routes/admin.usuaris'
-import { Route as AdminResumRouteImport } from './routes/admin.resum'
-import { Route as AdminRecompensesRouteImport } from './routes/admin.recompenses'
-import { Route as AdminConfiguracioRouteImport } from './routes/admin.configuracio'
-import { Route as AdminComercosRouteImport } from './routes/admin.comercos'
-import { Route as AdminBescanvisRouteImport } from './routes/admin.bescanvis'
 import { Route as AdminAccionsRouteImport } from './routes/admin.accions'
+import { Route as AdminBescanvisRouteImport } from './routes/admin.bescanvis'
+import { Route as AdminComercosRouteImport } from './routes/admin.comercos'
+import { Route as AdminConfiguracioRouteImport } from './routes/admin.configuracio'
+import { Route as AdminRecompensesRouteImport } from './routes/admin.recompenses'
+import { Route as AdminResumRouteImport } from './routes/admin.resum'
+import { Route as AdminUsuarisRouteImport } from './routes/admin.usuaris'
+import { Route as ComercIndexRouteImport } from './routes/comerc.index'
+import { Route as ComercConfiguracioRouteImport } from './routes/comerc.configuracio'
+import { Route as ComercElMeuQrRouteImport } from './routes/comerc.el-meu-qr'
+import { Route as ComercEstadistiquesRouteImport } from './routes/comerc.estadistiques'
+import { Route as ComercLaMevaFitxaRouteImport } from './routes/comerc.la-meva-fitxa'
+import { Route as ComercPromocionsRouteImport } from './routes/comerc.promocions'
+import { Route as ComercValsRouteImport } from './routes/comerc.vals'
 
-const RegistreRoute = RegistreRouteImport.update({
-  id: '/registre',
-  path: '/registre',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComercRoute = ComercRouteImport.update({
-  id: '/comerc',
-  path: '/comerc',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -50,74 +40,29 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ComercRoute = ComercRouteImport.update({
+  id: '/comerc',
+  path: '/comerc',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComercIndexRoute = ComercIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ComercRoute,
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistreRoute = RegistreRouteImport.update({
+  id: '/registre',
+  path: '/registre',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const ComercValsRoute = ComercValsRouteImport.update({
-  id: '/vals',
-  path: '/vals',
-  getParentRoute: () => ComercRoute,
-} as any)
-const ComercPromocionsRoute = ComercPromocionsRouteImport.update({
-  id: '/promocions',
-  path: '/promocions',
-  getParentRoute: () => ComercRoute,
-} as any)
-const ComercLaMevaFitxaRoute = ComercLaMevaFitxaRouteImport.update({
-  id: '/la-meva-fitxa',
-  path: '/la-meva-fitxa',
-  getParentRoute: () => ComercRoute,
-} as any)
-const ComercEstadistiquesRoute = ComercEstadistiquesRouteImport.update({
-  id: '/estadistiques',
-  path: '/estadistiques',
-  getParentRoute: () => ComercRoute,
-} as any)
-const ComercElMeuQrRoute = ComercElMeuQrRouteImport.update({
-  id: '/el-meu-qr',
-  path: '/el-meu-qr',
-  getParentRoute: () => ComercRoute,
-} as any)
-const ComercConfiguracioRoute = ComercConfiguracioRouteImport.update({
-  id: '/configuracio',
-  path: '/configuracio',
-  getParentRoute: () => ComercRoute,
-} as any)
-const AdminUsuarisRoute = AdminUsuarisRouteImport.update({
-  id: '/usuaris',
-  path: '/usuaris',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminResumRoute = AdminResumRouteImport.update({
-  id: '/resum',
-  path: '/resum',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRecompensesRoute = AdminRecompensesRouteImport.update({
-  id: '/recompenses',
-  path: '/recompenses',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConfiguracioRoute = AdminConfiguracioRouteImport.update({
-  id: '/configuracio',
-  path: '/configuracio',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminComercosRoute = AdminComercosRouteImport.update({
-  id: '/comercos',
-  path: '/comercos',
+const AdminAccionsRoute = AdminAccionsRouteImport.update({
+  id: '/accions',
+  path: '/accions',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBescanvisRoute = AdminBescanvisRouteImport.update({
@@ -125,10 +70,65 @@ const AdminBescanvisRoute = AdminBescanvisRouteImport.update({
   path: '/bescanvis',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAccionsRoute = AdminAccionsRouteImport.update({
-  id: '/accions',
-  path: '/accions',
+const AdminComercosRoute = AdminComercosRouteImport.update({
+  id: '/comercos',
+  path: '/comercos',
   getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracioRoute = AdminConfiguracioRouteImport.update({
+  id: '/configuracio',
+  path: '/configuracio',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRecompensesRoute = AdminRecompensesRouteImport.update({
+  id: '/recompenses',
+  path: '/recompenses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminResumRoute = AdminResumRouteImport.update({
+  id: '/resum',
+  path: '/resum',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsuarisRoute = AdminUsuarisRouteImport.update({
+  id: '/usuaris',
+  path: '/usuaris',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ComercIndexRoute = ComercIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ComercRoute,
+} as any)
+const ComercConfiguracioRoute = ComercConfiguracioRouteImport.update({
+  id: '/configuracio',
+  path: '/configuracio',
+  getParentRoute: () => ComercRoute,
+} as any)
+const ComercElMeuQrRoute = ComercElMeuQrRouteImport.update({
+  id: '/el-meu-qr',
+  path: '/el-meu-qr',
+  getParentRoute: () => ComercRoute,
+} as any)
+const ComercEstadistiquesRoute = ComercEstadistiquesRouteImport.update({
+  id: '/estadistiques',
+  path: '/estadistiques',
+  getParentRoute: () => ComercRoute,
+} as any)
+const ComercLaMevaFitxaRoute = ComercLaMevaFitxaRouteImport.update({
+  id: '/la-meva-fitxa',
+  path: '/la-meva-fitxa',
+  getParentRoute: () => ComercRoute,
+} as any)
+const ComercPromocionsRoute = ComercPromocionsRouteImport.update({
+  id: '/promocions',
+  path: '/promocions',
+  getParentRoute: () => ComercRoute,
+} as any)
+const ComercValsRoute = ComercValsRouteImport.update({
+  id: '/vals',
+  path: '/vals',
+  getParentRoute: () => ComercRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -273,25 +273,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/registre': {
-      id: '/registre'
-      path: '/registre'
-      fullPath: '/registre'
-      preLoaderRoute: typeof RegistreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comerc': {
-      id: '/comerc'
-      path: '/comerc'
-      fullPath: '/comerc'
-      preLoaderRoute: typeof ComercRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -301,19 +287,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/comerc': {
+      id: '/comerc'
+      path: '/comerc'
+      fullPath: '/comerc'
+      preLoaderRoute: typeof ComercRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/comerc/': {
-      id: '/comerc/'
-      path: '/'
-      fullPath: '/comerc/'
-      preLoaderRoute: typeof ComercIndexRouteImport
-      parentRoute: typeof ComercRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registre': {
+      id: '/registre'
+      path: '/registre'
+      fullPath: '/registre'
+      preLoaderRoute: typeof RegistreRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
@@ -322,81 +315,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/comerc/vals': {
-      id: '/comerc/vals'
-      path: '/vals'
-      fullPath: '/comerc/vals'
-      preLoaderRoute: typeof ComercValsRouteImport
-      parentRoute: typeof ComercRoute
-    }
-    '/comerc/promocions': {
-      id: '/comerc/promocions'
-      path: '/promocions'
-      fullPath: '/comerc/promocions'
-      preLoaderRoute: typeof ComercPromocionsRouteImport
-      parentRoute: typeof ComercRoute
-    }
-    '/comerc/la-meva-fitxa': {
-      id: '/comerc/la-meva-fitxa'
-      path: '/la-meva-fitxa'
-      fullPath: '/comerc/la-meva-fitxa'
-      preLoaderRoute: typeof ComercLaMevaFitxaRouteImport
-      parentRoute: typeof ComercRoute
-    }
-    '/comerc/estadistiques': {
-      id: '/comerc/estadistiques'
-      path: '/estadistiques'
-      fullPath: '/comerc/estadistiques'
-      preLoaderRoute: typeof ComercEstadistiquesRouteImport
-      parentRoute: typeof ComercRoute
-    }
-    '/comerc/el-meu-qr': {
-      id: '/comerc/el-meu-qr'
-      path: '/el-meu-qr'
-      fullPath: '/comerc/el-meu-qr'
-      preLoaderRoute: typeof ComercElMeuQrRouteImport
-      parentRoute: typeof ComercRoute
-    }
-    '/comerc/configuracio': {
-      id: '/comerc/configuracio'
-      path: '/configuracio'
-      fullPath: '/comerc/configuracio'
-      preLoaderRoute: typeof ComercConfiguracioRouteImport
-      parentRoute: typeof ComercRoute
-    }
-    '/admin/usuaris': {
-      id: '/admin/usuaris'
-      path: '/usuaris'
-      fullPath: '/admin/usuaris'
-      preLoaderRoute: typeof AdminUsuarisRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/resum': {
-      id: '/admin/resum'
-      path: '/resum'
-      fullPath: '/admin/resum'
-      preLoaderRoute: typeof AdminResumRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/recompenses': {
-      id: '/admin/recompenses'
-      path: '/recompenses'
-      fullPath: '/admin/recompenses'
-      preLoaderRoute: typeof AdminRecompensesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/configuracio': {
-      id: '/admin/configuracio'
-      path: '/configuracio'
-      fullPath: '/admin/configuracio'
-      preLoaderRoute: typeof AdminConfiguracioRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/comercos': {
-      id: '/admin/comercos'
-      path: '/comercos'
-      fullPath: '/admin/comercos'
-      preLoaderRoute: typeof AdminComercosRouteImport
+    '/admin/accions': {
+      id: '/admin/accions'
+      path: '/accions'
+      fullPath: '/admin/accions'
+      preLoaderRoute: typeof AdminAccionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/bescanvis': {
@@ -406,12 +329,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBescanvisRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/accions': {
-      id: '/admin/accions'
-      path: '/accions'
-      fullPath: '/admin/accions'
-      preLoaderRoute: typeof AdminAccionsRouteImport
+    '/admin/comercos': {
+      id: '/admin/comercos'
+      path: '/comercos'
+      fullPath: '/admin/comercos'
+      preLoaderRoute: typeof AdminComercosRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracio': {
+      id: '/admin/configuracio'
+      path: '/configuracio'
+      fullPath: '/admin/configuracio'
+      preLoaderRoute: typeof AdminConfiguracioRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/recompenses': {
+      id: '/admin/recompenses'
+      path: '/recompenses'
+      fullPath: '/admin/recompenses'
+      preLoaderRoute: typeof AdminRecompensesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/resum': {
+      id: '/admin/resum'
+      path: '/resum'
+      fullPath: '/admin/resum'
+      preLoaderRoute: typeof AdminResumRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/usuaris': {
+      id: '/admin/usuaris'
+      path: '/usuaris'
+      fullPath: '/admin/usuaris'
+      preLoaderRoute: typeof AdminUsuarisRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/comerc/': {
+      id: '/comerc/'
+      path: '/'
+      fullPath: '/comerc/'
+      preLoaderRoute: typeof ComercIndexRouteImport
+      parentRoute: typeof ComercRoute
+    }
+    '/comerc/configuracio': {
+      id: '/comerc/configuracio'
+      path: '/configuracio'
+      fullPath: '/comerc/configuracio'
+      preLoaderRoute: typeof ComercConfiguracioRouteImport
+      parentRoute: typeof ComercRoute
+    }
+    '/comerc/el-meu-qr': {
+      id: '/comerc/el-meu-qr'
+      path: '/el-meu-qr'
+      fullPath: '/comerc/el-meu-qr'
+      preLoaderRoute: typeof ComercElMeuQrRouteImport
+      parentRoute: typeof ComercRoute
+    }
+    '/comerc/estadistiques': {
+      id: '/comerc/estadistiques'
+      path: '/estadistiques'
+      fullPath: '/comerc/estadistiques'
+      preLoaderRoute: typeof ComercEstadistiquesRouteImport
+      parentRoute: typeof ComercRoute
+    }
+    '/comerc/la-meva-fitxa': {
+      id: '/comerc/la-meva-fitxa'
+      path: '/la-meva-fitxa'
+      fullPath: '/comerc/la-meva-fitxa'
+      preLoaderRoute: typeof ComercLaMevaFitxaRouteImport
+      parentRoute: typeof ComercRoute
+    }
+    '/comerc/promocions': {
+      id: '/comerc/promocions'
+      path: '/promocions'
+      fullPath: '/comerc/promocions'
+      preLoaderRoute: typeof ComercPromocionsRouteImport
+      parentRoute: typeof ComercRoute
+    }
+    '/comerc/vals': {
+      id: '/comerc/vals'
+      path: '/vals'
+      fullPath: '/comerc/vals'
+      preLoaderRoute: typeof ComercValsRouteImport
+      parentRoute: typeof ComercRoute
     }
   }
 }
@@ -473,3 +473,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

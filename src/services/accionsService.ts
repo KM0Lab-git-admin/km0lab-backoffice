@@ -5,6 +5,7 @@ import type { ApiPointAction, ApiShop } from "@/types/api";
 
 export const accioTipusList: AccioPuntsTipus[] = [
   "registre",
+  "aniversari",
   "escaneig_qr",
   "visita_web",
   "registre_web",
@@ -42,8 +43,7 @@ export const accionsService = {
   },
 
   async remove(id: string): Promise<void> {
-    // No DELETE — deactivate instead.
-    await api.post(`/actions/${id}/deactivate`);
+    await api.delete(`/actions/${id}`);
   },
 
   async getComercosOptions() {

@@ -59,6 +59,7 @@ export type BescanviResum = {
 // Admin · Accions de punts (llistat + alta/edició)
 export type AccioPuntsTipus =
   | "registre"
+  | "aniversari"
   | "escaneig_qr"
   | "visita_web"
   | "registre_web"
@@ -81,6 +82,8 @@ export type AccioPunts = {
   url?: string;
   esdevenimentId?: string;
   comercId?: string;
+  /** Días hasta que el mismo usuario puede volver a ganar puntos en ese comercio. */
+  cooldownDies?: number;
 };
 
 export type AccioPuntsInput = Omit<AccioPunts, "id" | "poblacioId">;

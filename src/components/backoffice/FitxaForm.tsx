@@ -24,6 +24,7 @@ import { ImageUploader } from "@/components/backoffice/ImageUploader";
 import { useLang } from "@/contexts/LangContext";
 import { cn } from "@/lib/utils";
 import { CATEGORIES_FITXA } from "@/data/fixtures/categoriesFitxa";
+import { categoryLabelToSlug } from "@/lib/mappers/categories";
 import type { MessageKey } from "@/lib/i18n";
 import type {
   ComercFitxa,
@@ -120,6 +121,10 @@ export function FitxaForm({
   submitting,
 }: Props) {
   const { t } = useLang();
+  const categoryLabel = (slugOrLabel: string) => {
+    const slug = categoryLabelToSlug(slugOrLabel);
+    return t(`shopCategories.${slug}` as MessageKey);
+  };
   const {
     register,
     handleSubmit,
@@ -210,16 +215,16 @@ export function FitxaForm({
             name="categories"
             control={control}
             render={({ field }) => {
-              const selected = field.value ?? [];
-              const toggle = (cat: string) => {
-                if (selected.includes(cat)) {
-                  field.onChange(selected.filter((c) => c !== cat));
+              const selected = (field.value ?? []).map(categoryLabelToSlug);
+              const toggle = (slug: string) => {
+                if (selected.includes(slug)) {
+                  field.onChange(selected.filter((c) => c !== slug));
                 } else {
-                  field.onChange([...selected, cat]);
+                  field.onChange([...selected, slug]);
                 }
               };
-              const remove = (cat: string) =>
-                field.onChange(selected.filter((c) => c !== cat));
+              const remove = (slug: string) =>
+                field.onChange(selected.filter((c) => c !== slug));
               const countLabel = t("fitxa.categories.count").replace(
                 "{{count}}",
                 String(selected.length),
@@ -260,13 +265,14 @@ export function FitxaForm({
                             {t("fitxa.categories.empty")}
                           </CommandEmpty>
                           <CommandGroup>
-                            {CATEGORIES_FITXA.map((cat) => {
-                              const checked = selected.includes(cat);
+                            {CATEGORIES_FITXA.map((slug) => {
+                              const checked = selected.includes(slug);
+                              const label = categoryLabel(slug);
                               return (
                                 <CommandItem
-                                  key={cat}
-                                  value={cat}
-                                  onSelect={() => toggle(cat)}
+                                  key={slug}
+                                  value={label}
+                                  onSelect={() => toggle(slug)}
                                   className="flex items-center gap-2"
                                 >
                                   <Checkbox
@@ -275,7 +281,7 @@ export function FitxaForm({
                                     tabIndex={-1}
                                     className="pointer-events-none"
                                   />
-                                  <span>{cat}</span>
+                                  <span>{label}</span>
                                 </CommandItem>
                               );
                             })}
@@ -286,24 +292,27 @@ export function FitxaForm({
                   </Popover>
                   {selected.length > 0 ? (
                     <ul className="flex flex-wrap gap-1.5">
-                      {selected.map((cat) => (
-                        <li key={cat}>
-                          <Badge
-                            variant="secondary"
-                            className="gap-1 pr-1"
-                          >
-                            {cat}
-                            <button
-                              type="button"
-                              onClick={() => remove(cat)}
-                              className="inline-flex h-4 w-4 items-center justify-center rounded-sm hover:bg-muted-foreground/20"
-                              aria-label={cat}
+                      {selected.map((cat) => {
+                        const label = categoryLabel(cat);
+                        return (
+                          <li key={cat}>
+                            <Badge
+                              variant="secondary"
+                              className="gap-1 pr-1"
                             >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        </li>
-                      ))}
+                              {label}
+                              <button
+                                type="button"
+                                onClick={() => remove(cat)}
+                                className="inline-flex h-4 w-4 items-center justify-center rounded-sm hover:bg-muted-foreground/20"
+                                aria-label={label}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : null}
                 </div>

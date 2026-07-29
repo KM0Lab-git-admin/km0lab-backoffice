@@ -86,6 +86,7 @@ export default function AccionsPage() {
       toast.success(t("toast.accio.deleted"));
       setToDelete(null);
     },
+    onError: () => toast.error(t("toast.accio.saveError")),
   });
 
   const accions = listQ.data ?? [];
