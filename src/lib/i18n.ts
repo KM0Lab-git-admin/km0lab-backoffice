@@ -523,9 +523,14 @@ export const messages = {
     en: "Enter a valid email address.",
   },
   "login.error.generic": {
-    ca: "No hem pogut enviar el codi. Torna-ho a provar.",
-    es: "No hemos podido enviar el código. Inténtalo de nuevo.",
-    en: "We couldn't send the code. Please try again.",
+    ca: "No hem pogut iniciar la sessió. Torna-ho a provar.",
+    es: "No hemos podido iniciar la sesión. Inténtalo de nuevo.",
+    en: "We couldn't sign you in. Please try again.",
+  },
+  "login.error.apiUnreachable": {
+    ca: "No es pot connectar amb l'API (localhost:8000). Comprova que km0lab-api està en marxa.",
+    es: "No se puede conectar con la API (localhost:8000). Comprueba que km0lab-api está en marcha.",
+    en: "Cannot reach the API (localhost:8000). Make sure km0lab-api is running.",
   },
   "login.toRegister.text": {
     ca: "Encara no tens compte?",
@@ -986,6 +991,77 @@ export const messages = {
     es: "El nombre y la descripción son fijos. Los límites se gestionan con el intervalo de reactivación del QR.",
     en: "Name and description are fixed. Limits are managed via the QR reactivation interval.",
   },
+  "accions.aniversari.fixedNom": {
+    ca: "Perquè avui és el teu aniversari!",
+    es: "¡Porque hoy es tu cumpleaños!",
+    en: "Because it's your birthday!",
+  },
+  "accions.aniversari.fixedDescripcio": {
+    ca: "Punts pel teu aniversari",
+    es: "Puntos por tu cumpleaños",
+    en: "Birthday points",
+  },
+  "accions.aniversari.info": {
+    ca: "El nom i la descripció són fixos i es mostren automàticament als veïns segons el seu idioma.",
+    es: "El nombre y la descripción son fijos y se muestran automáticamente a los vecinos según su idioma.",
+    en: "Name and description are fixed and shown to residents in their language.",
+  },
+  "accions.visitaWeb.fixedNom": {
+    ca: "Visita la web de turisme",
+    es: "Visita la web de turismo",
+    en: "Visit the tourism website",
+  },
+  "accions.visitaWeb.fixedDescripcio": {
+    ca: "Visita la web municipal de turisme",
+    es: "Visita la web municipal de turismo",
+    en: "Visit the municipal tourism website",
+  },
+  "accions.visitaWeb.info": {
+    ca: "El nom i la descripció són fixos. Només cal indicar la URL de la web.",
+    es: "El nombre y la descripción son fijos. Solo hace falta indicar la URL de la web.",
+    en: "Name and description are fixed. Only the website URL is needed.",
+  },
+  "accions.registreWeb.fixedNom": {
+    ca: "Registre al butlletí municipal",
+    es: "Registro al boletín municipal",
+    en: "Newsletter signup",
+  },
+  "accions.registreWeb.fixedDescripcio": {
+    ca: "Subscripció al butlletí",
+    es: "Suscripción al boletín",
+    en: "Subscribe to the newsletter",
+  },
+  "accions.registreWeb.info": {
+    ca: "El nom i la descripció són fixos. Indica la URL del formulari de subscripció.",
+    es: "El nombre y la descripción son fijos. Indica la URL del formulario de suscripción.",
+    en: "Name and description are fixed. Provide the signup form URL.",
+  },
+  "accions.esdeveniment.fixedNom": {
+    ca: "Inscripció a la Festa Major",
+    es: "Inscripción a la Fiesta Mayor",
+    en: "Festa Major signup",
+  },
+  "accions.esdeveniment.fixedDescripcio": {
+    ca: "Inscripció a un esdeveniment municipal",
+    es: "Inscripción a un evento municipal",
+    en: "Signup to a municipal event",
+  },
+  "accions.esdeveniment.info": {
+    ca: "El nom i la descripció són fixos. Indica la URL de l'esdeveniment.",
+    es: "El nombre y la descripción son fijos. Indica la URL del evento.",
+    en: "Name and description are fixed. Provide the event URL.",
+  },
+  "accions.form.i18nHint": {
+    ca: "Aquesta acció és personalitzable: escriu el nom i la descripció. Es mostrarà als veïns en l'idioma del poble (o català per defecte).",
+    es: "Esta acción es personalizable: escribe el nombre y la descripción. Se mostrará a los vecinos en el idioma del pueblo (o catalán por defecto).",
+    en: "This action is custom: write the name and description. Shown to residents in the town's language (or Catalan by default).",
+  },
+  "accions.form.nomCa": { ca: "Nom (català)", es: "Nombre (catalán)", en: "Name (Catalan)" },
+  "accions.form.nomEs": { ca: "Nom (castellà)", es: "Nombre (castellano)", en: "Name (Spanish)" },
+  "accions.form.nomEn": { ca: "Nom (anglès)", es: "Nombre (inglés)", en: "Name (English)" },
+  "accions.form.descCa": { ca: "Descripció (català)", es: "Descripción (catalán)", en: "Description (Catalan)" },
+  "accions.form.descEs": { ca: "Descripció (castellà)", es: "Descripción (castellano)", en: "Description (Spanish)" },
+  "accions.form.descEn": { ca: "Descripció (anglès)", es: "Descripción (inglés)", en: "Description (English)" },
 
 
   "toast.accio.saved": { ca: "Acció desada", es: "Acción guardada", en: "Action saved" },
@@ -1128,14 +1204,19 @@ export const messages = {
     en: "Merchants / services where it can be used",
   },
   "recompenses.form.comercos.tots": {
-    ca: "Tots els comerços adherits",
-    es: "Todos los comercios adheridos",
-    en: "All partner merchants",
+    ca: "Per a tots els serveis",
+    es: "Para todos los servicios",
+    en: "For all services",
   },
   "recompenses.form.comercos.hint": {
     ca: "Selecciona en quins comerços es pot bescanviar.",
     es: "Selecciona en qué comercios se puede canjear.",
     en: "Choose the merchants where it can be redeemed.",
+  },
+  "recompenses.form.comercos.disabled": {
+    ca: "De moment totes les recompenses apliquen a tots els serveis.",
+    es: "De momento todas las recompensas aplican a todos los servicios.",
+    en: "For now all rewards apply to all services.",
   },
   "recompenses.form.estoc.label": { ca: "Estoc disponible", es: "Stock disponible", en: "Available stock" },
   "recompenses.form.estoc.unlimited": {

@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUploader } from "@/components/backoffice/ImageUploader";
+import { I18nField } from "@/components/backoffice/I18nField";
 import { useLang } from "@/contexts/LangContext";
 import { cn } from "@/lib/utils";
+import { normalizeLang, pickPlain, seedI18n } from "@/types/i18n";
 import { CATEGORIES_FITXA } from "@/data/fixtures/categoriesFitxa";
 import { categoryLabelToSlug } from "@/lib/mappers/categories";
 import type { MessageKey } from "@/lib/i18n";
@@ -54,7 +56,13 @@ const horariDiaSchema: z.ZodType<HorariDia> = z.object({
 const schema = z.object({
   nom: z.string().trim().min(1).max(80),
   categories: z.array(z.string().min(1)).min(1).max(6),
-  descripcio: z.string().trim().max(400),
+  descripcio: z.string().trim().max(400).optional().or(z.literal("")),
+  descripcioI18n: z.object({
+    ca: z.string().optional(),
+    es: z.string().optional(),
+    en: z.string().optional(),
+  }),
+  idiomaOrigen: z.enum(["ca", "es", "en"]),
   logoUrl: z.string().optional(),
   heroUrl: z.string().optional(),
   adreca: z.string().trim().min(1).max(120),
@@ -83,10 +91,13 @@ type Props = {
 };
 
 function toFormValues(f: ComercFitxa): FormValues {
+  const origen = normalizeLang(f.idiomaOrigen);
   return {
     nom: f.nom,
     categories: [...f.categories],
     descripcio: f.descripcio,
+    descripcioI18n: seedI18n(f.descripcio, origen, f.descripcioI18n),
+    idiomaOrigen: origen,
     logoUrl: f.logoUrl,
     heroUrl: f.heroUrl,
     adreca: f.adreca,
@@ -99,10 +110,13 @@ function toFormValues(f: ComercFitxa): FormValues {
 }
 
 function toInput(v: FormValues): ComercFitxaInput {
+  const origen = v.idiomaOrigen;
   return {
     nom: v.nom,
     categories: v.categories,
-    descripcio: v.descripcio,
+    descripcio: pickPlain(v.descripcioI18n, origen, v.descripcio),
+    descripcioI18n: v.descripcioI18n,
+    idiomaOrigen: origen,
     logoUrl: v.logoUrl,
     heroUrl: v.heroUrl,
     adreca: v.adreca,
@@ -131,6 +145,7 @@ export function FitxaForm({
     control,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -329,13 +344,25 @@ export function FitxaForm({
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="descripcio">{t("fitxa.descripcio.label")}</Label>
-          <Textarea id="descripcio" rows={3} {...register("descripcio")} />
-          <p className="text-xs text-muted-foreground">
-            {t("fitxa.descripcio.hint")}
-          </p>
-        </div>
+        <Controller
+          control={control}
+          name="descripcioI18n"
+          render={({ field }) => (
+            <I18nField
+              id="descripcio"
+              label={t("fitxa.descripcio.label")}
+              value={field.value}
+              sourceLang={watch("idiomaOrigen")}
+              onChange={field.onChange}
+              onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+              multiline
+              rows={3}
+            />
+          )}
+        />
+        <p className="text-xs text-muted-foreground">
+          {t("fitxa.descripcio.hint")}
+        </p>
       </section>
 
       <Separator />

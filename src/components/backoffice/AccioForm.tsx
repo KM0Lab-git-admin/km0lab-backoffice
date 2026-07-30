@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -15,15 +15,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { I18nField } from "@/components/backoffice/I18nField";
 import { useLang } from "@/contexts/LangContext";
 import { accioTipusList } from "@/services/accionsService";
 import { tipusLabelKey } from "@/components/backoffice/AccioList";
+import type { MessageKey } from "@/lib/i18n";
 import type { AccioPunts, AccioPuntsInput, AccioPuntsTipus } from "@/types/backoffice";
+import { normalizeLang, pickPlain, seedI18n, type Lang } from "@/types/i18n";
+
+const i18nMapSchema = z.object({
+  ca: z.string().optional(),
+  es: z.string().optional(),
+  en: z.string().optional(),
+});
 
 const schema = z
   .object({
-    nom: z.string().min(1),
-    descripcio: z.string().min(1),
+    nom: z.string().optional().or(z.literal("")),
+    descripcio: z.string().optional().or(z.literal("")),
+    nomI18n: i18nMapSchema,
+    descripcioI18n: i18nMapSchema,
+    idiomaOrigen: z.enum(["ca", "es", "en"]),
     tipus: z.enum([
       "registre",
       "primer_escaneig",
@@ -74,6 +86,19 @@ const schema = z
     if (v.tipus === "personalitzada" && !v.condicions) {
       ctx.addIssue({ code: "custom", path: ["condicions"], message: "required" });
     }
+    if (v.tipus === "personalitzada") {
+      const src = v.idiomaOrigen;
+      if (!(v.nomI18n[src] || "").trim()) {
+        ctx.addIssue({ code: "custom", path: ["nomI18n"], message: "required" });
+      }
+      if (!(v.descripcioI18n[src] || "").trim()) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["descripcioI18n"],
+          message: "required",
+        });
+      }
+    }
   });
 
 type FormValues = z.infer<typeof schema>;
@@ -98,12 +123,20 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
     setValue,
     watch,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       nom: initial?.nom ?? "",
       descripcio: initial?.descripcio ?? "",
+      nomI18n: seedI18n(initial?.nom, normalizeLang(initial?.idiomaOrigen), initial?.nomI18n),
+      descripcioI18n: seedI18n(
+        initial?.descripcio,
+        normalizeLang(initial?.idiomaOrigen),
+        initial?.descripcioI18n,
+      ),
+      idiomaOrigen: normalizeLang(initial?.idiomaOrigen),
       tipus: initial?.tipus ?? "registre",
       punts: initial?.punts ?? 10,
       limitPerUsuari: initial?.limitPerUsuari ?? "",
@@ -123,9 +156,13 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
 
   useEffect(() => {
     if (initial) {
+      const origen = normalizeLang(initial.idiomaOrigen);
       reset({
         nom: initial.nom,
         descripcio: initial.descripcio,
+        nomI18n: seedI18n(initial.nom, origen, initial.nomI18n),
+        descripcioI18n: seedI18n(initial.descripcio, origen, initial.descripcioI18n),
+        idiomaOrigen: origen,
         tipus: initial.tipus,
         punts: initial.punts,
         limitPerUsuari: initial.limitPerUsuari ?? "",
@@ -156,25 +193,81 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
   const primerEscaneigDescripcio = t("accions.primerEscaneig.fixedDescripcio");
   const escaneigQrNom = t("accions.escaneigQr.fixedNom");
   const escaneigQrDescripcio = t("accions.escaneigQr.fixedDescripcio");
+  const aniversariNom = t("accions.aniversari.fixedNom");
+  const aniversariDescripcio = t("accions.aniversari.fixedDescripcio");
+  const visitaWebNom = t("accions.visitaWeb.fixedNom");
+  const visitaWebDescripcio = t("accions.visitaWeb.fixedDescripcio");
+  const registreWebNom = t("accions.registreWeb.fixedNom");
+  const registreWebDescripcio = t("accions.registreWeb.fixedDescripcio");
+  const esdevenimentNom = t("accions.esdeveniment.fixedNom");
+  const esdevenimentDescripcio = t("accions.esdeveniment.fixedDescripcio");
 
-  const isFixedTipus = (tp: AccioPuntsTipus) =>
+  // Catalog types: name/description are fixed (translated by lang in the API).
+  const isFixedText = (tp: AccioPuntsTipus) => tp !== "personalitzada";
+  // Simple actions: hide limits/validity/conditions (signup, first_scan, qr_scan).
+  const isSimpleAction = (tp: AccioPuntsTipus) =>
     tp === "registre" || tp === "primer_escaneig" || tp === "escaneig_qr";
   const fixedCopy = (tp: AccioPuntsTipus) => {
-    if (tp === "primer_escaneig")
-      return { nom: primerEscaneigNom, descripcio: primerEscaneigDescripcio };
-    if (tp === "escaneig_qr")
-      return { nom: escaneigQrNom, descripcio: escaneigQrDescripcio };
-    return { nom: registreNom, descripcio: registreDescripcio };
+    switch (tp) {
+      case "primer_escaneig":
+        return { nom: primerEscaneigNom, descripcio: primerEscaneigDescripcio };
+      case "escaneig_qr":
+        return { nom: escaneigQrNom, descripcio: escaneigQrDescripcio };
+      case "aniversari":
+        return { nom: aniversariNom, descripcio: aniversariDescripcio };
+      case "visita_web":
+        return { nom: visitaWebNom, descripcio: visitaWebDescripcio };
+      case "registre_web":
+        return { nom: registreWebNom, descripcio: registreWebDescripcio };
+      case "esdeveniment":
+        return { nom: esdevenimentNom, descripcio: esdevenimentDescripcio };
+      default:
+        return { nom: registreNom, descripcio: registreDescripcio };
+    }
+  };
+  const fixedInfoKey = (tp: AccioPuntsTipus): MessageKey => {
+    switch (tp) {
+      case "primer_escaneig":
+        return "accions.primerEscaneig.info";
+      case "escaneig_qr":
+        return "accions.escaneigQr.info";
+      case "aniversari":
+        return "accions.aniversari.info";
+      case "visita_web":
+        return "accions.visitaWeb.info";
+      case "registre_web":
+        return "accions.registreWeb.info";
+      case "esdeveniment":
+        return "accions.esdeveniment.info";
+      default:
+        return "accions.registre.info";
+    }
   };
 
   useEffect(() => {
-    if (isFixedTipus(tipus)) {
+    if (isFixedText(tipus)) {
       const { nom, descripcio } = fixedCopy(tipus);
       setValue("nom", nom, { shouldDirty: false });
       setValue("descripcio", descripcio, { shouldDirty: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tipus, registreNom, registreDescripcio, primerEscaneigNom, primerEscaneigDescripcio, escaneigQrNom, escaneigQrDescripcio]);
+  }, [
+    tipus,
+    registreNom,
+    registreDescripcio,
+    primerEscaneigNom,
+    primerEscaneigDescripcio,
+    escaneigQrNom,
+    escaneigQrDescripcio,
+    aniversariNom,
+    aniversariDescripcio,
+    visitaWebNom,
+    visitaWebDescripcio,
+    registreWebNom,
+    registreWebDescripcio,
+    esdevenimentNom,
+    esdevenimentDescripcio,
+  ]);
 
   return (
     <form
@@ -183,28 +276,41 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
           values.tipus === "escaneig_qr" &&
           values.cooldownValor !== "" &&
           values.cooldownValor != null;
-        const isFixed = isFixedTipus(values.tipus);
+        const isFixed = isFixedText(values.tipus);
+        const isSimple = isSimpleAction(values.tipus);
         const fixed = isFixed ? fixedCopy(values.tipus) : null;
+        const origen = (values.idiomaOrigen ?? "ca") as Lang;
+        const nomI18n = fixed
+          ? seedI18n(fixed.nom, origen)
+          : values.nomI18n;
+        const descripcioI18n = fixed
+          ? seedI18n(fixed.descripcio, origen)
+          : values.descripcioI18n;
         const input: AccioPuntsInput = {
-          nom: fixed ? fixed.nom : values.nom,
-          descripcio: fixed ? fixed.descripcio : values.descripcio,
+          nom: fixed ? fixed.nom : pickPlain(nomI18n, origen, values.nom),
+          descripcio: fixed
+            ? fixed.descripcio
+            : pickPlain(descripcioI18n, origen, values.descripcio),
+          nomI18n,
+          descripcioI18n,
+          idiomaOrigen: origen,
           tipus: values.tipus,
           punts: Number(values.punts),
-          limitPerUsuari: isFixed
+          limitPerUsuari: isSimple
             ? values.tipus === "escaneig_qr"
               ? undefined
               : 1
             : values.limitPerUsuari === "" || values.limitPerUsuari == null
               ? undefined
               : Number(values.limitPerUsuari),
-          limitTotal: isFixed
+          limitTotal: isSimple
             ? undefined
             : values.limitTotal === "" || values.limitTotal == null
               ? undefined
               : Number(values.limitTotal),
-          vigenciaInici: isFixed ? undefined : values.vigenciaInici || undefined,
-          vigenciaFi: isFixed ? undefined : values.vigenciaFi || undefined,
-          condicions: isFixed ? undefined : values.condicions || undefined,
+          vigenciaInici: isSimple ? undefined : values.vigenciaInici || undefined,
+          vigenciaFi: isSimple ? undefined : values.vigenciaFi || undefined,
+          condicions: isSimple ? undefined : values.condicions || undefined,
           activa: values.activa,
           visibleAHome: values.visibleAHome,
           url:
@@ -331,7 +437,7 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
 
 
       {/* Nom + Descripció: fixos per a tipus predefinits, editables per a la resta */}
-      {isFixedTipus(tipus) ? (
+      {isFixedText(tipus) ? (
         <div className="flex flex-col gap-3 rounded-md border bg-muted/30 p-4">
           <div className="flex flex-col gap-1">
             <Label className="text-xs text-muted-foreground">
@@ -346,44 +452,51 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
             <p className="text-sm text-muted-foreground">{fixedCopy(tipus).descripcio}</p>
           </div>
           <p className="text-xs text-muted-foreground">
-            {tipus === "primer_escaneig"
-              ? t("accions.primerEscaneig.info")
-              : tipus === "escaneig_qr"
-                ? t("accions.escaneigQr.info")
-                : t("accions.registre.info")}
+            {t(fixedInfoKey(tipus))}
           </p>
         </div>
 
       ) : (
         <>
-          {/* Nom */}
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="nom">{t("accions.form.nom.label")}</Label>
-            <Input
-              id="nom"
-              placeholder={t("accions.form.nom.placeholder")}
-              aria-invalid={!!errors.nom}
-              {...register("nom")}
-            />
-            {errors.nom ? (
-              <p className="text-xs text-destructive">{t("form.error.required")}</p>
-            ) : null}
-          </div>
-
-          {/* Descripció */}
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="descripcio">{t("accions.form.descripcio.label")}</Label>
-            <Textarea
-              id="descripcio"
-              rows={3}
-              placeholder={t("accions.form.descripcio.placeholder")}
-              aria-invalid={!!errors.descripcio}
-              {...register("descripcio")}
-            />
-            {errors.descripcio ? (
-              <p className="text-xs text-destructive">{t("form.error.required")}</p>
-            ) : null}
-          </div>
+          <p className="text-xs text-muted-foreground">{t("accions.form.i18nHint")}</p>
+          <Controller
+            control={control}
+            name="nomI18n"
+            render={({ field }) => (
+              <I18nField
+                id="nom"
+                label={t("accions.form.nom.label")}
+                value={field.value}
+                sourceLang={watch("idiomaOrigen")}
+                onChange={field.onChange}
+                onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+                placeholder={t("accions.form.nom.placeholder")}
+              />
+            )}
+          />
+          {errors.nomI18n ? (
+            <p className="text-xs text-destructive">{t("form.error.required")}</p>
+          ) : null}
+          <Controller
+            control={control}
+            name="descripcioI18n"
+            render={({ field }) => (
+              <I18nField
+                id="descripcio"
+                label={t("accions.form.descripcio.label")}
+                value={field.value}
+                sourceLang={watch("idiomaOrigen")}
+                onChange={field.onChange}
+                onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+                multiline
+                rows={3}
+                placeholder={t("accions.form.descripcio.placeholder")}
+              />
+            )}
+          />
+          {errors.descripcioI18n ? (
+            <p className="text-xs text-destructive">{t("form.error.required")}</p>
+          ) : null}
         </>
       )}
 
@@ -403,7 +516,7 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
         ) : null}
       </div>
 
-      {!isFixedTipus(tipus) && (
+      {!isSimpleAction(tipus) && (
         <>
           {/* Límits */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

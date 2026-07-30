@@ -119,7 +119,12 @@ export function LoginPage() {
       applySession(session);
     } catch (err) {
       console.error("[login] demo bypass failed", err);
-      toast.error(t("login.error.generic"));
+      const unreachable =
+        err instanceof TypeError ||
+        (err instanceof Error && /failed to fetch|networkerror|load failed/i.test(err.message));
+      toast.error(
+        unreachable ? t("login.error.apiUnreachable") : t("login.error.generic"),
+      );
     } finally {
       setSubmitting(false);
     }

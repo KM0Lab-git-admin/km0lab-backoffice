@@ -17,6 +17,7 @@ import type {
   ComercEstat,
   DeuteComerc,
   EntitatTipus,
+  IdiomaDefecte,
   PagamentComerc,
   PoblacioConfig,
   PoblacioConfigInput,
@@ -30,6 +31,7 @@ import type {
 } from "@/types/backoffice";
 import { absoluteMediaUrl } from "@/lib/apiClient";
 import { categoriesFromApi, categoriesToApi } from "@/lib/mappers/categories";
+import { normalizeLang, pickPlain, seedI18n } from "@/types/i18n";
 import type {
   ApiAdminStats,
   ApiPointAction,
@@ -116,12 +118,16 @@ function cooldownValorUnitatToDays(
 
 export function accioFromApi(a: ApiPointAction): AccioPunts {
   const cooldown = cooldownDaysToValorUnitat(a.cooldown_days);
+  const idiomaOrigen = normalizeLang(a.i18n_source_lang);
   return {
     id: a.id,
     poblacioId: a.town_id,
     tipus: ACCIO_TIPUS_FROM_API[a.type] ?? "personalitzada",
     nom: a.name,
     descripcio: a.description,
+    nomI18n: seedI18n(a.name, idiomaOrigen, a.name_i18n),
+    descripcioI18n: seedI18n(a.description, idiomaOrigen, a.description_i18n),
+    idiomaOrigen,
     punts: a.points,
     limitPerUsuari: a.per_user_limit ?? undefined,
     limitTotal: a.total_limit ?? undefined,
@@ -129,8 +135,7 @@ export function accioFromApi(a: ApiPointAction): AccioPunts {
     vigenciaFi: isoDate(a.valid_until),
     condicions: a.conditions ?? undefined,
     activa: a.active,
-    // TODO backend: km0lab-api no exposa encara visible_home; per defecte true.
-    visibleAHome: true,
+    visibleAHome: a.visible_home ?? true,
     url: a.url ?? undefined,
     esdevenimentId: a.event_id ?? undefined,
     comercId: a.shop_id ?? undefined,
@@ -140,10 +145,20 @@ export function accioFromApi(a: ApiPointAction): AccioPunts {
 }
 
 export function accioToApi(input: AccioPuntsInput): Record<string, unknown> {
+  const idiomaOrigen = normalizeLang(input.idiomaOrigen);
+  const nomI18n = seedI18n(input.nom, idiomaOrigen, input.nomI18n);
+  const descripcioI18n = seedI18n(
+    input.descripcio,
+    idiomaOrigen,
+    input.descripcioI18n,
+  );
   return {
     type: ACCIO_TIPUS_TO_API[input.tipus],
-    name: input.nom,
-    description: input.descripcio ?? "",
+    name: pickPlain(nomI18n, idiomaOrigen, input.nom),
+    description: pickPlain(descripcioI18n, idiomaOrigen, input.descripcio),
+    name_i18n: nomI18n,
+    description_i18n: descripcioI18n,
+    i18n_source_lang: idiomaOrigen,
     points: input.punts,
     per_user_limit: input.limitPerUsuari ?? null,
     total_limit: input.limitTotal ?? null,
@@ -151,10 +166,10 @@ export function accioToApi(input: AccioPuntsInput): Record<string, unknown> {
     valid_until: toIsoDateTime(input.vigenciaFi),
     conditions: input.condicions ?? null,
     active: input.activa,
+    visible_home: input.visibleAHome ?? true,
     url: input.url ?? null,
     event_id: input.esdevenimentId ?? null,
-    shop_id: input.comercId ?? null,
-    // TODO backend: km0lab-api no accepta visible_home; s'omet per ara.
+    // shop_id removed from API (migration 0017); omit.
     cooldown_days:
       input.tipus === "escaneig_qr"
         ? cooldownValorUnitatToDays(input.cooldownValor, input.cooldownUnitat)
@@ -206,11 +221,15 @@ const RECOMPENSA_ESTAT_FROM_API: Record<string, RecompensaEstat> = {
 };
 
 export function recompensaFromApi(r: ApiReward): Recompensa {
+  const idiomaOrigen = normalizeLang(r.i18n_source_lang);
   return {
     id: r.id,
     poblacioId: r.town_id,
     nom: r.name,
     descripcio: r.description,
+    nomI18n: seedI18n(r.name, idiomaOrigen, r.name_i18n),
+    descripcioI18n: seedI18n(r.description, idiomaOrigen, r.description_i18n),
+    idiomaOrigen,
     imatgeUrl: absoluteMediaUrl(r.image_url) ?? undefined,
     tipus: RECOMPENSA_TIPUS_FROM_API[r.type] ?? "producte",
     puntsNecessaris: r.points_required,
@@ -225,9 +244,19 @@ export function recompensaFromApi(r: ApiReward): Recompensa {
 }
 
 export function recompensaToApi(input: RecompensaInput): Record<string, unknown> {
+  const idiomaOrigen = normalizeLang(input.idiomaOrigen);
+  const nomI18n = seedI18n(input.nom, idiomaOrigen, input.nomI18n);
+  const descripcioI18n = seedI18n(
+    input.descripcio,
+    idiomaOrigen,
+    input.descripcioI18n,
+  );
   return {
-    name: input.nom,
-    description: input.descripcio ?? "",
+    name: pickPlain(nomI18n, idiomaOrigen, input.nom),
+    description: pickPlain(descripcioI18n, idiomaOrigen, input.descripcio),
+    name_i18n: nomI18n,
+    description_i18n: descripcioI18n,
+    i18n_source_lang: idiomaOrigen,
     // Image via PUT /rewards/{id}/media — do not send data URLs in image_url
     type: RECOMPENSA_TIPUS_TO_API[input.tipus],
     points_required: input.puntsNecessaris,
@@ -508,10 +537,11 @@ export function configFromTown(town: ApiTown): PoblacioConfig {
     entitatTipus: ENTITAT_FROM_API[town.entity_type] ?? "ajuntament",
     contacteEmail: town.contact_email,
     responsable: town.manager_name,
-    logoUrl: town.logo_url ?? undefined,
-    puntsPerEuro: 200,
+    logoUrl: absoluteMediaUrl(town.logo_url) ?? undefined,
+    puntsPerEuro: town.points_per_euro ?? 200,
     caducitatMesos: town.expiry_months ?? undefined,
-    idiomaDefecte: "ca",
+    puntsPerVisitaDefecte: town.default_visit_points ?? undefined,
+    idiomaDefecte: (town.default_lang as IdiomaDefecte) ?? "ca",
   };
 }
 
@@ -523,7 +553,10 @@ export function configToTownUpdate(
     entity_type: ENTITAT_TO_API[input.entitatTipus],
     contact_email: input.contacteEmail,
     manager_name: input.responsable,
-    logo_url: input.logoUrl ?? null,
+    // Logo via PUT /towns/{id}/media/logo — do not send data URLs in logo_url
+    points_per_euro: input.puntsPerEuro,
+    default_visit_points: input.puntsPerVisitaDefecte ?? 10,
+    default_lang: input.idiomaDefecte,
     expiry_months: input.caducitatMesos ?? null,
   };
 }

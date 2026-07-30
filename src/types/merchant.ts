@@ -6,6 +6,9 @@ export type Promocio = {
   etiqueta: string;
   titol: string;
   detall: string;
+  titolI18n?: import("@/types/i18n").I18nMap;
+  detallI18n?: import("@/types/i18n").I18nMap;
+  idiomaOrigen?: import("@/types/i18n").Lang;
   valor?: string;
   compraMinima?: string;
   vigenciaInici?: string;
@@ -61,6 +64,8 @@ export type ComercFitxa = {
   nom: string;
   categories: string[]; // e.g. ["Alimentació", "Fleca"]
   descripcio: string; // copy shown in the app
+  descripcioI18n?: import("@/types/i18n").I18nMap;
+  idiomaOrigen?: import("@/types/i18n").Lang;
   logoUrl?: string; // small logo (list/summary)
   heroUrl?: string; // large image at the top
   adreca: string;

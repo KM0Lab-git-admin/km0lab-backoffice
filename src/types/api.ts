@@ -61,6 +61,8 @@ export type ApiShop = {
   phone: string | null;
   website: string | null;
   description: string | null;
+  description_i18n?: Record<string, string> | null;
+  i18n_source_lang?: string;
   opening_hours: ApiOpeningHours | null;
   status: string;
   qr_code: string | null;
@@ -86,6 +88,11 @@ export type ApiPromotion = {
   label: string;
   title: string;
   detail: string;
+  label_i18n?: Record<string, string> | null;
+  title_i18n?: Record<string, string> | null;
+  detail_i18n?: Record<string, string> | null;
+  conditions_i18n?: Record<string, string> | null;
+  i18n_source_lang?: string;
   value: string | null;
   min_purchase: string | null;
   valid_from: string | null;
@@ -187,6 +194,10 @@ export type ApiPointAction = {
   type: string;
   name: string;
   description: string;
+  name_i18n?: Record<string, string> | null;
+  description_i18n?: Record<string, string> | null;
+  conditions_i18n?: Record<string, string> | null;
+  i18n_source_lang?: string;
   points: number;
   per_user_limit: number | null;
   total_limit: number | null;
@@ -194,9 +205,10 @@ export type ApiPointAction = {
   valid_until: string | null;
   conditions: string | null;
   active: boolean;
+  visible_home: boolean;
   url: string | null;
   event_id: string | null;
-  shop_id: string | null;
+  shop_id?: string | null;
   cooldown_days: number | null;
   is_fake: boolean;
   created_at: string;
@@ -208,6 +220,10 @@ export type ApiReward = {
   town_id: string;
   name: string;
   description: string;
+  name_i18n?: Record<string, string> | null;
+  description_i18n?: Record<string, string> | null;
+  conditions_i18n?: Record<string, string> | null;
+  i18n_source_lang?: string;
   image_url: string | null;
   has_image?: boolean;
   type: string;
@@ -233,6 +249,10 @@ export type ApiTown = {
   contact_email: string;
   manager_name: string;
   logo_url: string | null;
+  has_logo?: boolean;
+  points_per_euro: number;
+  default_visit_points: number;
+  default_lang: string;
   expiry_months: number | null;
   postal_codes: { postal_code: string; is_primary: boolean }[];
   created_at: string;
@@ -243,5 +263,8 @@ export type ApiShopCategory = {
   slug: string;
   sort_order: number;
   active: boolean;
+  label?: string | null;
+  label_i18n?: Record<string, string> | null;
+  i18n_source_lang?: string;
   created_at: string;
 };

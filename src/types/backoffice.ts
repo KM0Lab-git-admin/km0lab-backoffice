@@ -76,6 +76,9 @@ export type AccioPunts = {
   tipus: AccioPuntsTipus;
   nom: string;
   descripcio: string;
+  nomI18n?: import("@/types/i18n").I18nMap;
+  descripcioI18n?: import("@/types/i18n").I18nMap;
+  idiomaOrigen?: import("@/types/i18n").Lang;
   punts: number;
   limitPerUsuari?: number;
   limitTotal?: number;
@@ -117,6 +120,9 @@ export type Recompensa = {
   poblacioId: string;
   nom: string;
   descripcio: string;
+  nomI18n?: import("@/types/i18n").I18nMap;
+  descripcioI18n?: import("@/types/i18n").I18nMap;
+  idiomaOrigen?: import("@/types/i18n").Lang;
   imatgeUrl?: string;
   tipus: RecompensaTipus;
   puntsNecessaris: number;

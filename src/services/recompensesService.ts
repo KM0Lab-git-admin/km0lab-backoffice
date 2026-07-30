@@ -33,9 +33,12 @@ async function deleteImageIfCleared(
   value: string | undefined,
   hadImage: boolean,
 ): Promise<void> {
-  if (hadImage && !value) {
-    await api.delete(`/rewards/${rewardId}/media`);
-  }
+  // Only when the user explicitly cleared the uploader (no URL / no data URL).
+  // Keep media if the form still has the persisted HTTP(S) media URL.
+  if (!hadImage) return;
+  if (value?.startsWith("data:") || value?.startsWith("http")) return;
+  if (value) return;
+  await api.delete(`/rewards/${rewardId}/media`);
 }
 
 export const recompensesService = {
