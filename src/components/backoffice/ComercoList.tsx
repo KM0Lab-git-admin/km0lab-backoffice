@@ -78,9 +78,9 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs }: Props) {
   });
   const categoryLabel = (value: string) => {
     const slug = categoryLabelToSlug(value);
-    const fromApi = categoriesQ.data?.find((c) => c.slug === slug)?.label;
-    if (fromApi) return fromApi;
-    return t(`shopCategories.${slug}` as MessageKey);
+    const row = categoriesQ.data?.find((c) => c.slug === slug);
+    const label = row?.label ?? t(`shopCategories.${slug}` as MessageKey);
+    return row?.emoji ? `${row.emoji} ${label}` : label;
   };
 
   return (
@@ -190,9 +190,9 @@ export function ComercoCards({ comercos, onEdit, onToggle, onActAs }: Props) {
   });
   const categoryLabel = (value: string) => {
     const slug = categoryLabelToSlug(value);
-    const fromApi = categoriesQ.data?.find((c) => c.slug === slug)?.label;
-    if (fromApi) return fromApi;
-    return t(`shopCategories.${slug}` as MessageKey);
+    const row = categoriesQ.data?.find((c) => c.slug === slug);
+    const label = row?.label ?? t(`shopCategories.${slug}` as MessageKey);
+    return row?.emoji ? `${row.emoji} ${label}` : label;
   };
 
   return (

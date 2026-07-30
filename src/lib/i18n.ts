@@ -180,6 +180,26 @@ export const messages = {
   "form.submit": { ca: "Desar promoció", es: "Guardar promoción", en: "Save promotion" },
   "form.submitting": { ca: "Desant…", es: "Guardando…", en: "Saving…" },
   "form.error.required": { ca: "Camp obligatori", es: "Campo obligatorio", en: "Required field" },
+  "form.error.requiredField": {
+    ca: "Revisa el camp: {field}",
+    es: "Revisa el campo: {field}",
+    en: "Check the field: {field}",
+  },
+  "form.error.invalidTime": {
+    ca: "Hora no vàlida",
+    es: "Hora no válida",
+    en: "Invalid time",
+  },
+  "form.error.splitHours": {
+    ca: "Indica obertura i tancament del 2n tram",
+    es: "Indica apertura y cierre del 2.º tramo",
+    en: "Enter both open and close times for the 2nd slot",
+  },
+  "form.error.tooLong": {
+    ca: "Text massa llarg (màx. {max} caràcters)",
+    es: "Texto demasiado largo (máx. {max} caracteres)",
+    en: "Text too long (max {max} characters)",
+  },
   "form.error.dateRange": {
     ca: "La data final ha de ser posterior a la inicial",
     es: "La fecha final debe ser posterior a la inicial",

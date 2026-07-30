@@ -57,9 +57,9 @@ export function ComercoForm({ initial, onSubmit, onCancel, submitting }: Props) 
     categoriesQ.data?.map((c) => c.slug) ?? [...CATEGORIES_FITXA];
   const categoryLabel = (slugOrLabel: string) => {
     const slug = categoryLabelToSlug(slugOrLabel);
-    const fromApi = categoriesQ.data?.find((c) => c.slug === slug)?.label;
-    if (fromApi) return fromApi;
-    return t(`shopCategories.${slug}` as MessageKey);
+    const row = categoriesQ.data?.find((c) => c.slug === slug);
+    const label = row?.label ?? t(`shopCategories.${slug}` as MessageKey);
+    return row?.emoji ? `${row.emoji} ${label}` : label;
   };
 
   const {

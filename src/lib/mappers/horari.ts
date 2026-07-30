@@ -53,16 +53,24 @@ function dayFromApi(d: ApiDayHours | undefined): HorariDia {
   };
 }
 
+/** Normalize browser time values to HH:mm for the API. */
+function toHm(value: string | undefined | null): string | null {
+  const v = (value ?? "").trim();
+  if (!v) return null;
+  const m = /^(\d{2}):(\d{2})(?::\d{2})?$/.exec(v);
+  return m ? `${m[1]}:${m[2]}` : v;
+}
+
 function dayToApi(d: HorariDia): ApiDayHours {
   if (d.tancat) {
     return { closed: true, opens: null, closes: null, opens_2: null, closes_2: null };
   }
-  const opens2 = d.obertura2?.trim() || null;
-  const closes2 = d.tancament2?.trim() || null;
+  const opens2 = toHm(d.obertura2);
+  const closes2 = toHm(d.tancament2);
   return {
     closed: false,
-    opens: d.obertura,
-    closes: d.tancament,
+    opens: toHm(d.obertura),
+    closes: toHm(d.tancament),
     opens_2: opens2 && closes2 ? opens2 : null,
     closes_2: opens2 && closes2 ? closes2 : null,
   };

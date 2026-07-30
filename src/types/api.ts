@@ -264,6 +264,7 @@ export type ApiShopCategory = {
   slug: string;
   sort_order: number;
   active: boolean;
+  emoji?: string | null;
   label?: string | null;
   label_i18n?: Record<string, string> | null;
   i18n_source_lang?: string;
