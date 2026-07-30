@@ -96,8 +96,16 @@ export function LoginPage() {
     try {
       const session = await authService.verifyLoginCode(email, otp);
       applySession(session);
-    } catch {
-      setOtpError("auth.otp.invalid");
+    } catch (err) {
+      const unreachable =
+        err instanceof TypeError ||
+        (err instanceof Error &&
+          /failed to fetch|networkerror|load failed/i.test(err.message));
+      if (unreachable) {
+        toast.error(t("login.error.apiUnreachable"));
+      } else {
+        setOtpError("auth.otp.invalid");
+      }
     } finally {
       setSubmitting(false);
     }
