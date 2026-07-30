@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,7 +7,6 @@ import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { normalizeLang, pickPlain, seedI18n } from "@/types/i18n";
 import { CATEGORIES_FITXA } from "@/data/fixtures/categoriesFitxa";
 import { categoryLabelToSlug } from "@/lib/mappers/categories";
+import { fitxaService } from "@/services/fitxaService";
 import type { MessageKey } from "@/lib/i18n";
 import type {
   ComercFitxa,
@@ -46,12 +47,32 @@ const dayOrder: DiaSetmana[] = [
 ];
 
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+const optionalTime = z
+  .string()
+  .regex(timePattern)
+  .or(z.literal(""))
+  .optional();
 
-const horariDiaSchema: z.ZodType<HorariDia> = z.object({
-  tancat: z.boolean(),
-  obertura: z.string().regex(timePattern),
-  tancament: z.string().regex(timePattern),
-});
+const horariDiaSchema: z.ZodType<HorariDia> = z
+  .object({
+    tancat: z.boolean(),
+    obertura: z.string().regex(timePattern),
+    tancament: z.string().regex(timePattern),
+    obertura2: optionalTime,
+    tancament2: optionalTime,
+  })
+  .superRefine((d, ctx) => {
+    if (d.tancat) return;
+    const a = (d.obertura2 ?? "").trim();
+    const b = (d.tancament2 ?? "").trim();
+    if ((a && !b) || (!a && b)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "split",
+        path: a ? ["tancament2"] : ["obertura2"],
+      });
+    }
+  });
 
 const schema = z.object({
   nom: z.string().trim().min(1).max(80),
@@ -134,9 +155,18 @@ export function FitxaForm({
   onSubmit,
   submitting,
 }: Props) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const categoriesQ = useQuery({
+    queryKey: ["shop-categories", lang],
+    queryFn: () => fitxaService.listCategories(lang),
+    staleTime: 60_000,
+  });
+  const categoryOptions =
+    categoriesQ.data?.map((c) => c.slug) ?? [...CATEGORIES_FITXA];
   const categoryLabel = (slugOrLabel: string) => {
     const slug = categoryLabelToSlug(slugOrLabel);
+    const fromApi = categoriesQ.data?.find((c) => c.slug === slug)?.label;
+    if (fromApi) return fromApi;
     return t(`shopCategories.${slug}` as MessageKey);
   };
   const {
@@ -205,7 +235,6 @@ export function FitxaForm({
               />
             )}
           />
-
         </div>
       </section>
 
@@ -280,7 +309,7 @@ export function FitxaForm({
                             {t("fitxa.categories.empty")}
                           </CommandEmpty>
                           <CommandGroup>
-                            {CATEGORIES_FITXA.map((slug) => {
+                            {categoryOptions.map((slug) => {
                               const checked = selected.includes(slug);
                               const label = categoryLabel(slug);
                               return (
@@ -354,7 +383,7 @@ export function FitxaForm({
               value={field.value}
               sourceLang={watch("idiomaOrigen")}
               onChange={field.onChange}
-              onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+              onSourceLangChange={(nextLang) => setValue("idiomaOrigen", nextLang)}
               multiline
               rows={3}
             />
@@ -387,7 +416,16 @@ export function FitxaForm({
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="poblacio">{t("fitxa.poblacio.label")}</Label>
-            <Input id="poblacio" {...register("poblacio")} />
+            <Input
+              id="poblacio"
+              readOnly
+              disabled
+              className="bg-muted"
+              {...register("poblacio")}
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("fitxa.poblacio.hint")}
+            </p>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="telefon">{t("fitxa.telefon.label")}</Label>
@@ -406,6 +444,9 @@ export function FitxaForm({
       <section className="flex flex-col gap-3">
         <header>
           <h2 className="text-base font-bold">{t("fitxa.section.horari")}</h2>
+          <p className="text-xs text-muted-foreground">
+            {t("fitxa.horari.splitHint")}
+          </p>
         </header>
         <ul className="flex flex-col gap-2">
           {dayOrder.map((day) => {
@@ -414,43 +455,65 @@ export function FitxaForm({
             return (
               <li
                 key={day}
-                className="flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 rounded-lg border bg-card p-3"
               >
-                <div className="flex items-center gap-3">
-                  <span className="w-24 text-sm font-medium">{t(key)}</span>
-                  <Controller
-                    name={`horari.${day}.tancat`}
-                    control={control}
-                    render={({ field }) => (
-                      <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Switch
-                          checked={!field.value}
-                          onCheckedChange={(v) => field.onChange(!v)}
-                        />
-                        {field.value
-                          ? t("fitxa.horari.tancat")
-                          : t("fitxa.horari.obertAra")}
-                      </label>
-                    )}
-                  />
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="w-24 text-sm font-medium">{t(key)}</span>
+                    <Controller
+                      name={`horari.${day}.tancat`}
+                      control={control}
+                      render={({ field }) => (
+                        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Switch
+                            checked={!field.value}
+                            onCheckedChange={(v) => field.onChange(!v)}
+                          />
+                          {field.value
+                            ? t("fitxa.horari.tancat")
+                            : t("fitxa.horari.obertAra")}
+                        </label>
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Input
+                      type="time"
+                      aria-label={t("fitxa.horari.obertura")}
+                      disabled={tancat}
+                      className="w-32"
+                      {...register(`horari.${day}.obertura`)}
+                    />
+                    <span className="text-muted-foreground">–</span>
+                    <Input
+                      type="time"
+                      aria-label={t("fitxa.horari.tancament")}
+                      disabled={tancat}
+                      className="w-32"
+                      {...register(`horari.${day}.tancament`)}
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="time"
-                    aria-label={t("fitxa.horari.obertura")}
-                    disabled={tancat}
-                    className="w-32"
-                    {...register(`horari.${day}.obertura`)}
-                  />
-                  <span className="text-muted-foreground">–</span>
-                  <Input
-                    type="time"
-                    aria-label={t("fitxa.horari.tancament")}
-                    disabled={tancat}
-                    className="w-32"
-                    {...register(`horari.${day}.tancament`)}
-                  />
-                </div>
+                {!tancat ? (
+                  <div className="flex flex-wrap items-center gap-2 sm:pl-28">
+                    <span className="text-xs text-muted-foreground">
+                      {t("fitxa.horari.tram2")}
+                    </span>
+                    <Input
+                      type="time"
+                      aria-label={t("fitxa.horari.obertura2")}
+                      className="w-32"
+                      {...register(`horari.${day}.obertura2`)}
+                    />
+                    <span className="text-muted-foreground">–</span>
+                    <Input
+                      type="time"
+                      aria-label={t("fitxa.horari.tancament2")}
+                      className="w-32"
+                      {...register(`horari.${day}.tancament2`)}
+                    />
+                  </div>
+                ) : null}
               </li>
             );
           })}

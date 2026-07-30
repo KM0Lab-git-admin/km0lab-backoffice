@@ -3,19 +3,30 @@ import { categoriesFromApi, categoriesToApi } from "@/lib/mappers/categories";
 import { horariFromApi, horariToApi } from "@/lib/mappers/horari";
 import type { ComercFitxa, ComercFitxaInput, ComercMe, ComercQR, QRMetrics } from "@/types/merchant";
 import type { ApiQr, ApiShop } from "@/types/api";
-import { normalizeLang, pickPlain, seedI18n } from "@/types/i18n";
+import {
+  normalizeLang,
+  pickPlain,
+  seedI18n,
+  i18nToApiPayload,
+} from "@/types/i18n";
 
 export function comercMeFromShop(shop: ApiShop): ComercMe {
+  const bust = shop.updated_at ? `?v=${encodeURIComponent(shop.updated_at)}` : "";
+  const logo = absoluteMediaUrl(shop.logo_url);
   return {
     id: shop.id,
     nom: shop.name,
     emoji: shop.emoji ?? undefined,
+    logoUrl: logo ? `${logo}${bust}` : undefined,
     adherit: true,
   };
 }
 
 export function fitxaFromShop(shop: ApiShop): ComercFitxa {
   const idiomaOrigen = normalizeLang(shop.i18n_source_lang);
+  const bust = shop.updated_at ? `?v=${encodeURIComponent(shop.updated_at)}` : "";
+  const logo = absoluteMediaUrl(shop.logo_url);
+  const hero = absoluteMediaUrl(shop.hero_url);
   return {
     id: shop.id,
     nom: shop.name,
@@ -23,11 +34,11 @@ export function fitxaFromShop(shop: ApiShop): ComercFitxa {
     descripcio: shop.description ?? "",
     descripcioI18n: seedI18n(shop.description, idiomaOrigen, shop.description_i18n),
     idiomaOrigen,
-    logoUrl: absoluteMediaUrl(shop.logo_url),
-    heroUrl: absoluteMediaUrl(shop.hero_url),
+    logoUrl: logo ? `${logo}${bust}` : undefined,
+    heroUrl: hero ? `${hero}${bust}` : undefined,
     adreca: shop.address ?? "",
     codiPostal: shop.postal_code ?? "",
-    poblacio: "",
+    poblacio: shop.town_name ?? "",
     telefon: shop.phone ?? "",
     web: shop.website ?? "",
     horari: horariFromApi(shop.opening_hours),
@@ -36,10 +47,10 @@ export function fitxaFromShop(shop: ApiShop): ComercFitxa {
 
 export function fitxaToProfileUpdate(input: ComercFitxaInput): Record<string, unknown> {
   const idiomaOrigen = normalizeLang(input.idiomaOrigen);
-  const descripcioI18n = seedI18n(
-    input.descripcio,
-    idiomaOrigen,
+  const descripcioI18n = i18nToApiPayload(
     input.descripcioI18n,
+    idiomaOrigen,
+    input.descripcio,
   );
   return {
     name: input.nom,

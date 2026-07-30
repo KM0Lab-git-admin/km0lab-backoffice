@@ -8,7 +8,17 @@ export const Route = createFileRoute("/merchant")({
     if (!useAuthStore.getState().isAuthenticated) {
       throw redirect({ to: "/login" });
     }
-    if (useSessionStore.getState().rol !== "comerc") {
+    const session = useSessionStore.getState();
+    const roles = useAuthStore.getState().user?.roles ?? [];
+    const isAdminActing =
+      roles.includes("admin") && Boolean(session.actingAsShopId);
+    const isMerchant = roles.includes("merchant");
+
+    if (!isMerchant && !isAdminActing) {
+      throw redirect({ to: "/admin/merchants" });
+    }
+
+    if (session.rol !== "comerc") {
       useSessionStore.getState().setRol("comerc");
     }
   },

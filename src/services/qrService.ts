@@ -19,9 +19,15 @@ export const qrService = {
     return qrFromApi(qr);
   },
 
+  /** Single GET /shops/me/qr → QR payload + visit metrics (avoids double fetch). */
+  async getMyQRPage(): Promise<{ qr: ComercQR; metrics: QRMetrics }> {
+    const raw = await api.get<ApiQr>("/shops/me/qr");
+    return { qr: qrFromApi(raw), metrics: qrMetricsFromApi(raw) };
+  },
+
   async getMetrics(): Promise<QRMetrics> {
-    const qr = await api.get<ApiQr>("/shops/me/qr");
-    return qrMetricsFromApi(qr);
+    const { metrics } = await qrService.getMyQRPage();
+    return metrics;
   },
 
   async downloadPDF(): Promise<void> {

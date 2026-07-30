@@ -19,6 +19,8 @@ export type AdminMe = {
   poblacioId: string;
   poblacioNom: string;
   nom: string;
+  /** Town brand logo (Settings / config). */
+  logoUrl?: string;
 };
 
 export type AdminResumStats = {
@@ -150,6 +152,9 @@ export type ComercAdmin = {
   emailContacte: string;
   puntsPerVisita: number;
   adreca?: string;
+  codiPostal?: string;
+  telefon?: string;
+  web?: string;
   estat: ComercEstat;
   qrGenerat: boolean;
   nPromocionsActives: number;
@@ -164,6 +169,9 @@ export type ComercAdminInput = {
   emailContacte: string;
   puntsPerVisita: number;
   adreca?: string;
+  codiPostal?: string;
+  telefon?: string;
+  web?: string;
 };
 
 // Admin · Usuaris (veïns del programa)

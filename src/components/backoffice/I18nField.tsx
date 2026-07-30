@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,10 +22,9 @@ type Props = {
 };
 
 /**
- * Trilingual text field (ca/es/en). The active tab is the language being
- * edited; the source language can be set by clicking the tab label badge
- * (or via onSourceLangChange). Empty languages are auto-filled by the API
- * on save.
+ * Trilingual text field (ca/es/en). Empty non-source languages are
+ * auto-filled by the API on save. Editing the source language clears
+ * untouched target langs so stale translations are not re-sent.
  */
 export function I18nField({
   id,
@@ -41,6 +40,13 @@ export function I18nField({
   className,
 }: Props) {
   const [active, setActive] = useState<Lang>(sourceLang);
+  /** Languages the user typed into (kept when source changes). */
+  const touchedRef = useRef<Set<Lang>>(new Set());
+
+  useEffect(() => {
+    touchedRef.current = new Set();
+  }, [sourceLang]);
+
   const filled = useMemo(
     () =>
       Object.fromEntries(
@@ -50,6 +56,22 @@ export function I18nField({
   );
 
   const Field = multiline ? Textarea : Input;
+
+  const handleChange = (lang: Lang, text: string) => {
+    if (lang === sourceLang) {
+      const next: I18nMap = { ...value, [lang]: text };
+      for (const other of LANGS) {
+        if (other === sourceLang) continue;
+        if (!touchedRef.current.has(other)) {
+          next[other] = "";
+        }
+      }
+      onChange(next);
+      return;
+    }
+    touchedRef.current.add(lang);
+    onChange({ ...value, [lang]: text });
+  };
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -90,7 +112,7 @@ export function I18nField({
               disabled={disabled}
               rows={multiline ? rows : undefined}
               onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                onChange({ ...value, [lang]: e.target.value })
+                handleChange(lang, e.target.value)
               }
             />
           </TabsContent>

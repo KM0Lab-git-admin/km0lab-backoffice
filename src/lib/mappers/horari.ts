@@ -36,12 +36,20 @@ const DIAS_CA: DiaSetmana[] = [
 
 function dayFromApi(d: ApiDayHours | undefined): HorariDia {
   if (!d || d.closed) {
-    return { tancat: true, obertura: "09:00", tancament: "14:00" };
+    return {
+      tancat: true,
+      obertura: "09:00",
+      tancament: "14:00",
+      obertura2: "",
+      tancament2: "",
+    };
   }
   return {
     tancat: false,
     obertura: d.opens ?? "09:00",
     tancament: d.closes ?? "14:00",
+    obertura2: d.opens_2 ?? "",
+    tancament2: d.closes_2 ?? "",
   };
 }
 
@@ -49,18 +57,29 @@ function dayToApi(d: HorariDia): ApiDayHours {
   if (d.tancat) {
     return { closed: true, opens: null, closes: null, opens_2: null, closes_2: null };
   }
+  const opens2 = d.obertura2?.trim() || null;
+  const closes2 = d.tancament2?.trim() || null;
   return {
     closed: false,
     opens: d.obertura,
     closes: d.tancament,
-    opens_2: null,
-    closes_2: null,
+    opens_2: opens2 && closes2 ? opens2 : null,
+    closes_2: opens2 && closes2 ? closes2 : null,
   };
 }
 
 export function defaultHorari(): Horari {
   return Object.fromEntries(
-    DIAS_CA.map((d) => [d, { tancat: true, obertura: "09:00", tancament: "14:00" }]),
+    DIAS_CA.map((d) => [
+      d,
+      {
+        tancat: true,
+        obertura: "09:00",
+        tancament: "14:00",
+        obertura2: "",
+        tancament2: "",
+      },
+    ]),
   ) as Horari;
 }
 
@@ -84,4 +103,14 @@ export function horariToApi(horari: Horari): ApiOpeningHours {
     saturday: dayToApi(horari.dissabte),
     sunday: dayToApi(horari.diumenge),
   };
+}
+
+/** Display "09:00–14:00 · 17:00–20:00" for a day. */
+export function formatHorariDia(d: HorariDia): string {
+  if (d.tancat) return "";
+  const first = `${d.obertura}–${d.tancament}`;
+  if (d.obertura2?.trim() && d.tancament2?.trim()) {
+    return `${first} · ${d.obertura2}–${d.tancament2}`;
+  }
+  return first;
 }

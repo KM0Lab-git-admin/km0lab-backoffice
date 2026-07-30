@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Plus, Search, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,8 +37,10 @@ type EstatFilter = "tots" | ComercEstat;
 
 export default function ComercosPage() {
   const { t } = useLang();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const poblacioId = useSessionStore((s) => s.poblacioId);
+  const enterActingAsShop = useSessionStore((s) => s.enterActingAsShop);
 
   const meQ = useQuery({
     queryKey: ["admin", "me"],
@@ -111,6 +114,11 @@ export default function ComercosPage() {
 
   const handleToggle = (c: ComercAdmin, next: boolean) => {
     toggleMut.mutate({ id: c.id, estat: next ? "actiu" : "inactiu" });
+  };
+
+  const handleActAs = (c: ComercAdmin) => {
+    enterActingAsShop({ id: c.id, nom: c.nom });
+    void navigate({ to: "/merchant/my-qr" });
   };
 
   return (
@@ -193,11 +201,13 @@ export default function ComercosPage() {
                 comercos={filtered}
                 onEdit={setEditing}
                 onToggle={handleToggle}
+                onActAs={handleActAs}
               />
               <ComercoCards
                 comercos={filtered}
                 onEdit={setEditing}
                 onToggle={handleToggle}
+                onActAs={handleActAs}
               />
             </>
           )}

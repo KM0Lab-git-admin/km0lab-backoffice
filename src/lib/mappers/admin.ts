@@ -301,6 +301,9 @@ export function comercAdminFromShop(
     emailContacte: shop.contact_email,
     puntsPerVisita: shop.visit_points,
     adreca: shop.address ?? undefined,
+    codiPostal: shop.postal_code ?? undefined,
+    telefon: shop.phone ?? undefined,
+    web: shop.website ?? undefined,
     estat: ESTAT_FROM_API[shop.status] ?? "inactiu",
     qrGenerat: Boolean(shop.qr_code),
     nPromocionsActives,
@@ -311,11 +314,14 @@ export function comercAdminFromShop(
 export function comercAdminToCreate(input: ComercAdminInput): Record<string, unknown> {
   return {
     name: input.nom,
-    emoji: input.emoji ?? null,
+    emoji: null,
     categories: categoriesToApi(input.categories),
     contact_email: input.emailContacte,
     visit_points: input.puntsPerVisita,
-    address: input.adreca ?? null,
+    address: input.adreca || null,
+    postal_code: input.codiPostal || null,
+    phone: input.telefon || null,
+    website: input.web || null,
   };
 }
 
@@ -501,11 +507,16 @@ export function bescanviResumFromApi(
 // —— Admin me / stats / town config ——
 
 export function adminMeFromUser(user: ApiUser, town?: ApiTown | null): AdminMe {
+  const bust = town?.updated_at
+    ? `?v=${encodeURIComponent(town.updated_at)}`
+    : "";
+  const logo = absoluteMediaUrl(town?.logo_url);
   return {
     id: user.id,
     poblacioId: user.town_id ?? town?.id ?? "",
     poblacioNom: user.town_name ?? town?.name ?? "",
     nom: user.name ?? user.email,
+    logoUrl: logo ? `${logo}${bust}` : undefined,
   };
 }
 

@@ -47,6 +47,7 @@ export type ApiOpeningHours = {
 export type ApiShop = {
   id: string;
   town_id: string;
+  town_name?: string | null;
   name: string;
   emoji: string | null;
   logo_url: string | null;

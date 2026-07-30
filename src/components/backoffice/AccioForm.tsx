@@ -79,14 +79,20 @@ const schema = z
       (v.tipus === "visita_web" ||
         v.tipus === "registre_web" ||
         v.tipus === "esdeveniment") &&
-      !v.url
+      !v.url?.trim()
     ) {
       ctx.addIssue({ code: "custom", path: ["url"], message: "required" });
     }
     if (v.tipus === "personalitzada" && !v.condicions) {
       ctx.addIssue({ code: "custom", path: ["condicions"], message: "required" });
     }
-    if (v.tipus === "personalitzada") {
+    // Editable text types: require name + description in the source language.
+    if (
+      v.tipus === "personalitzada" ||
+      v.tipus === "visita_web" ||
+      v.tipus === "registre_web" ||
+      v.tipus === "esdeveniment"
+    ) {
       const src = v.idiomaOrigen;
       if (!(v.nomI18n[src] || "").trim()) {
         ctx.addIssue({ code: "custom", path: ["nomI18n"], message: "required" });
@@ -195,16 +201,14 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
   const escaneigQrDescripcio = t("accions.escaneigQr.fixedDescripcio");
   const aniversariNom = t("accions.aniversari.fixedNom");
   const aniversariDescripcio = t("accions.aniversari.fixedDescripcio");
-  const visitaWebNom = t("accions.visitaWeb.fixedNom");
-  const visitaWebDescripcio = t("accions.visitaWeb.fixedDescripcio");
-  const registreWebNom = t("accions.registreWeb.fixedNom");
-  const registreWebDescripcio = t("accions.registreWeb.fixedDescripcio");
-  const esdevenimentNom = t("accions.esdeveniment.fixedNom");
-  const esdevenimentDescripcio = t("accions.esdeveniment.fixedDescripcio");
 
-  // Catalog types: name/description are fixed (translated by lang in the API).
-  const isFixedText = (tp: AccioPuntsTipus) => tp !== "personalitzada";
-  // Simple actions: hide limits/validity/conditions (signup, first_scan, qr_scan).
+  // Fixed catalog types: name/description are not editable (API serves by lang).
+  const isFixedText = (tp: AccioPuntsTipus) =>
+    tp === "registre" ||
+    tp === "primer_escaneig" ||
+    tp === "escaneig_qr" ||
+    tp === "aniversari";
+  // Simple actions: hide limits/validity/conditions.
   const isSimpleAction = (tp: AccioPuntsTipus) =>
     tp === "registre" || tp === "primer_escaneig" || tp === "escaneig_qr";
   const fixedCopy = (tp: AccioPuntsTipus) => {
@@ -215,12 +219,6 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
         return { nom: escaneigQrNom, descripcio: escaneigQrDescripcio };
       case "aniversari":
         return { nom: aniversariNom, descripcio: aniversariDescripcio };
-      case "visita_web":
-        return { nom: visitaWebNom, descripcio: visitaWebDescripcio };
-      case "registre_web":
-        return { nom: registreWebNom, descripcio: registreWebDescripcio };
-      case "esdeveniment":
-        return { nom: esdevenimentNom, descripcio: esdevenimentDescripcio };
       default:
         return { nom: registreNom, descripcio: registreDescripcio };
     }
@@ -233,12 +231,6 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
         return "accions.escaneigQr.info";
       case "aniversari":
         return "accions.aniversari.info";
-      case "visita_web":
-        return "accions.visitaWeb.info";
-      case "registre_web":
-        return "accions.registreWeb.info";
-      case "esdeveniment":
-        return "accions.esdeveniment.info";
       default:
         return "accions.registre.info";
     }
@@ -261,12 +253,6 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
     escaneigQrDescripcio,
     aniversariNom,
     aniversariDescripcio,
-    visitaWebNom,
-    visitaWebDescripcio,
-    registreWebNom,
-    registreWebDescripcio,
-    esdevenimentNom,
-    esdevenimentDescripcio,
   ]);
 
   return (
@@ -436,7 +422,7 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
 
 
 
-      {/* Nom + Descripció: fixos per a tipus predefinits, editables per a la resta */}
+      {/* Nom + Descripció: fixos per a tipus de catàleg; editables (i18n) per a web/event/custom */}
       {isFixedText(tipus) ? (
         <div className="flex flex-col gap-3 rounded-md border bg-muted/30 p-4">
           <div className="flex flex-col gap-1">
@@ -458,7 +444,13 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
 
       ) : (
         <>
-          <p className="text-xs text-muted-foreground">{t("accions.form.i18nHint")}</p>
+          <p className="text-xs text-muted-foreground">
+            {tipus === "visita_web" ||
+            tipus === "registre_web" ||
+            tipus === "esdeveniment"
+              ? t("accions.form.i18nHintWeb")
+              : t("accions.form.i18nHint")}
+          </p>
           <Controller
             control={control}
             name="nomI18n"

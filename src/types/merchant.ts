@@ -21,6 +21,8 @@ export type ComercMe = {
   id: string;
   nom: string;
   emoji?: string;
+  /** Listing logo (same asset as fitxa logo). */
+  logoUrl?: string;
   adherit: true;
 };
 
@@ -55,6 +57,9 @@ export type HorariDia = {
   tancat: boolean;
   obertura: string; // "HH:mm"
   tancament: string; // "HH:mm"
+  /** Optional afternoon / second slot (API opens_2 / closes_2). */
+  obertura2?: string;
+  tancament2?: string;
 };
 
 export type Horari = Record<DiaSetmana, HorariDia>;

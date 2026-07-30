@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useSessionStore } from "@/stores/useSessionStore";
 
 const API_URL = (
   (import.meta.env.VITE_API_URL as string | undefined) ||
@@ -93,6 +94,13 @@ export async function apiRequest<T>(
   if (token) reqHeaders.Authorization = `Bearer ${token}`;
   if (body !== undefined && !rawBody && !(body instanceof FormData)) {
     reqHeaders["Content-Type"] = "application/json";
+  }
+
+  // Admin acting as a merchant shop (on behalf).
+  const actingAsShopId = useSessionStore.getState().actingAsShopId;
+  const roles = useAuthStore.getState().user?.roles ?? [];
+  if (actingAsShopId && roles.includes("admin") && !reqHeaders["X-Acting-Shop-Id"]) {
+    reqHeaders["X-Acting-Shop-Id"] = actingAsShopId;
   }
 
   const res = await fetch(url, {

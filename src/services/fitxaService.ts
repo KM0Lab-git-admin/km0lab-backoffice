@@ -2,7 +2,7 @@ import { api, absoluteMediaUrl } from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { fitxaFromShop, fitxaToProfileUpdate } from "@/lib/mappers/shop";
 import type { ComercFitxa, ComercFitxaInput } from "@/types/merchant";
-import type { ApiShop } from "@/types/api";
+import type { ApiShop, ApiShopCategory } from "@/types/api";
 
 function dataUrlToBlob(dataUrl: string): { blob: Blob; filename: string } {
   const [header, data] = dataUrl.split(",");
@@ -30,7 +30,9 @@ async function deleteMediaIfCleared(
   value: string | undefined,
   hadMedia: boolean,
 ): Promise<void> {
-  if (hadMedia && !value) {
+  // Ignore cache-bust query when deciding "cleared".
+  const cleared = !value || value.trim() === "";
+  if (hadMedia && cleared) {
     await api.delete(`/shops/me/media/${kind}`);
   }
 }
@@ -39,9 +41,15 @@ export const fitxaService = {
   async getFitxa(): Promise<ComercFitxa> {
     const shop = await api.get<ApiShop>("/shops/me");
     const fitxa = fitxaFromShop(shop);
-    const townName = useAuthStore.getState().user?.townName;
-    if (townName) fitxa.poblacio = townName;
+    if (!fitxa.poblacio) {
+      fitxa.poblacio = useAuthStore.getState().user?.townName ?? "";
+    }
     return fitxa;
+  },
+
+  async listCategories(lang?: string): Promise<ApiShopCategory[]> {
+    const q = lang ? `?lang=${encodeURIComponent(lang)}` : "";
+    return api.get<ApiShopCategory[]>(`/shop-categories${q}`, { auth: false });
   },
 
   async updateFitxa(input: ComercFitxaInput): Promise<ComercFitxa> {
@@ -58,9 +66,22 @@ export const fitxaService = {
     );
     const fitxa = fitxaFromShop(shop);
     fitxa.poblacio =
-      input.poblacio || useAuthStore.getState().user?.townName || "";
-    fitxa.logoUrl = absoluteMediaUrl(shop.logo_url) ?? input.logoUrl;
-    fitxa.heroUrl = absoluteMediaUrl(shop.hero_url) ?? input.heroUrl;
+      shop.town_name ||
+      input.poblacio ||
+      useAuthStore.getState().user?.townName ||
+      "";
+    // Prefer freshly resolved API media URLs (with bust from updated_at).
+    if (!fitxa.logoUrl && input.logoUrl?.startsWith("data:")) {
+      fitxa.logoUrl = input.logoUrl;
+    }
+    if (!fitxa.heroUrl && input.heroUrl?.startsWith("data:")) {
+      fitxa.heroUrl = input.heroUrl;
+    }
+    // Keep absolute fallback if mapper somehow missed.
+    fitxa.logoUrl =
+      fitxa.logoUrl ?? absoluteMediaUrl(shop.logo_url) ?? input.logoUrl;
+    fitxa.heroUrl =
+      fitxa.heroUrl ?? absoluteMediaUrl(shop.hero_url) ?? input.heroUrl;
     return fitxa;
   },
 };

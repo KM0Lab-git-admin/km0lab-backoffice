@@ -1,6 +1,7 @@
 import { Bell, ChevronLeft, Globe, MapPin, Phone, ScanLine } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import { categoryLabelToSlug } from "@/lib/mappers/categories";
+import { formatHorariDia } from "@/lib/mappers/horari";
 import type { ComercFitxa, DiaSetmana } from "@/types/merchant";
 import type { MessageKey } from "@/lib/i18n";
 
@@ -76,23 +77,6 @@ export function FitxaPreview({ fitxa }: Props) {
             <div className="flex h-full w-full items-center justify-center text-xs text-km0-blue-500">
               {t("fitxa.preview.heroPlaceholder")}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Logo panel */}
-      <div className="bg-km0-beige-100 px-6 py-6">
-        <div className="mx-auto flex aspect-square w-40 items-center justify-center overflow-hidden rounded-2xl bg-white">
-          {fitxa.logoUrl ? (
-            <img
-              src={fitxa.logoUrl}
-              alt={fitxa.nom}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="px-2 text-center text-xs text-muted-foreground">
-              {t("fitxa.preview.logoPlaceholder")}
-            </span>
           )}
         </div>
       </div>
@@ -183,7 +167,7 @@ export function FitxaPreview({ fitxa }: Props) {
               title={
                 horariAvui.tancat
                   ? t("fitxa.horari.tancatAvui")
-                  : `${horariAvui.obertura}–${horariAvui.tancament}`
+                  : formatHorariDia(horariAvui)
               }
               subtitle={
                 obertAra ? (
@@ -233,7 +217,7 @@ export function FitxaPreview({ fitxa }: Props) {
                   <span>
                     {h.tancat
                       ? t("fitxa.horari.tancat")
-                      : `${h.obertura}–${h.tancament}`}
+                      : formatHorariDia(h)}
                   </span>
                 </li>
               );

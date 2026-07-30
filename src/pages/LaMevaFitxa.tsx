@@ -28,6 +28,7 @@ export default function LaMevaFitxa() {
     mutationFn: (input: ComercFitxaInput) => fitxaService.updateFitxa(input),
     onSuccess: (saved) => {
       qc.setQueryData(["fitxa", "me"], saved);
+      void qc.invalidateQueries({ queryKey: ["comerc", "me"] });
       setDraft(saved);
       toast.success(t("fitxa.toast.saved"));
     },

@@ -26,6 +26,20 @@ export function seedI18n(
   return {};
 }
 
+/** Always emit ca/es/en for API payloads ("" = hole → server translates). */
+export function i18nToApiPayload(
+  i18n: I18nMap | null | undefined,
+  source: Lang = "ca",
+  plain?: string | null,
+): Record<Lang, string> {
+  const seeded = seedI18n(plain, source, i18n);
+  return {
+    ca: (seeded.ca ?? "").trim(),
+    es: (seeded.es ?? "").trim(),
+    en: (seeded.en ?? "").trim(),
+  };
+}
+
 /** Pick the best plain string for lists/legacy from an i18n map. */
 export function pickPlain(
   i18n: I18nMap | null | undefined,

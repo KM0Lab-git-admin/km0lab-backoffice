@@ -338,11 +338,32 @@ export const messages = {
   "fitxa.adreca.label": { ca: "Adreça", es: "Dirección", en: "Address" },
   "fitxa.codiPostal.label": { ca: "Codi postal", es: "Código postal", en: "Postal code" },
   "fitxa.poblacio.label": { ca: "Població", es: "Población", en: "Town" },
+  "fitxa.poblacio.hint": {
+    ca: "Ve de la població del programa (no editable).",
+    es: "Viene de la población del programa (no editable).",
+    en: "Comes from the programme town (read-only).",
+  },
   "fitxa.telefon.label": { ca: "Telèfon", es: "Teléfono", en: "Phone" },
   "fitxa.web.label": { ca: "Web", es: "Web", en: "Website" },
   "fitxa.horari.tancat": { ca: "Tancat", es: "Cerrado", en: "Closed" },
   "fitxa.horari.obertura": { ca: "Obertura", es: "Apertura", en: "Opens" },
   "fitxa.horari.tancament": { ca: "Tancament", es: "Cierre", en: "Closes" },
+  "fitxa.horari.obertura2": {
+    ca: "Obertura (2n tram)",
+    es: "Apertura (2.º tramo)",
+    en: "Opens (2nd slot)",
+  },
+  "fitxa.horari.tancament2": {
+    ca: "Tancament (2n tram)",
+    es: "Cierre (2.º tramo)",
+    en: "Closes (2nd slot)",
+  },
+  "fitxa.horari.tram2": { ca: "2n tram", es: "2.º tramo", en: "2nd slot" },
+  "fitxa.horari.splitHint": {
+    ca: "Pots afegir un segon tram opcional (p. ex. tarda).",
+    es: "Puedes añadir un segundo tramo opcional (p. ej. tarde).",
+    en: "You can add an optional second slot (e.g. afternoon).",
+  },
   "fitxa.horari.obertAra": { ca: "Obert ara", es: "Abierto ahora", en: "Open now" },
   "fitxa.horari.tancaAvui": {
     ca: "tanca a les {hora}",
@@ -1052,9 +1073,14 @@ export const messages = {
     en: "Name and description are fixed. Provide the event URL.",
   },
   "accions.form.i18nHint": {
-    ca: "Aquesta acció és personalitzable: escriu el nom i la descripció. Es mostrarà als veïns en l'idioma del poble (o català per defecte).",
-    es: "Esta acción es personalizable: escribe el nombre y la descripción. Se mostrará a los vecinos en el idioma del pueblo (o catalán por defecto).",
-    en: "This action is custom: write the name and description. Shown to residents in the town's language (or Catalan by default).",
+    ca: "Escriu el nom i la descripció en l'idioma font (doble clic a la pestanya). Els altres idiomes es generaran automàticament en desar.",
+    es: "Escribe el nombre y la descripción en el idioma fuente (doble clic en la pestaña). Los otros idiomas se generarán automáticamente al guardar.",
+    en: "Write the name and description in the source language (double-click the tab). Other languages are auto-generated on save.",
+  },
+  "accions.form.i18nHintWeb": {
+    ca: "Escriu el nom i la descripció en l'idioma font (doble clic a la pestanya). Els altres idiomes es generaran automàticament en desar. La URL és obligatòria.",
+    es: "Escribe el nombre y la descripción en el idioma fuente (doble clic en la pestaña). Los otros idiomas se generarán automáticamente al guardar. La URL es obligatoria.",
+    en: "Write the name and description in the source language (double-click the tab). Other languages are auto-generated on save. URL is required.",
   },
   "accions.form.nomCa": { ca: "Nom (català)", es: "Nombre (catalán)", en: "Name (Catalan)" },
   "accions.form.nomEs": { ca: "Nom (castellà)", es: "Nombre (castellano)", en: "Name (Spanish)" },
@@ -1336,6 +1362,21 @@ export const messages = {
   },
   "comercos.col.alta": { ca: "Alta", es: "Alta", en: "Joined" },
   "comercos.col.actions": { ca: "Accions", es: "Acciones", en: "Actions" },
+  "comercos.actAs": {
+    ca: "Gestionar com a comerç",
+    es: "Gestionar como comercio",
+    en: "Manage as merchant",
+  },
+  "acting.banner": {
+    ca: "Actuant com a {name}",
+    es: "Actuando como {name}",
+    en: "Acting as {name}",
+  },
+  "acting.exit": {
+    ca: "Sortir",
+    es: "Salir",
+    en: "Exit",
+  },
   "comercos.card.altaLabel": { ca: "Alta:", es: "Alta:", en: "Joined:" },
 
   "comercos.form.new.title": {
@@ -1344,9 +1385,9 @@ export const messages = {
     en: "Add merchant",
   },
   "comercos.form.new.subtitle": {
-    ca: "Dona d'alta un comerç i envia-li la invitació per accedir al seu panell.",
-    es: "Da de alta un comercio y envíale la invitación para acceder a su panel.",
-    en: "Register a merchant and send them the invitation to access their panel.",
+    ca: "Dona d'alta un comerç amb dades de contacte i envia-li la invitació al panell.",
+    es: "Da de alta un comercio con datos de contacto y envíale la invitación a su panel.",
+    en: "Register a merchant with contact details and send them an invite to their panel.",
   },
   "comercos.form.edit.title": {
     ca: "Editar comerç",
@@ -1370,14 +1411,29 @@ export const messages = {
     en: "Categories",
   },
   "comercos.form.categories.placeholder": {
-    ca: "Alimentació, Fleca",
-    es: "Alimentación, Panadería",
-    en: "Food, Bakery",
+    ca: "Selecciona categories…",
+    es: "Selecciona categorías…",
+    en: "Select categories…",
   },
   "comercos.form.categories.hint": {
-    ca: "Separa les categories amb comes.",
-    es: "Separa las categorías con comas.",
-    en: "Separate categories with commas.",
+    ca: "Pots triar fins a 6 categories del catàleg.",
+    es: "Puedes elegir hasta 6 categorías del catálogo.",
+    en: "You can choose up to 6 categories from the catalogue.",
+  },
+  "comercos.form.categories.count": {
+    ca: "{{count}} seleccionades",
+    es: "{{count}} seleccionadas",
+    en: "{{count}} selected",
+  },
+  "comercos.form.categories.search": {
+    ca: "Cerca categories…",
+    es: "Buscar categorías…",
+    en: "Search categories…",
+  },
+  "comercos.form.categories.empty": {
+    ca: "Cap categoria trobada",
+    es: "Ninguna categoría encontrada",
+    en: "No categories found",
   },
   "comercos.form.email.label": {
     ca: "Email de contacte",
@@ -1424,6 +1480,41 @@ export const messages = {
     ca: "C. Major, 12",
     es: "C. Mayor, 12",
     en: "12 Main St.",
+  },
+  "comercos.form.contact.title": {
+    ca: "Contacte i ubicació",
+    es: "Contacto y ubicación",
+    en: "Contact and location",
+  },
+  "comercos.form.codiPostal.label": {
+    ca: "Codi postal",
+    es: "Código postal",
+    en: "Postal code",
+  },
+  "comercos.form.codiPostal.placeholder": {
+    ca: "00000",
+    es: "00000",
+    en: "00000",
+  },
+  "comercos.form.telefon.label": {
+    ca: "Telèfon",
+    es: "Teléfono",
+    en: "Phone",
+  },
+  "comercos.form.telefon.placeholder": {
+    ca: "937 00 00 00",
+    es: "937 00 00 00",
+    en: "+34 937 00 00 00",
+  },
+  "comercos.form.web.label": {
+    ca: "Pàgina web",
+    es: "Página web",
+    en: "Website",
+  },
+  "comercos.form.web.placeholder": {
+    ca: "https://elmeucomerc.cat",
+    es: "https://micomercio.es",
+    en: "https://mymerchant.com",
   },
   "comercos.form.inviteHint": {
     ca: "Es crearà el comerç en estat 'Pendent d'accés' i es generarà el seu QR automàticament.",

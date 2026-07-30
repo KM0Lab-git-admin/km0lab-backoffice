@@ -8,8 +8,16 @@ export const Route = createFileRoute("/admin")({
     if (!useAuthStore.getState().isAuthenticated) {
       throw redirect({ to: "/login" });
     }
-    if (useSessionStore.getState().rol !== "admin") {
-      useSessionStore.getState().setRol("admin");
+    const roles = useAuthStore.getState().user?.roles ?? [];
+    if (!roles.includes("admin")) {
+      throw redirect({ to: "/merchant/my-qr" });
+    }
+    // Leaving merchant acting mode when entering admin area.
+    const session = useSessionStore.getState();
+    if (session.actingAsShopId) {
+      session.exitActingAsShop();
+    } else if (session.rol !== "admin") {
+      session.setRol("admin");
     }
   },
   component: AdminLayout,
