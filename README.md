@@ -9,8 +9,8 @@ Front de producto del **backoffice KM0 LAB** (roles admin / comerç).
 ## Desarrollo
 
 ```sh
-bun install
-bun run dev
+npm install
+npm run dev
 ```
 
 Ramas: `develop` (integración) y `main` (producción).
@@ -18,8 +18,8 @@ Ramas: `develop` (integración) y `main` (producción).
 ## Sync desde Lovable
 
 ```sh
-bun run sync:lovable -- --dry-run --source ../km0lab-backoffice-lovable
-bun run sync:lovable -- --source ../km0lab-backoffice-lovable
+npm run sync:lovable -- --dry-run --source ../km0lab-backoffice-lovable
+npm run sync:lovable -- --source ../km0lab-backoffice-lovable
 ```
 
 ## Stack

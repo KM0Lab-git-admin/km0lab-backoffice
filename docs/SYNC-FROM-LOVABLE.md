@@ -16,14 +16,14 @@ a este repo de producto. No corre en cada push a Lovable: lo lanzas tú.
 
 ```bash
 # Recomendado: checkout local al lado de este repo
-bun run sync:lovable -- --dry-run --source ../km0lab-backoffice-lovable
-bun run sync:lovable -- --source ../km0lab-backoffice-lovable
+npm run sync:lovable -- --dry-run --source ../km0lab-backoffice-lovable
+npm run sync:lovable -- --source ../km0lab-backoffice-lovable
 
 # Listar qué se copiaría
-bun run sync:lovable -- --list --source ../km0lab-backoffice-lovable
+npm run sync:lovable -- --list --source ../km0lab-backoffice-lovable
 
 # Sin --source: usa defaultSourceDir del manifest, o GitHub API + raw
-bun run sync:lovable -- --dry-run
+npm run sync:lovable -- --dry-run
 ```
 
 Revisa el diff y commitea en `develop`.
@@ -41,7 +41,7 @@ La BD y la lógica de servidor viven en `km0lab-api`, no aquí.
 ## Flujo de trabajo
 
 1. Iteras UI en Lovable → queda en `km0lab-backoffice-lovable` `main`.
-2. Cuando quieras traer cambios: `bun run sync:lovable -- --source ../km0lab-backoffice-lovable`.
+2. Cuando quieras traer cambios: `npm run sync:lovable -- --source ../km0lab-backoffice-lovable`.
 3. Revisas diff, resuelves conflictos si tocaste archivos no locked.
 4. Merge a `develop` → luego `main` cuando toque desplegar.
 

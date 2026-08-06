@@ -1,7 +1,7 @@
 # AGENTS — km0lab-backoffice
 
 Front de producto del backoffice KM0 LAB. La UI nace en Lovable
-(`km0lab-backoffice-lovable`) y se trae aquí con `bun run sync:lovable`
+(`km0lab-backoffice-lovable`) y se trae aquí con `npm run sync:lovable`
 (ver `docs/SYNC-FROM-LOVABLE.md`).
 
 ## Frontera

@@ -1,7 +1,14 @@
 # Docs · Backoffice KM0 LAB
 
-Contexto y prompts para ampliar este backoffice con el **rol administrador** (gestor de
-població), integrándolo con el panel del **comerç** que ya existe.
+> **Estado:** el **rol administrador** (gestor de població) **ya está
+> implementado** (rutas `admin.*` y páginas AdminResum/Accions/Recompenses/
+> Bescanvis/Comerços/Usuaris/Configuració), conviviendo con el panel del
+> **comerç**. Los prompts de abajo son el **registro histórico** con el que se
+> generó ese rol en Lovable; `KNOWLEDGE.md` sigue siendo la referencia viva de
+> arquitectura, roles y reglas.
+
+Contexto y prompts con los que se amplió este backoffice con el **rol
+administrador** (gestor de població), integrándolo con el panel del **comerç**.
 
 ## Contenido
 
