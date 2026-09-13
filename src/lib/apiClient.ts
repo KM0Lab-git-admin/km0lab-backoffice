@@ -39,6 +39,18 @@ export function absoluteMediaUrl(
   return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/** Bust browser cache when the media path is stable (`/rewards/{id}/media`). */
+export function cacheBustedMediaUrl(
+  path: string | null | undefined,
+  version?: string | null,
+): string | undefined {
+  const abs = absoluteMediaUrl(path);
+  if (!abs) return undefined;
+  if (!version || /[?&]v=/.test(abs)) return abs;
+  const sep = abs.includes("?") ? "&" : "?";
+  return `${abs}${sep}v=${encodeURIComponent(version)}`;
+}
+
 type RequestOptions = {
   method?: string;
   body?: unknown;

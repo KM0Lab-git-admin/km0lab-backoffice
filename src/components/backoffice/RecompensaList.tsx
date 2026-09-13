@@ -95,6 +95,7 @@ export function RecompensaGrid({ recompenses, onEdit, onDelete }: Props) {
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
               {r.imatgeUrl ? (
                 <img
+                  key={r.imatgeUrl}
                   src={r.imatgeUrl}
                   alt={r.nom}
                   className="h-full w-full object-cover"

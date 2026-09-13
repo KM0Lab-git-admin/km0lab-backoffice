@@ -56,7 +56,10 @@ export default function RecompensesPage() {
   const updateMut = useMutation({
     mutationFn: ({ id, input }: { id: string; input: RecompensaInput }) =>
       recompensesService.update(id, input),
-    onSuccess: () => {
+    onSuccess: (updated) => {
+      qc.setQueryData<Recompensa[]>(["admin", "recompenses"], (prev) =>
+        prev?.map((r) => (r.id === updated.id ? updated : r)) ?? [updated],
+      );
       invalidate();
       toast.success(t("toast.recompensa.saved"));
       setEditing(null);
