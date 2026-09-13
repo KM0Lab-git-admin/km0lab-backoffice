@@ -8,6 +8,33 @@ Format basat en [Keep a Changelog](https://keepachangelog.com/) i
 
 ---
 
+## [1.3.0] — 2026-09-13
+
+Portabilitat 1.3.0 des de Lovable (`km0lab-backoffice-lovable` `main`).
+La UI integrada amb `km0lab-api` es preserva (forms i18n, services, auth).
+El catàleg visible surt de l'API, no dels fixtures de Lovable.
+
+### Added
+- Imatges finals de vals 5/10/20/50 €, gorra, samarreta, bossa i cinema
+  materialitzades a `public/rewards/` (PNG reals; sense CDN `/__l5e/`).
+- Seed de `km0lab-api`: les mateixes imatges a `scripts/seed_media/rewards/`
+  i `PUT` implícit a `reward_media` via `seed_fake_rewards` /
+  `python -m scripts.seed_reward_images`.
+- Catàleg demo: **Gorra KM0 LAB** i **Entrada de cinema** (punts demo
+  existents dels vals/bossa/samarreta no es toquen).
+
+### Changed
+- Manifest de sync: `exclude` per fixtures/assets/stores mock de Lovable;
+  `locked` amplia i18n, types de producte i formularis amb `I18nField`.
+- Pre-flight documentat: cada porte baixa `origin/main` de Lovable abans
+  del sync (`docs/SYNC-FROM-LOVABLE.md`).
+
+### Preservat de la integració real (no portat de Lovable)
+- Services, mappers, `apiClient`, stores d'auth, `I18nField` als forms,
+  claus `shopCategories.*` i punts del seed demo.
+
+---
+
 ## [1.2.0] — 2026-07-29
 
 Portabilitat 1.2.0 des de Lovable. La UI ve de Lovable; la integració amb

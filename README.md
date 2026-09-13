@@ -17,10 +17,25 @@ Ramas: `develop` (integración) y `main` (producción).
 
 ## Sync desde Lovable
 
+Siempre desde `main` de Lovable actualizado. Si el checkout local está
+desfasado, el sync porta una versión vieja.
+
+```powershell
+cd ..\km0lab-backoffice-lovable
+git fetch origin
+git checkout main
+git pull --ff-only origin main
+git status -sb
+```
+
+Luego, en este repo (`develop`):
+
 ```sh
 npm run sync:lovable -- --dry-run --source ../km0lab-backoffice-lovable
 npm run sync:lovable -- --source ../km0lab-backoffice-lovable
 ```
+
+Guía completa: `docs/SYNC-FROM-LOVABLE.md`.
 
 ## Stack
 
