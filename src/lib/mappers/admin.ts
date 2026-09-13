@@ -230,7 +230,10 @@ export function recompensaFromApi(r: ApiReward): Recompensa {
     nomI18n: seedI18n(r.name, idiomaOrigen, r.name_i18n),
     descripcioI18n: seedI18n(r.description, idiomaOrigen, r.description_i18n),
     idiomaOrigen,
-    imatgeUrl: cacheBustedMediaUrl(r.image_url, r.updated_at) ?? undefined,
+    imatgeUrl:
+      r.has_image === false
+        ? undefined
+        : cacheBustedMediaUrl(r.image_url, r.updated_at) ?? undefined,
     tipus: RECOMPENSA_TIPUS_FROM_API[r.type] ?? "producte",
     puntsNecessaris: r.points_required,
     valor: r.value ?? undefined,

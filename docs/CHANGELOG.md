@@ -8,6 +8,14 @@ Format basat en [Keep a Changelog](https://keepachangelog.com/) i
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- Recompenses: no demana `/rewards/{id}/media` si `has_image` és fals
+  (evita 404 pintats com a CORS al catàleg).
+
+---
+
 ## [1.3.0] — 2026-09-13
 
 Portabilitat 1.3.0 des de Lovable (`km0lab-backoffice-lovable` `main`).
