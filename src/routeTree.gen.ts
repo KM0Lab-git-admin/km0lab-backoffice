@@ -16,6 +16,7 @@ import { Route as MerchantRouteImport } from './routes/merchant'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminActionsRouteImport } from './routes/admin.actions'
+import { Route as AdminInvitesRouteImport } from './routes/admin.invites'
 import { Route as AdminMerchantsRouteImport } from './routes/admin.merchants'
 import { Route as AdminOverviewRouteImport } from './routes/admin.overview'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
@@ -63,6 +64,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminActionsRoute = AdminActionsRouteImport.update({
   id: '/actions',
   path: '/actions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInvitesRoute = AdminInvitesRouteImport.update({
+  id: '/invites',
+  path: '/invites',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMerchantsRoute = AdminMerchantsRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/merchant': typeof MerchantRouteWithChildren
   '/register': typeof RegisterRoute
   '/admin/actions': typeof AdminActionsRoute
+  '/admin/invites': typeof AdminInvitesRoute
   '/admin/merchants': typeof AdminMerchantsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/admin/actions': typeof AdminActionsRoute
+  '/admin/invites': typeof AdminInvitesRoute
   '/admin/merchants': typeof AdminMerchantsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/merchant': typeof MerchantRouteWithChildren
   '/register': typeof RegisterRoute
   '/admin/actions': typeof AdminActionsRoute
+  '/admin/invites': typeof AdminInvitesRoute
   '/admin/merchants': typeof AdminMerchantsRoute
   '/admin/overview': typeof AdminOverviewRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/merchant'
     | '/register'
     | '/admin/actions'
+    | '/admin/invites'
     | '/admin/merchants'
     | '/admin/overview'
     | '/admin/redemptions'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/admin/actions'
+    | '/admin/invites'
     | '/admin/merchants'
     | '/admin/overview'
     | '/admin/redemptions'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/merchant'
     | '/register'
     | '/admin/actions'
+    | '/admin/invites'
     | '/admin/merchants'
     | '/admin/overview'
     | '/admin/redemptions'
@@ -320,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/actions'
       fullPath: '/admin/actions'
       preLoaderRoute: typeof AdminActionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/invites': {
+      id: '/admin/invites'
+      path: '/invites'
+      fullPath: '/admin/invites'
+      preLoaderRoute: typeof AdminInvitesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/merchants': {
@@ -418,6 +437,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminActionsRoute: typeof AdminActionsRoute
+  AdminInvitesRoute: typeof AdminInvitesRoute
   AdminMerchantsRoute: typeof AdminMerchantsRoute
   AdminOverviewRoute: typeof AdminOverviewRoute
   AdminRedemptionsRoute: typeof AdminRedemptionsRoute
@@ -429,6 +449,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActionsRoute: AdminActionsRoute,
+  AdminInvitesRoute: AdminInvitesRoute,
   AdminMerchantsRoute: AdminMerchantsRoute,
   AdminOverviewRoute: AdminOverviewRoute,
   AdminRedemptionsRoute: AdminRedemptionsRoute,

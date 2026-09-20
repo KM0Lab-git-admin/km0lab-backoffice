@@ -9,6 +9,7 @@ import {
   Sparkles,
   Star,
   Cake,
+  Store,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,8 @@ const TIPUS_ICON: Record<AccioPuntsTipus, LucideIcon> = {
   registre_web: Mail,
   esdeveniment: CalendarDays,
   personalitzada: Sparkles,
+  invitacio_persona: UserPlus,
+  invitacio_negoci: Store,
 };
 
 export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
@@ -56,6 +59,10 @@ export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
       return "accions.tipus.esdeveniment";
     case "personalitzada":
       return "accions.tipus.personalitzada";
+    case "invitacio_persona":
+      return "accions.tipus.invitacio_persona";
+    case "invitacio_negoci":
+      return "accions.tipus.invitacio_negoci";
   }
 }
 

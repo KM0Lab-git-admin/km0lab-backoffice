@@ -12,6 +12,8 @@ export const accioTipusList: AccioPuntsTipus[] = [
   "registre_web",
   "esdeveniment",
   "personalitzada",
+  "invitacio_persona",
+  "invitacio_negoci",
 ];
 
 export const accionsService = {

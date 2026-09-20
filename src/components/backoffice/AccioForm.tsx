@@ -45,6 +45,8 @@ const schema = z
       "registre_web",
       "esdeveniment",
       "personalitzada",
+      "invitacio_persona",
+      "invitacio_negoci",
     ]),
 
     punts: z.coerce.number().int().positive(),
@@ -201,16 +203,26 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
   const escaneigQrDescripcio = t("accions.escaneigQr.fixedDescripcio");
   const aniversariNom = t("accions.aniversari.fixedNom");
   const aniversariDescripcio = t("accions.aniversari.fixedDescripcio");
+  const invitacioPersonaNom = t("accions.invitacioPersona.fixedNom");
+  const invitacioPersonaDescripcio = t("accions.invitacioPersona.fixedDescripcio");
+  const invitacioNegociNom = t("accions.invitacioNegoci.fixedNom");
+  const invitacioNegociDescripcio = t("accions.invitacioNegoci.fixedDescripcio");
 
   // Fixed catalog types: name/description are not editable (API serves by lang).
   const isFixedText = (tp: AccioPuntsTipus) =>
     tp === "registre" ||
     tp === "primer_escaneig" ||
     tp === "escaneig_qr" ||
-    tp === "aniversari";
+    tp === "aniversari" ||
+    tp === "invitacio_persona" ||
+    tp === "invitacio_negoci";
   // Simple actions: hide limits/validity/conditions.
   const isSimpleAction = (tp: AccioPuntsTipus) =>
-    tp === "registre" || tp === "primer_escaneig" || tp === "escaneig_qr";
+    tp === "registre" ||
+    tp === "primer_escaneig" ||
+    tp === "escaneig_qr" ||
+    tp === "invitacio_persona" ||
+    tp === "invitacio_negoci";
   const fixedCopy = (tp: AccioPuntsTipus) => {
     switch (tp) {
       case "primer_escaneig":
@@ -219,6 +231,10 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
         return { nom: escaneigQrNom, descripcio: escaneigQrDescripcio };
       case "aniversari":
         return { nom: aniversariNom, descripcio: aniversariDescripcio };
+      case "invitacio_persona":
+        return { nom: invitacioPersonaNom, descripcio: invitacioPersonaDescripcio };
+      case "invitacio_negoci":
+        return { nom: invitacioNegociNom, descripcio: invitacioNegociDescripcio };
       default:
         return { nom: registreNom, descripcio: registreDescripcio };
     }
@@ -231,6 +247,10 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
         return "accions.escaneigQr.info";
       case "aniversari":
         return "accions.aniversari.info";
+      case "invitacio_persona":
+        return "accions.invitacioPersona.info";
+      case "invitacio_negoci":
+        return "accions.invitacioNegoci.info";
       default:
         return "accions.registre.info";
     }
@@ -253,6 +273,10 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
     escaneigQrDescripcio,
     aniversariNom,
     aniversariDescripcio,
+    invitacioPersonaNom,
+    invitacioPersonaDescripcio,
+    invitacioNegociNom,
+    invitacioNegociDescripcio,
   ]);
 
   return (

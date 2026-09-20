@@ -56,6 +56,8 @@ const ACCIO_TIPUS_TO_API: Record<AccioPuntsTipus, string> = {
   registre_web: "web_signup",
   esdeveniment: "event",
   personalitzada: "custom",
+  invitacio_persona: "invite_person",
+  invitacio_negoci: "invite_business",
 };
 
 const ACCIO_TIPUS_FROM_API: Record<string, AccioPuntsTipus> = {
@@ -67,6 +69,8 @@ const ACCIO_TIPUS_FROM_API: Record<string, AccioPuntsTipus> = {
   web_signup: "registre_web",
   event: "esdeveniment",
   custom: "personalitzada",
+  invite_person: "invitacio_persona",
+  invite_business: "invitacio_negoci",
 };
 
 const ACCIO_TOP_TIPUS: Record<string, AccioTipus> = {

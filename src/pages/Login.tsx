@@ -19,6 +19,7 @@ import {
   authService,
   DEV_SKIP_OTP,
   MOCK_OTP_CODE,
+  isFixedOtpEmail,
 } from "@/services/authService";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useSessionStore } from "@/stores/useSessionStore";
@@ -65,8 +66,8 @@ export function LoginPage() {
   const onEmailSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true);
     try {
-      // Local only: demo emails enter in one step (no OTP screen).
-      if (DEV_SKIP_OTP) {
+      // Local: cuentas con OTP fijo (demo + Malgrat QA) entran sin pantalla de código.
+      if (DEV_SKIP_OTP && isFixedOtpEmail(values.email)) {
         const session = await authService.verifyLoginCode(
           values.email,
           MOCK_OTP_CODE,
@@ -127,6 +128,24 @@ export function LoginPage() {
       applySession(session);
     } catch (err) {
       console.error("[login] demo bypass failed", err);
+      const unreachable =
+        err instanceof TypeError ||
+        (err instanceof Error && /failed to fetch|networkerror|load failed/i.test(err.message));
+      toast.error(
+        unreachable ? t("login.error.apiUnreachable") : t("login.error.generic"),
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function onMalgratLogin(kind: "admin" | "merchant1" | "merchant2") {
+    setSubmitting(true);
+    try {
+      const session = await authService.loginAsMalgrat(kind);
+      applySession(session);
+    } catch (err) {
+      console.error("[login] malgrat QA bypass failed", err);
       const unreachable =
         err instanceof TypeError ||
         (err instanceof Error && /failed to fetch|networkerror|load failed/i.test(err.message));
@@ -243,9 +262,7 @@ export function LoginPage() {
         <Button type="submit" disabled={submitting} className="w-full">
           {submitting
             ? t("login.verifying")
-            : DEV_SKIP_OTP
-              ? t("login.verify")
-              : t("login.submit")}
+            : t("login.submit")}
         </Button>
       </form>
 
@@ -269,6 +286,36 @@ export function LoginPage() {
             onClick={() => onDemoLogin("merchant")}
           >
             {t("login.dev.merchant")}
+          </Button>
+          <p className="pt-2 text-xs text-muted-foreground">
+            {t("login.dev.malgratHint")}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onMalgratLogin("admin")}
+          >
+            {t("login.dev.malgratAdmin")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onMalgratLogin("merchant1")}
+          >
+            {t("login.dev.malgratMerchant1")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onMalgratLogin("merchant2")}
+          >
+            {t("login.dev.malgratMerchant2")}
           </Button>
         </div>
       ) : null}

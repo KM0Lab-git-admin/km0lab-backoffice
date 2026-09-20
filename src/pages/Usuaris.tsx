@@ -38,6 +38,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
 import { usuarisService } from "@/services/usuarisService";
+import { invitationsService } from "@/services/invitationsService";
 import { adminService } from "@/services/adminService";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { ErrorState } from "@/components/backoffice/ErrorState";
@@ -91,10 +92,11 @@ function NivellBadge({ nivell }: { nivell: number }) {
 
 function ContactCell({ v }: { v: VeiPrograma }) {
   const { t } = useLang();
-  if (!v.contacteCompartit || (!v.email && !v.telefon)) {
+  const phone = v.contacteCompartit ? v.telefon : undefined;
+  if (!v.email && !phone) {
     return (
       <span className="text-xs italic text-muted-foreground">
-        {t("usuaris.contact.notShared")}
+        {t("usuaris.contact.none")}
       </span>
     );
   }
@@ -110,14 +112,14 @@ function ContactCell({ v }: { v: VeiPrograma }) {
           {v.email}
         </a>
       ) : null}
-      {v.telefon ? (
+      {phone ? (
         <a
-          href={`tel:${v.telefon.replace(/\s/g, "")}`}
+          href={`tel:${phone.replace(/\s/g, "")}`}
           onClick={(e) => e.stopPropagation()}
           className="inline-flex items-center gap-1 text-km0-blue-700 hover:underline"
         >
           <Phone className="h-3 w-3" />
-          {v.telefon}
+          {phone}
         </a>
       ) : null}
     </div>
@@ -169,6 +171,13 @@ export default function UsuarisPage() {
   const selected = selectedId
     ? veins.find((v) => v.id === selectedId) ?? null
     : null;
+
+  const invitesQ = useQuery({
+    queryKey: ["admin", "invites", "user", selectedId],
+    queryFn: () =>
+      invitationsService.list({ inviterUserId: selectedId ?? undefined }),
+    enabled: Boolean(selectedId),
+  });
 
   const poblacioNom = meQ.data?.poblacioNom ?? "";
 
@@ -252,7 +261,7 @@ export default function UsuarisPage() {
                       </TableHead>
                       <TableHead>{t("usuaris.col.alta")}</TableHead>
                       <TableHead>{t("usuaris.col.ultima")}</TableHead>
-                      <TableHead>{t("usuaris.col.contacte")}</TableHead>
+                      <TableHead>{t("usuaris.col.email")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -394,6 +403,60 @@ export default function UsuarisPage() {
                     {t("usuaris.detall.contacte")}
                   </p>
                   <ContactCell v={selected} />
+                </section>
+
+                <section className="flex flex-col gap-3">
+                  <p className="text-sm font-semibold">
+                    {t("usuaris.detall.invitacions")}
+                  </p>
+                  {invitesQ.isLoading ? (
+                    <Skeleton className="h-20 w-full" />
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-3">
+                        <SummaryTile
+                          label={t("invitations.kpi.persons")}
+                          value={(invitesQ.data?.persons_registered ?? 0).toLocaleString(
+                            locale,
+                          )}
+                        />
+                        <SummaryTile
+                          label={t("invitations.kpi.businesses")}
+                          value={(
+                            invitesQ.data?.businesses_registered ?? 0
+                          ).toLocaleString(locale)}
+                        />
+                        <SummaryTile
+                          label={t("invitations.kpi.points")}
+                          value={(invitesQ.data?.points_granted ?? 0).toLocaleString(
+                            locale,
+                          )}
+                        />
+                      </div>
+                      {(invitesQ.data?.conversions ?? []).length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                          {t("invitations.empty")}
+                        </p>
+                      ) : (
+                        <ul className="flex flex-col gap-2">
+                          {(invitesQ.data?.conversions ?? []).slice(0, 8).map((row) => (
+                            <li
+                              key={row.id}
+                              className="flex items-center justify-between rounded-lg border bg-card px-3 py-2 text-xs"
+                            >
+                              <span>
+                                {row.display_name ?? "—"} ·{" "}
+                                {row.kind === "person"
+                                  ? t("invitations.filter.person")
+                                  : t("invitations.filter.business")}
+                              </span>
+                              <span className="tabular-nums">+{row.points}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  )}
                 </section>
 
                 <section className="flex flex-col gap-3">

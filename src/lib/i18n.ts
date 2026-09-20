@@ -26,6 +26,7 @@ export const messages = {
   "nav.estadistiques": { ca: "Estadístiques", es: "Estadísticas", en: "Statistics" },
   "nav.laMevaFitxa": { ca: "La meva fitxa", es: "Mi ficha", en: "My profile" },
   "nav.configuracio": { ca: "Configuració", es: "Configuración", en: "Settings" },
+  "nav.invitations": { ca: "Invitacions", es: "Invitaciones", en: "Invitations" },
   "nav.vals": { ca: "Validar vals", es: "Validar vales", en: "Validate vouchers" },
   "nav.openMenu": { ca: "Obrir menú", es: "Abrir menú", en: "Open menu" },
 
@@ -595,6 +596,26 @@ export const messages = {
     es: "Entrar como Merchant (demo)",
     en: "Sign in as Merchant (demo)",
   },
+  "login.dev.malgratHint": {
+    ca: "Malgrat real (CP 08380) — OTP 123456",
+    es: "Malgrat real (CP 08380) — OTP 123456",
+    en: "Real Malgrat (postcode 08380) — OTP 123456",
+  },
+  "login.dev.malgratAdmin": {
+    ca: "Admin Malgrat",
+    es: "Admin Malgrat",
+    en: "Malgrat admin",
+  },
+  "login.dev.malgratMerchant1": {
+    ca: "Comerç 1 Malgrat",
+    es: "Comercio 1 Malgrat",
+    en: "Malgrat shop 1",
+  },
+  "login.dev.malgratMerchant2": {
+    ca: "Comerç 2 Malgrat",
+    es: "Comercio 2 Malgrat",
+    en: "Malgrat shop 2",
+  },
 
   // Register
   "register.title": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
@@ -858,6 +879,16 @@ export const messages = {
     ca: "Personalitzada",
     es: "Personalizada",
     en: "Custom",
+  },
+  "accions.tipus.invitacio_persona": {
+    ca: "Invitació de veí",
+    es: "Invitación de vecino",
+    en: "Neighbour invitation",
+  },
+  "accions.tipus.invitacio_negoci": {
+    ca: "Invitació de comerç",
+    es: "Invitación de comercio",
+    en: "Shop invitation",
   },
 
   "accions.form.new.title": { ca: "Nova acció de punts", es: "Nueva acción de puntos", en: "New point action" },
@@ -1616,6 +1647,11 @@ export const messages = {
     es: "No compartido",
     en: "Not shared",
   },
+  "usuaris.contact.none": {
+    ca: "Sense correu",
+    es: "Sin correo",
+    en: "No email",
+  },
   "usuaris.col.nom": { ca: "Nom", es: "Nombre", en: "Name" },
   "usuaris.col.punts": { ca: "Punts", es: "Puntos", en: "Points" },
   "usuaris.col.nivell": { ca: "Nivell", es: "Nivel", en: "Level" },
@@ -1627,6 +1663,7 @@ export const messages = {
     en: "Last activity",
   },
   "usuaris.col.contacte": { ca: "Contacte", es: "Contacto", en: "Contact" },
+  "usuaris.col.email": { ca: "Correu", es: "Correo", en: "Email" },
 
   "usuaris.activitat.escaneig": {
     ca: "Escaneig de QR",
@@ -1667,6 +1704,11 @@ export const messages = {
     ca: "Encara no hi ha activitat registrada.",
     es: "Aún no hay actividad registrada.",
     en: "No activity recorded yet.",
+  },
+  "usuaris.detall.invitacions": {
+    ca: "Invitacions",
+    es: "Invitaciones",
+    en: "Invitations",
   },
 
   // Admin · Configuració
@@ -2524,6 +2566,73 @@ export const messages = {
     ca: "L'administració registrarà el cobrament via Bizum quan es faci efectiu.",
     es: "La administración registrará el cobro por Bizum cuando se haga efectivo.",
     en: "The admin will record the Bizum payout when it is completed.",
+  },
+
+  "invitations.title": { ca: "Invitacions", es: "Invitaciones", en: "Invitations" },
+  "invitations.subtitle": {
+    ca: "Registres completats a {poblacio}.",
+    es: "Registros completados en {poblacio}.",
+    en: "Completed signups in {poblacio}.",
+  },
+  "invitations.kpi.persons": { ca: "Veïns", es: "Vecinos", en: "Neighbours" },
+  "invitations.kpi.businesses": { ca: "Comerços", es: "Comercios", en: "Shops" },
+  "invitations.kpi.points": { ca: "Punts concedits", es: "Puntos concedidos", en: "Points granted" },
+  "invitations.kpi.shares": { ca: "Comparticions", es: "Compartidos", en: "Shares" },
+  "invitations.shares.note": {
+    ca: "Les comparticions són un senyal, no equivalen a enviaments ni lectures.",
+    es: "Los compartidos son una señal, no equivalen a envíos ni lecturas.",
+    en: "Shares are a signal, not proof of delivery or reads.",
+  },
+  "invitations.filter.all": { ca: "Tots", es: "Todos", en: "All" },
+  "invitations.filter.person": { ca: "Veí", es: "Vecino", en: "Neighbour" },
+  "invitations.filter.business": { ca: "Comerç", es: "Comercio", en: "Shop" },
+  "invitations.status.granted": { ca: "Concedida", es: "Concedida", en: "Granted" },
+  "invitations.status.pending": { ca: "Pendent", es: "Pendiente", en: "Pending" },
+  "invitations.status.failed": { ca: "Fallida", es: "Fallida", en: "Failed" },
+  "invitations.empty": {
+    ca: "Encara no hi ha registres completats.",
+    es: "Aún no hay registros completados.",
+    en: "No completed signups yet.",
+  },
+  "invitations.col.kind": { ca: "Tipus", es: "Tipo", en: "Kind" },
+  "invitations.col.name": { ca: "Nom", es: "Nombre", en: "Name" },
+  "invitations.col.status": { ca: "Estat", es: "Estado", en: "Status" },
+  "invitations.col.points": { ca: "Punts", es: "Puntos", en: "Points" },
+  "invitations.col.when": { ca: "Quan", es: "Cuándo", en: "When" },
+  "invitations.col.code": { ca: "Codi", es: "Código", en: "Code" },
+  "invitations.detail.title": { ca: "Conversió", es: "Conversión", en: "Conversion" },
+  "invitations.retry": { ca: "Reintentar recompensa", es: "Reintentar recompensa", en: "Retry reward" },
+  "invitations.retry.ok": { ca: "Recompensa actualitzada", es: "Recompensa actualizada", en: "Reward updated" },
+  "invitations.retry.error": { ca: "No s'ha pogut reintentar", es: "No se ha podido reintentar", en: "Retry failed" },
+  "accions.invitacioPersona.fixedNom": {
+    ca: "Invitació de veí",
+    es: "Invitación de vecino",
+    en: "Neighbour invitation",
+  },
+  "accions.invitacioPersona.fixedDescripcio": {
+    ca: "Alta d'un veí completada des d'una invitació",
+    es: "Alta de un vecino completada desde una invitación",
+    en: "Completed neighbour signup from an invitation",
+  },
+  "accions.invitacioPersona.info": {
+    ca: "S'abona al prescriptor quan el veí completa el registre al mateix municipi.",
+    es: "Se abona al prescriptor cuando el vecino completa el registro en el mismo municipio.",
+    en: "Paid to the inviter when the neighbour completes signup in the same town.",
+  },
+  "accions.invitacioNegoci.fixedNom": {
+    ca: "Invitació de comerç",
+    es: "Invitación de comercio",
+    en: "Shop invitation",
+  },
+  "accions.invitacioNegoci.fixedDescripcio": {
+    ca: "Alta d'un comerç completada des d'una invitació",
+    es: "Alta de un comercio completada desde una invitación",
+    en: "Completed shop signup from an invitation",
+  },
+  "accions.invitacioNegoci.info": {
+    ca: "S'abona al prescriptor quan el comerç queda activat al mateix municipi.",
+    es: "Se abona al prescriptor cuando el comercio queda activado en el mismo municipio.",
+    en: "Paid to the inviter when the shop is activated in the same town.",
   },
 
 } satisfies Record<string, Dict>;

@@ -15,6 +15,18 @@ npm run dev
 
 Ramas: `develop` (integración) y `main` (producción).
 
+## Login local
+
+OTP `123456` (API en development). Documentación: `km0lab-api/docs/LOCAL-ACCOUNTS.md`.
+
+| Botón / email | Pueblo |
+|---------------|--------|
+| Admin (demo) `admin@km0lab.com` | Demo KM0 |
+| Admin Malgrat `admin-malgrat@km0lab.com` | Malgrat real |
+| Comerç 1/2 Malgrat | Malgrat real |
+
+Gmail y otros correos piden OTP enviado (no 123456).
+
 ## Sync desde Lovable
 
 Siempre desde `main` de Lovable actualizado. Si el checkout local está

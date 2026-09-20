@@ -67,7 +67,9 @@ export type AccioPuntsTipus =
   | "visita_web"
   | "registre_web"
   | "esdeveniment"
-  | "personalitzada";
+  | "personalitzada"
+  | "invitacio_persona"
+  | "invitacio_negoci";
 
 
 export type CooldownUnitat = "dies" | "setmanes" | "mesos";

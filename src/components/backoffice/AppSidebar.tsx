@@ -14,6 +14,7 @@ import {
   Users,
   Settings,
   Landmark,
+  Share2,
 } from "lucide-react";
 
 import {
@@ -53,6 +54,7 @@ const adminNav: NavItem[] = [
   { to: "/admin/redemptions", labelKey: "nav.bescanvis", icon: Ticket },
   { to: "/admin/merchants", labelKey: "nav.comercos", icon: Store },
   { to: "/admin/users", labelKey: "nav.usuaris", icon: Users },
+  { to: "/admin/invites", labelKey: "nav.invitations", icon: Share2 },
   { to: "/admin/settings", labelKey: "nav.configuracio", icon: Settings },
 ];
 
