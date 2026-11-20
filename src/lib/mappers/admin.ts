@@ -247,6 +247,7 @@ export function recompensaFromApi(r: ApiReward): Recompensa {
     dataFi: isoDate(r.valid_until),
     condicions: r.conditions ?? undefined,
     estat: RECOMPENSA_ESTAT_FROM_API[r.status] ?? "inactiva",
+    contingutBloquejat: Boolean(r.content_locked),
   };
 }
 
@@ -309,6 +310,8 @@ export function comercAdminFromShop(
     puntsPerVisita: shop.visit_points,
     adreca: shop.address ?? undefined,
     codiPostal: shop.postal_code ?? undefined,
+    localitatId: shop.locality_id ?? undefined,
+    localitatNom: shop.town_name ?? undefined,
     telefon: shop.phone ?? undefined,
     web: shop.website ?? undefined,
     estat: ESTAT_FROM_API[shop.status] ?? "inactiu",
@@ -327,6 +330,9 @@ export function comercAdminToCreate(input: ComercAdminInput): Record<string, unk
     visit_points: input.puntsPerVisita,
     address: input.adreca || null,
     postal_code: input.codiPostal || null,
+    // Only when chosen: without it the API takes the town from the postal
+    // code, or the only one the municipality has.
+    ...(input.localitatId ? { locality_id: input.localitatId } : {}),
     phone: input.telefon || null,
     website: input.web || null,
   };
@@ -521,7 +527,14 @@ export function adminMeFromUser(user: ApiUser, town?: ApiTown | null): AdminMe {
   return {
     id: user.id,
     poblacioId: user.town_id ?? town?.id ?? "",
-    poblacioNom: user.town_name ?? town?.name ?? "",
+    // The municipality, not `town_name`: for the admin of a municipality
+    // that groups towns, that one is the town their account is tied to.
+    poblacioNom: town?.name ?? user.municipality_name ?? user.town_name ?? "",
+    localitats: (town?.localities ?? []).map((l) => ({
+      id: l.id,
+      nom: l.name,
+      codisPostals: l.postal_codes ?? [],
+    })),
     nom: user.name ?? user.email,
     logoUrl: logo ? `${logo}${bust}` : undefined,
   };

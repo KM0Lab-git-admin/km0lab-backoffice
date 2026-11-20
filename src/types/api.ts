@@ -10,7 +10,10 @@ export type ApiUser = {
   lang: string;
   postal_code: string | null;
   town_id: string | null;
+  /** The town the person is tied to (what the residents app shows). */
   town_name: string | null;
+  /** The managed scope. Differs from town_name when a municipality groups towns. */
+  municipality_name?: string | null;
   points: number;
   roles: string[];
   shop_id: string | null;
@@ -47,7 +50,9 @@ export type ApiOpeningHours = {
 export type ApiShop = {
   id: string;
   town_id: string;
+  /** Name of the town (locality) the shop is in, not of the municipality. */
   town_name?: string | null;
+  locality_id?: string | null;
   name: string;
   emoji: string | null;
   logo_url: string | null;
@@ -237,8 +242,20 @@ export type ApiReward = {
   status: string;
   shop_ids: string[];
   is_fake: boolean;
+  /** Copy of the shared catalog: only `status` (active | inactive) may change. */
+  content_locked?: boolean;
+  catalog_id?: string | null;
   created_at: string;
   updated_at: string;
+};
+
+/** A town (població) inside a municipality. */
+export type ApiLocality = {
+  id: string;
+  name: string;
+  slug?: string;
+  postal_codes: string[];
+  art_url?: string | null;
 };
 
 export type ApiTown = {
@@ -256,6 +273,8 @@ export type ApiTown = {
   default_lang: string;
   expiry_months: number | null;
   postal_codes: { postal_code: string; is_primary: boolean }[];
+  /** One entry (named like the municipality) when it is a single town. */
+  localities?: ApiLocality[];
   created_at: string;
   updated_at: string;
 };

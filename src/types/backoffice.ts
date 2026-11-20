@@ -14,10 +14,20 @@ export type Sessio = {
   nom: string;
 };
 
+/** Una població dins del municipi que gestiona l'administrador. */
+export type Localitat = {
+  id: string;
+  nom: string;
+  codisPostals: string[];
+};
+
 export type AdminMe = {
   id: string;
+  /** El municipi (àmbit gestionat), no la població on viu l'administrador. */
   poblacioId: string;
   poblacioNom: string;
+  /** Poblacions del municipi. Una de sola quan el municipi és un sol poble. */
+  localitats?: Localitat[];
   nom: string;
   /** Town brand logo (Settings / config). */
   logoUrl?: string;
@@ -137,6 +147,8 @@ export type Recompensa = {
   dataFi?: string;
   condicions?: string;
   estat: RecompensaEstat;
+  /** Premi del catàleg comú: només es pot activar o desactivar. */
+  contingutBloquejat?: boolean;
 };
 
 export type RecompensaInput = Omit<Recompensa, "id" | "poblacioId">;
@@ -155,6 +167,9 @@ export type ComercAdmin = {
   puntsPerVisita: number;
   adreca?: string;
   codiPostal?: string;
+  /** Població del municipi on és el comerç. */
+  localitatId?: string;
+  localitatNom?: string;
   telefon?: string;
   web?: string;
   estat: ComercEstat;
@@ -172,6 +187,8 @@ export type ComercAdminInput = {
   puntsPerVisita: number;
   adreca?: string;
   codiPostal?: string;
+  /** Obligatori quan el municipi té més d'una població. */
+  localitatId?: string;
   telefon?: string;
   web?: string;
 };

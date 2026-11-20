@@ -1537,6 +1537,21 @@ export const messages = {
     es: "Contacto y ubicación",
     en: "Contact and location",
   },
+  "comercos.form.localitat.label": {
+    ca: "Població",
+    es: "Población",
+    en: "Town",
+  },
+  "comercos.form.localitat.placeholder": {
+    ca: "Tria la població",
+    es: "Elige la población",
+    en: "Choose the town",
+  },
+  "comercos.form.localitat.hint": {
+    ca: "El municipi té diverses poblacions: indica a quina és el comerç.",
+    es: "El municipio tiene varias poblaciones: indica en cuál está el comercio.",
+    en: "The municipality has several towns: say which one the shop is in.",
+  },
   "comercos.form.codiPostal.label": {
     ca: "Codi postal",
     es: "Código postal",

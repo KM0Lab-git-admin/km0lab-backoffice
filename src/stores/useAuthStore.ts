@@ -10,7 +10,10 @@ export type AuthUser = {
   lastName?: string | null;
   roles: string[];
   townId?: string | null;
+  /** Població a la qual està lligat el compte (la del comerç, per a un comerç). */
   townName?: string | null;
+  /** Municipi (àmbit gestionat). El que es mostra a un administrador. */
+  municipalityName?: string | null;
   shopId?: string | null;
 };
 

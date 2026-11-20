@@ -69,6 +69,7 @@ function mapUser(apiUser: ApiUser, fallback?: Partial<AuthUser>): AuthUser {
     roles: apiUser.roles,
     townId: apiUser.town_id,
     townName: apiUser.town_name,
+    municipalityName: apiUser.municipality_name ?? apiUser.town_name,
     shopId: apiUser.shop_id,
   };
 }
