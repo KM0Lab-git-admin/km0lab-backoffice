@@ -23,7 +23,7 @@ import {
 import { useLang } from "@/contexts/LangContext";
 import { adminComercosService } from "@/services/adminComercosService";
 import { ComercoForm } from "@/components/backoffice/ComercoForm";
-import { ComercoCards, ComercoTable } from "@/components/backoffice/ComercoList";
+import { ComercoCards, ComercoTable, municipiAmbDiversesPoblacions } from "@/components/backoffice/ComercoList";
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { adminService } from "@/services/adminService";
@@ -202,12 +202,14 @@ export default function ComercosPage() {
                 onEdit={setEditing}
                 onToggle={handleToggle}
                 onActAs={handleActAs}
+                mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
               />
               <ComercoCards
                 comercos={filtered}
                 onEdit={setEditing}
                 onToggle={handleToggle}
                 onActAs={handleActAs}
+                mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
               />
             </>
           )}

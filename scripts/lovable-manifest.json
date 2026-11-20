@@ -24,6 +24,8 @@
   ],
   "exclude": [
     "src/lib/lovable-error-reporting.ts",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
     ".lovable/**",
     "src/integrations/**",
     "supabase/**",

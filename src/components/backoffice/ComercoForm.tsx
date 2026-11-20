@@ -77,7 +77,7 @@ export function ComercoForm({ initial, onSubmit, onCancel, submitting }: Props) 
     queryKey: ["admin", "me"],
     queryFn: () => adminService.getMe(),
   });
-  const localitats = meQ.data?.localitats ?? [];
+  const localitats = meQ.data?.poblacions ?? [];
   // With a single town the API assigns it: the form stays as it was.
   const calLocalitat = localitats.length > 1;
 
@@ -109,7 +109,7 @@ export function ComercoForm({ initial, onSubmit, onCancel, submitting }: Props) 
   // a change by the user, so opening a shop never moves it.
   const codiPostal = watch("codiPostal")?.trim() ?? "";
   const localitatDelCodi = calLocalitat
-    ? localitats.find((l) => l.codisPostals.includes(codiPostal))?.id
+    ? localitats.find((l) => l.codisPostals?.includes(codiPostal))?.id
     : undefined;
   const codiCanviat = !!dirtyFields.codiPostal;
   useEffect(() => {

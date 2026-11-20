@@ -1537,6 +1537,18 @@ export const messages = {
     es: "Contacto y ubicación",
     en: "Contact and location",
   },
+  "comercos.col.poblacio": { ca: "Població", es: "Población", en: "Town" },
+  "recompenses.catalegComu": {
+    ca: "Els premis són del catàleg comú de KM0 LAB. Activa els que vulguis oferir.",
+    es: "Los premios son del catálogo común de KM0 LAB. Activa los que quieras ofrecer.",
+    en: "Rewards come from the shared KM0 LAB catalogue. Turn on the ones you want to offer.",
+  },
+  "recompenses.card.actiu": { ca: "Actiu", es: "Activo", en: "Active" },
+  "recompenses.card.senseExistencies": {
+    ca: "Sense existències",
+    es: "Sin existencias",
+    en: "Out of stock",
+  },
   "comercos.form.localitat.label": {
     ca: "Població",
     es: "Población",

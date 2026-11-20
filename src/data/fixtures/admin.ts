@@ -15,8 +15,13 @@ export const poblacionsFixture: Poblacio[] = [
 export const adminMeFixture: AdminMe = {
   id: "admin-malgrat",
   poblacioId: "malgrat",
-  poblacioNom: "Malgrat de Mar",
-  nom: "Ajuntament de Malgrat de Mar",
+  poblacioNom: "Baix Montseny",
+  nom: "Consell del Baix Montseny",
+  poblacions: [
+    { id: "breda", nom: "Breda" },
+    { id: "hostalric", nom: "Hostalric" },
+    { id: "riells", nom: "Riells i Viabrea" },
+  ],
 };
 
 export const adminResumStatsFixture: AdminResumStats = {

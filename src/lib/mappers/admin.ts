@@ -311,7 +311,7 @@ export function comercAdminFromShop(
     adreca: shop.address ?? undefined,
     codiPostal: shop.postal_code ?? undefined,
     localitatId: shop.locality_id ?? undefined,
-    localitatNom: shop.town_name ?? undefined,
+    poblacioNom: shop.town_name ?? undefined,
     telefon: shop.phone ?? undefined,
     web: shop.website ?? undefined,
     estat: ESTAT_FROM_API[shop.status] ?? "inactiu",
@@ -530,7 +530,7 @@ export function adminMeFromUser(user: ApiUser, town?: ApiTown | null): AdminMe {
     // The municipality, not `town_name`: for the admin of a municipality
     // that groups towns, that one is the town their account is tied to.
     poblacioNom: town?.name ?? user.municipality_name ?? user.town_name ?? "",
-    localitats: (town?.localities ?? []).map((l) => ({
+    poblacions: (town?.localities ?? []).map((l) => ({
       id: l.id,
       nom: l.name,
       codisPostals: l.postal_codes ?? [],

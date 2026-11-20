@@ -51,7 +51,7 @@ export function FitxaPreview({ fitxa }: Props) {
           </button>
           <div className="flex-1 text-center">
             <p className="text-lg font-black leading-none text-km0-blue-800">
-              Malgrat de Mar
+              {fitxa.poblacio}
             </p>
             <span className="mt-1 inline-flex items-center rounded-md bg-km0-blue-700 px-2 py-0.5 text-[10px] font-black tracking-wide text-km0-beige-100">
               KM0 LAB

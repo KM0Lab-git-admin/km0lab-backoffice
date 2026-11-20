@@ -1,6 +1,7 @@
 import { Pencil, Trash2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
 import { RecompensaTipusIcon } from "@/components/backoffice/recompensaTipusIcon";
@@ -63,13 +64,25 @@ function EstatBadge({ estat }: { estat: RecompensaEstat }) {
   return <Badge variant="secondary">{label}</Badge>;
 }
 
+export function totesBloquejades(recompenses: Recompensa[]): boolean {
+  return recompenses.length > 0 && recompenses.every((r) => r.contingutBloquejat === true);
+}
+
 type Props = {
   recompenses: Recompensa[];
   onEdit: (r: Recompensa) => void;
   onDelete: (r: Recompensa) => void;
+  onToggleEstat: (r: Recompensa, activa: boolean) => void;
+  savingId: string | null;
 };
 
-export function RecompensaGrid({ recompenses, onEdit, onDelete }: Props) {
+export function RecompensaGrid({
+  recompenses,
+  onEdit,
+  onDelete,
+  onToggleEstat,
+  savingId,
+}: Props) {
   const { t } = useLang();
 
   return (
@@ -148,22 +161,41 @@ export function RecompensaGrid({ recompenses, onEdit, onDelete }: Props) {
               </dl>
 
               <div className="mt-auto flex items-center justify-end gap-1 border-t pt-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(r)}
-                  aria-label={t("common.edit")}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onDelete(r)}
-                  aria-label={t("common.delete")}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {r.contingutBloquejat ? (
+                  <label className="flex items-center gap-2 text-sm font-medium">
+                    {r.estat === "esgotada" ? (
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {t("recompenses.card.senseExistencies")}
+                      </span>
+                    ) : null}
+                    <span>{t("recompenses.card.actiu")}</span>
+                    <Switch
+                      checked={r.estat === "activa"}
+                      disabled={r.estat === "esgotada" || savingId === r.id}
+                      onCheckedChange={(v) => onToggleEstat(r, v)}
+                      aria-label={t("recompenses.card.actiu")}
+                    />
+                  </label>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(r)}
+                      aria-label={t("common.edit")}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onDelete(r)}
+                      aria-label={t("common.delete")}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

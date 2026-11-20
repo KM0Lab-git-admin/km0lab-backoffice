@@ -76,7 +76,7 @@ export const recompensesService = {
     return mapped;
   },
 
-  async setEstat(id: string, estat: Recompensa["estat"]): Promise<void> {
+  async setEstat(id: string, estat: "activa" | "inactiva"): Promise<void> {
     await api.patch(`/rewards/${id}`, { status: recompensaEstatToApi(estat) });
   },
 

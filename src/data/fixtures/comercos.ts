@@ -10,6 +10,7 @@ export const comercosFixture: ComercAdmin[] = [
   {
     id: "forn-rovira",
     poblacioId: "malgrat",
+    poblacioNom: "Breda",
     nom: "Forn Rovira",
     emoji: "🥖",
     categories: ["Alimentació", "Fleca"],
@@ -24,6 +25,7 @@ export const comercosFixture: ComercAdmin[] = [
   {
     id: "cafe-del-mar",
     poblacioId: "malgrat",
+    poblacioNom: "Hostalric",
     nom: "Cafè del Mar",
     emoji: "☕",
     categories: ["Restauració"],
@@ -38,6 +40,7 @@ export const comercosFixture: ComercAdmin[] = [
   {
     id: "cal-sastre",
     poblacioId: "malgrat",
+    poblacioNom: "Riells i Viabrea",
     nom: "Cal Sastre",
     emoji: "🧵",
     categories: ["Moda"],
@@ -52,6 +55,7 @@ export const comercosFixture: ComercAdmin[] = [
   {
     id: "floristeria-nom",
     poblacioId: "malgrat",
+    poblacioNom: "Breda",
     nom: "Floristeria Nom",
     emoji: "💐",
     categories: ["Serveis"],
@@ -66,6 +70,7 @@ export const comercosFixture: ComercAdmin[] = [
   {
     id: "peixateria-marina",
     poblacioId: "malgrat",
+    poblacioNom: "Hostalric",
     nom: "Peixateria Marina",
     emoji: "🐟",
     categories: ["Alimentació"],
@@ -80,6 +85,7 @@ export const comercosFixture: ComercAdmin[] = [
   {
     id: "llibreria-robafaves",
     poblacioId: "malgrat",
+    poblacioNom: "Breda",
     nom: "Llibreria Robafaves",
     emoji: "📚",
     categories: ["Cultura"],

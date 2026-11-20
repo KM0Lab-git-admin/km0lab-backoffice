@@ -16,7 +16,7 @@ import { useLang } from "@/contexts/LangContext";
 import { categoryLabelToSlug } from "@/lib/mappers/categories";
 import { fitxaService } from "@/services/fitxaService";
 import type { MessageKey } from "@/lib/i18n";
-import type { ComercAdmin, ComercEstat } from "@/types/backoffice";
+import type { ComercAdmin, ComercEstat, Poblacio } from "@/types/backoffice";
 
 export const estatLabelKey = (e: ComercEstat): MessageKey =>
   e === "actiu" ? "comercos.estat.actiu" : "comercos.estat.inactiu";
@@ -67,9 +67,14 @@ type Props = {
   onEdit: (c: ComercAdmin) => void;
   onToggle: (c: ComercAdmin, actiu: boolean) => void;
   onActAs?: (c: ComercAdmin) => void;
+  mostrarPoblacio: boolean;
 };
 
-export function ComercoTable({ comercos, onEdit, onToggle, onActAs }: Props) {
+export function municipiAmbDiversesPoblacions(poblacions: Poblacio[] | undefined): boolean {
+  return (poblacions?.length ?? 0) > 1;
+}
+
+export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio }: Props) {
   const { t, lang } = useLang();
   const categoriesQ = useQuery({
     queryKey: ["shop-categories", lang],
@@ -89,6 +94,7 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs }: Props) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[32%]">{t("comercos.col.comerc")}</TableHead>
+            {mostrarPoblacio ? <TableHead>{t("comercos.col.poblacio")}</TableHead> : null}
             <TableHead>{t("comercos.col.categories")}</TableHead>
             <TableHead>{t("comercos.col.estat")}</TableHead>
             <TableHead className="text-center">{t("comercos.col.qr")}</TableHead>
@@ -115,6 +121,9 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs }: Props) {
                   </div>
                 </div>
               </TableCell>
+              {mostrarPoblacio ? (
+                <TableCell className="text-sm">{c.poblacioNom ?? "—"}</TableCell>
+              ) : null}
               <TableCell>
                 <div className="flex flex-wrap gap-1">
                   {c.categories.map((cat) => (
@@ -181,7 +190,7 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs }: Props) {
   );
 }
 
-export function ComercoCards({ comercos, onEdit, onToggle, onActAs }: Props) {
+export function ComercoCards({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio }: Props) {
   const { t, lang } = useLang();
   const categoriesQ = useQuery({
     queryKey: ["shop-categories", lang],
@@ -215,6 +224,11 @@ export function ComercoCards({ comercos, onEdit, onToggle, onActAs }: Props) {
               <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 {c.emailContacte}
               </p>
+              {mostrarPoblacio && c.poblacioNom ? (
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {t("comercos.col.poblacio")}: {c.poblacioNom}
+                </p>
+              ) : null}
               <div className="mt-2 flex flex-wrap gap-1">
                 {c.categories.map((cat) => (
                   <Badge key={cat} variant="secondary" className="font-normal">

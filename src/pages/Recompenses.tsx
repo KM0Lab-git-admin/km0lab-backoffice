@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Gift, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,9 +29,32 @@ import {
 import { useLang } from "@/contexts/LangContext";
 import { recompensesService } from "@/services/recompensesService";
 import { RecompensaForm } from "@/components/backoffice/RecompensaForm";
-import { RecompensaGrid } from "@/components/backoffice/RecompensaList";
+import { RecompensaGrid, totesBloquejades } from "@/components/backoffice/RecompensaList";
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import type { Recompensa, RecompensaInput } from "@/types/backoffice";
+
+const recompensesKey = ["admin", "recompenses"] as const;
+
+type EstatVars = { id: string; estat: "activa" | "inactiva" };
+
+// Optimistic toggle: updates the cached list at once and restores it on failure.
+export function recompensaEstatMutationOptions(qc: QueryClient, onFailure: () => void) {
+  return {
+    mutationFn: ({ id, estat }: EstatVars) => recompensesService.setEstat(id, estat),
+    onMutate: async ({ id, estat }: EstatVars) => {
+      await qc.cancelQueries({ queryKey: recompensesKey });
+      const previous = qc.getQueryData<Recompensa[]>(recompensesKey);
+      qc.setQueryData<Recompensa[]>(recompensesKey, (list) =>
+        list?.map((r) => (r.id === id ? { ...r, estat } : r)),
+      );
+      return { previous };
+    },
+    onError: (_err: unknown, _vars: EstatVars, ctx: { previous?: Recompensa[] } | undefined) => {
+      if (ctx?.previous) qc.setQueryData(recompensesKey, ctx.previous);
+      onFailure();
+    },
+  };
+}
 
 export default function RecompensesPage() {
   const { t } = useLang();
@@ -76,7 +104,12 @@ export default function RecompensesPage() {
     },
   });
 
+  const estatMut = useMutation(
+    recompensaEstatMutationOptions(qc, () => toast.error(t("toast.recompensa.saveError"))),
+  );
+
   const recompenses = listQ.data ?? [];
+  const catalegComu = totesBloquejades(recompenses);
   const submitting = createMut.isPending || updateMut.isPending;
 
   return (
@@ -89,11 +122,18 @@ export default function RecompensesPage() {
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground md:text-base">
             {t("recompenses.subtitle")}
           </p>
+          {catalegComu ? (
+            <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+              {t("recompenses.catalegComu")}
+            </p>
+          ) : null}
         </div>
-        <Button onClick={() => setCreating(true)} className="shrink-0">
-          <Plus className="h-4 w-4" />
-          {t("recompenses.add")}
-        </Button>
+        {catalegComu ? null : (
+          <Button onClick={() => setCreating(true)} className="shrink-0">
+            <Plus className="h-4 w-4" />
+            {t("recompenses.add")}
+          </Button>
+        )}
       </header>
 
       {listQ.isLoading ? (
@@ -123,6 +163,10 @@ export default function RecompensesPage() {
           recompenses={recompenses}
           onEdit={setEditing}
           onDelete={setToDelete}
+          onToggleEstat={(r, activa) =>
+            estatMut.mutate({ id: r.id, estat: activa ? "activa" : "inactiva" })
+          }
+          savingId={estatMut.isPending ? (estatMut.variables?.id ?? null) : null}
         />
       )}
 

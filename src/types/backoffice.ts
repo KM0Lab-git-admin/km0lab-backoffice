@@ -5,6 +5,8 @@ export type Rol = "admin" | "comerc";
 export type Poblacio = {
   id: string;
   nom: string;
+  /** Només a producció (API `postal_codes`): el formulari de comerç els fa servir. */
+  codisPostals?: string[];
 };
 
 export type Sessio = {
@@ -14,20 +16,13 @@ export type Sessio = {
   nom: string;
 };
 
-/** Una població dins del municipi que gestiona l'administrador. */
-export type Localitat = {
-  id: string;
-  nom: string;
-  codisPostals: string[];
-};
-
 export type AdminMe = {
   id: string;
   /** El municipi (àmbit gestionat), no la població on viu l'administrador. */
   poblacioId: string;
   poblacioNom: string;
-  /** Poblacions del municipi. Una de sola quan el municipi és un sol poble. */
-  localitats?: Localitat[];
+  // Poblacions que formen el municipi (pot ser més d'una).
+  poblacions: Poblacio[];
   nom: string;
   /** Town brand logo (Settings / config). */
   logoUrl?: string;
@@ -147,7 +142,8 @@ export type Recompensa = {
   dataFi?: string;
   condicions?: string;
   estat: RecompensaEstat;
-  /** Premi del catàleg comú: només es pot activar o desactivar. */
+  // API: `content_locked`. true = premi del catàleg comú de KM0 LAB:
+  // l'admin només el pot activar o desactivar.
   contingutBloquejat?: boolean;
 };
 
@@ -167,9 +163,9 @@ export type ComercAdmin = {
   puntsPerVisita: number;
   adreca?: string;
   codiPostal?: string;
-  /** Població del municipi on és el comerç. */
+  /** Població del municipi on és el comerç (API `locality_id` i `town_name`). */
   localitatId?: string;
-  localitatNom?: string;
+  poblacioNom?: string;
   telefon?: string;
   web?: string;
   estat: ComercEstat;
