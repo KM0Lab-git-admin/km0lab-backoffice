@@ -1528,9 +1528,9 @@ export const messages = {
     en: "hello@mymerchant.com",
   },
   "comercos.form.email.hintNew": {
-    ca: "El comerç entrarà al panell amb aquest correu. No s’envia cap avís: digues-li tu que ja pot entrar.",
-    es: "El comercio entrará en el panel con este correo. No se envía ningún aviso: dile tú que ya puede entrar.",
-    en: "The shop will sign in to the panel with this email. No notice is sent: tell them they can sign in.",
+    ca: "El comerç entrarà al panell amb aquest correu. Li enviem un avís amb els passos per entrar-hi.",
+    es: "El comercio entrará en el panel con este correo. Le enviamos un aviso con los pasos para entrar.",
+    en: "The shop will sign in to the panel with this email. We send it a notice with the steps to get in.",
   },
   "comercos.form.email.hintEdit": {
     ca: "Email de contacte del comerç.",
