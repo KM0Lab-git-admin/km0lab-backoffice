@@ -15,7 +15,13 @@ export const Route = createFileRoute("/merchant")({
     const isMerchant = roles.includes("merchant");
 
     if (!isMerchant && !isAdminActing) {
-      throw redirect({ to: "/admin/merchants" });
+      if (roles.includes("admin")) {
+        throw redirect({ to: "/admin/merchants" });
+      }
+      // Neither a shop nor an administrator: /admin would send them back
+      // here for ever ("Too many redirects"). Out, and to the login.
+      useAuthStore.getState().signOut();
+      throw redirect({ to: "/login" });
     }
 
     if (session.rol !== "comerc") {

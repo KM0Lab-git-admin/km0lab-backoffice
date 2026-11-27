@@ -570,9 +570,14 @@ export const messages = {
     en: "We couldn't sign you in. Please try again.",
   },
   "login.error.apiUnreachable": {
-    ca: "No es pot connectar amb l'API (localhost:8000). Comprova que km0lab-api està en marxa.",
-    es: "No se puede conectar con la API (localhost:8000). Comprueba que km0lab-api está en marcha.",
-    en: "Cannot reach the API (localhost:8000). Make sure km0lab-api is running.",
+    ca: "No hi ha connexió amb el servidor. Comprova la xarxa i torna-ho a provar.",
+    es: "No hay conexión con el servidor. Comprueba la red e inténtalo de nuevo.",
+    en: "Cannot reach the server. Check your connection and try again.",
+  },
+  "login.error.noShop": {
+    ca: "Aquest correu no té cap comerç donat d’alta. Entra amb el correu que vas donar en apuntar-te al programa o demana a qui el gestiona que el revisi.",
+    es: "Este correo no tiene ningún comercio dado de alta. Entra con el correo que diste al apuntarte al programa o pide a quien lo gestiona que lo revise.",
+    en: "This email has no shop registered. Sign in with the email you gave when you joined the programme, or ask whoever runs it to check.",
   },
   "login.toRegister.text": {
     ca: "Encara no tens compte?",
@@ -1497,9 +1502,9 @@ export const messages = {
     en: "hello@mymerchant.com",
   },
   "comercos.form.email.hintNew": {
-    ca: "Enviarem la invitació a aquest email (mock).",
-    es: "Enviaremos la invitación a este email (mock).",
-    en: "We'll send the invitation to this email (mock).",
+    ca: "El comerç entrarà al panell amb aquest correu. No s’envia cap avís: digues-li tu que ja pot entrar.",
+    es: "El comercio entrará en el panel con este correo. No se envía ningún aviso: dile tú que ya puede entrar.",
+    en: "The shop will sign in to the panel with this email. No notice is sent: tell them they can sign in.",
   },
   "comercos.form.email.hintEdit": {
     ca: "Email de contacte del comerç.",

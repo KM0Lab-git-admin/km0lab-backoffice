@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/backoffice/AuthShell";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLang } from "@/contexts/LangContext";
 import {
   authService,
+  canUseBackoffice,
   DEV_SKIP_OTP,
   MOCK_OTP_CODE,
   isFixedOtpEmail,
@@ -43,6 +44,20 @@ export function LoginPage() {
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [otpError, setOtpError] = useState<MessageKey | null>(null);
+  const [noShop, setNoShop] = useState(false);
+
+  // A page reload is answered by the server, which cannot see the session
+  // kept in this browser and sends everyone here. Whoever is already signed
+  // in goes straight back in instead of being asked for a new code.
+  useEffect(() => {
+    const { isAuthenticated, user } = useAuthStore.getState();
+    if (!isAuthenticated || !user) return;
+    if (!canUseBackoffice(user.roles)) {
+      useAuthStore.getState().signOut();
+      return;
+    }
+    navigate({ to: homePathForRol(rolFromRoles(user.roles)), replace: true });
+  }, [navigate]);
 
   const form = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
@@ -52,6 +67,14 @@ export function LoginPage() {
   function applySession(
     session: Awaited<ReturnType<typeof authService.verifyLoginCode>>,
   ) {
+    // The code was right but this email runs no shop: say so here. Letting
+    // them in would leave them on a page that never loads.
+    if (!canUseBackoffice(session.user.roles)) {
+      setNoShop(true);
+      setOtp("");
+      setStep("email");
+      return;
+    }
     const rol = rolFromRoles(session.user.roles);
     signIn(session);
     setSession({
@@ -65,6 +88,7 @@ export function LoginPage() {
 
   const onEmailSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true);
+    setNoShop(false);
     try {
       // Local: cuentas con OTP fijo (demo + Malgrat QA) entran sin pantalla de código.
       if (DEV_SKIP_OTP && isFixedOtpEmail(values.email)) {
@@ -75,7 +99,7 @@ export function LoginPage() {
         applySession(session);
         return;
       }
-      await authService.requestLoginCode(values.email);
+      await authService.requestLoginCode(values.email, lang);
       setEmail(values.email);
       setOtp("");
       setStep("otp");
@@ -114,7 +138,7 @@ export function LoginPage() {
 
   async function onResend() {
     try {
-      await authService.requestLoginCode(email);
+      await authService.requestLoginCode(email, lang);
       toast.success(t("auth.otp.sent"));
     } catch {
       toast.error(t("login.error.generic"));
@@ -229,22 +253,15 @@ export function LoginPage() {
   }
 
   return (
-    <AuthShell
-      title={t("login.title")}
-      subtitle={t("login.subtitle")}
-      footer={
-        <>
-          {t("login.toRegister.text")}{" "}
-          <Link
-            to="/register"
-            className="font-medium text-foreground underline underline-offset-4"
-          >
-            {t("login.toRegister.cta")}
-          </Link>
-        </>
-      }
-    >
+    <AuthShell title={t("login.title")} subtitle={t("login.subtitle")}>
+      {/* No "register your shop" link: shops are registered by whoever runs
+          the programme, and the old form created an account with no shop. */}
       <form onSubmit={onEmailSubmit} className="space-y-4" noValidate>
+        {noShop ? (
+          <Alert variant="destructive">
+            <AlertDescription>{t("login.error.noShop")}</AlertDescription>
+          </Alert>
+        ) : null}
         <div className="space-y-2">
           <Label htmlFor="email">{t("login.email.label")}</Label>
           <Input

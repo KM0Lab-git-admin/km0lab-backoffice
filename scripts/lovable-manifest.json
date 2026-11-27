@@ -74,6 +74,7 @@
     "src/components/backoffice/PromocioForm.tsx",
     "src/components/backoffice/RecompensaForm.tsx",
     "src/pages/Login.tsx",
+    "src/routes/merchant.tsx",
     "src/stores/useAuthStore.ts",
     "src/stores/useSessionStore.ts",
     ".env",

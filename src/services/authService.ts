@@ -39,6 +39,11 @@ export function isFixedOtpEmail(email: string): boolean {
   return FIXED_OTP_EMAILS.has(email.trim().toLowerCase());
 }
 
+/** The backoffice is for administrators and shops; a resident has no page in it. */
+export function canUseBackoffice(roles: string[]): boolean {
+  return roles.includes("admin") || roles.includes("merchant");
+}
+
 export type RegisterInput = {
   nomComerc: string;
   personaContacte: string;
@@ -84,10 +89,11 @@ function mapAuth(out: ApiAuthOut, fallback?: Partial<AuthUser>): AuthSession {
 let pendingRegister: RegisterInput | null = null;
 
 export const authService = {
-  async requestLoginCode(email: string): Promise<{ ok: true }> {
+  async requestLoginCode(email: string, lang?: string): Promise<{ ok: true }> {
     // Demo accounts use fixed OTP — no need to hit the rate-limited endpoint.
     if (isFixedOtpEmail(email)) return { ok: true };
-    await api.post("/auth/request-otp", { email }, { auth: false });
+    // `lang`: the email with the code comes in the language of the screen.
+    await api.post("/auth/request-otp", { email, lang }, { auth: false });
     return { ok: true };
   },
 
