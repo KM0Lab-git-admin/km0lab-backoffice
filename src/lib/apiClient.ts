@@ -128,6 +128,11 @@ export async function apiRequest<T>(
 
   if (res.status === 401 && auth) {
     useAuthStore.getState().signOut();
+    // The session is over (it lasts 30 days). Back to the login, instead of
+    // an error page whose "retry" can only fail again.
+    if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+      window.location.assign("/login");
+    }
   }
 
   if (!res.ok) {

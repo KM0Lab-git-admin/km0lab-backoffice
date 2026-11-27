@@ -15,8 +15,9 @@ import { ErrorState } from "@/components/backoffice/ErrorState";
  * Production page (locked in scripts/lovable-manifest.json).
  *
  * The prototype draws a decorative grid that only looks like a QR. Here the
- * picture is the real one from the API (`png_url`): what the shop sees on
- * screen, photographs or prints is what a resident's phone can read.
+ * picture is the real one from the API (`png_url`, fetched with the session:
+ * it is not public): what the shop sees on screen, photographs or prints is
+ * what a resident's phone can read.
  *
  * Printing: the poster is rendered straight under <body> and, when printing,
  * it is the only thing left on the page. No pop-up window (browsers block
@@ -53,16 +54,24 @@ export default function ElMeuQRPage() {
 
   const comercQ = useQuery({ queryKey: ["comerc", "me"], queryFn: () => comercService.getMe() });
   const qrQ = useQuery({ queryKey: ["qr", "me"], queryFn: () => qrService.getMyQRPage() });
+  const pngUrl = qrQ.data?.qr.pngUrl;
+  const imageQ = useQuery({
+    queryKey: ["qr", "me", "image", pngUrl],
+    queryFn: () => qrService.getImageUrl(pngUrl as string),
+    enabled: Boolean(pngUrl),
+    staleTime: Infinity,
+  });
 
   // The poster hangs from <body>, which only exists in the browser.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const loading = comercQ.isLoading || qrQ.isLoading;
-  const error = comercQ.error || qrQ.error;
+  const error = comercQ.error || qrQ.error || imageQ.error;
   const qr = qrQ.data?.qr;
   const metrics = qrQ.data?.metrics;
-  const ready = Boolean(qr?.pngUrl && comercQ.data);
+  const image = imageQ.data;
+  const ready = Boolean(image && comercQ.data);
 
   if (error) {
     return (
@@ -70,6 +79,7 @@ export default function ElMeuQRPage() {
         onRetry={() => {
           comercQ.refetch();
           qrQ.refetch();
+          imageQ.refetch();
         }}
       />
     );
@@ -116,12 +126,12 @@ export default function ElMeuQRPage() {
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
         <Card className="overflow-hidden">
           <CardContent className="flex flex-col items-center gap-4 bg-gradient-to-b from-white to-km0-beige-50 p-6">
-            {loading || !qr?.pngUrl || !comercQ.data ? (
+            {loading || !image || !comercQ.data ? (
               <Skeleton className="h-[240px] w-[240px]" />
             ) : (
               <div className="rounded-xl border bg-white p-4 shadow-sm">
                 <img
-                  src={qr.pngUrl}
+                  src={image}
                   alt={t("qr.alt")}
                   width={220}
                   height={220}
@@ -174,12 +184,12 @@ export default function ElMeuQRPage() {
         </Card>
       </section>
 
-      {mounted && ready && qr?.pngUrl && comercQ.data
+      {mounted && image && comercQ.data
         ? createPortal(
             <div id={POSTER_ID}>
               <style>{POSTER_PRINT_CSS}</style>
               <h1>{t("qr.poster.title")}</h1>
-              <img src={qr.pngUrl} alt={t("qr.alt")} />
+              <img src={image} alt={t("qr.alt")} />
               <p className="shop">{comercQ.data.nom}</p>
               <p className="how">{t("qr.poster.how")}</p>
               <p className="brand">{t("app.brand")}</p>

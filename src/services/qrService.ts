@@ -25,6 +25,17 @@ export const qrService = {
     return { qr: qrFromApi(raw), metrics: qrMetricsFromApi(raw) };
   },
 
+  /**
+   * The QR picture as a local address an <img> can show.
+   *
+   * The API only hands the picture to the shop itself (it is the scan code),
+   * so it cannot be an `<img src>` to the API: it is fetched with the session
+   * and kept in memory.
+   */
+  async getImageUrl(pngUrl: string): Promise<string> {
+    return URL.createObjectURL(await fetchAuthorizedBlob(pngUrl));
+  },
+
   async getMetrics(): Promise<QRMetrics> {
     const { metrics } = await qrService.getMyQRPage();
     return metrics;
