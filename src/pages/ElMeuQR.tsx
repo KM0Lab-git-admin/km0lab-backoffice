@@ -1,14 +1,52 @@
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Download, Printer, FileText, RefreshCw } from "lucide-react";
+import { Download, Printer, RefreshCw } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import { qrService } from "@/services/qrService";
 import { comercService } from "@/services/comercService";
-import { QRMock } from "@/components/backoffice/QRMock";
 import { ErrorState } from "@/components/backoffice/ErrorState";
+
+/*
+ * Production page (locked in scripts/lovable-manifest.json).
+ *
+ * The prototype draws a decorative grid that only looks like a QR. Here the
+ * picture is the real one from the API (`png_url`): what the shop sees on
+ * screen, photographs or prints is what a resident's phone can read.
+ *
+ * Printing: the poster is rendered straight under <body> and, when printing,
+ * it is the only thing left on the page. No pop-up window (browsers block
+ * them) and no PDF library: the print dialog already saves as PDF.
+ */
+const POSTER_ID = "qr-poster";
+const POSTER_PRINT_CSS = `
+#${POSTER_ID} { display: none; }
+@media print {
+  @page { margin: 14mm; }
+  body > *:not(#${POSTER_ID}) { display: none !important; }
+  #${POSTER_ID} {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9mm;
+    min-height: 225mm;
+    text-align: center;
+    color: #000;
+    background: #fff;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  #${POSTER_ID} h1 { font-size: 34pt; font-weight: 800; line-height: 1.1; margin: 0; }
+  #${POSTER_ID} img { width: 120mm; height: 120mm; image-rendering: pixelated; }
+  #${POSTER_ID} .shop { font-size: 22pt; font-weight: 700; margin: 0; }
+  #${POSTER_ID} .how { font-size: 14pt; max-width: 130mm; margin: 0; }
+  #${POSTER_ID} .brand { font-size: 11pt; font-weight: 700; letter-spacing: 0.08em; margin: 0; }
+}
+`;
 
 export default function ElMeuQRPage() {
   const { t } = useLang();
@@ -16,10 +54,15 @@ export default function ElMeuQRPage() {
   const comercQ = useQuery({ queryKey: ["comerc", "me"], queryFn: () => comercService.getMe() });
   const qrQ = useQuery({ queryKey: ["qr", "me"], queryFn: () => qrService.getMyQRPage() });
 
+  // The poster hangs from <body>, which only exists in the browser.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const loading = comercQ.isLoading || qrQ.isLoading;
   const error = comercQ.error || qrQ.error;
   const qr = qrQ.data?.qr;
   const metrics = qrQ.data?.metrics;
+  const ready = Boolean(qr?.pngUrl && comercQ.data);
 
   if (error) {
     return (
@@ -32,16 +75,17 @@ export default function ElMeuQRPage() {
     );
   }
 
-  const handleDownload = async (kind: "pdf" | "png") => {
-    if (kind === "pdf") await qrService.downloadPDF();
-    else await qrService.downloadPNG();
-    toast.success(t("qr.toast.downloaded"));
+  const handleDownload = async () => {
+    try {
+      await qrService.downloadPNG();
+      toast.success(t("qr.toast.downloaded"));
+    } catch {
+      toast.error(t("qr.toast.error"));
+    }
   };
 
-  const handlePrint = async () => {
-    await qrService.print();
-    toast(t("qr.toast.printed"));
-  };
+  // Synchronous on purpose: called from the click, so no browser blocks it.
+  const handlePrint = () => window.print();
 
   return (
     <div className="flex flex-col gap-8">
@@ -72,18 +116,24 @@ export default function ElMeuQRPage() {
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
         <Card className="overflow-hidden">
           <CardContent className="flex flex-col items-center gap-4 bg-gradient-to-b from-white to-km0-beige-50 p-6">
-            {loading || !qr || !comercQ.data ? (
+            {loading || !qr?.pngUrl || !comercQ.data ? (
               <Skeleton className="h-[240px] w-[240px]" />
             ) : (
-              <div className="rounded-xl border bg-white p-4 text-km0-blue-800 shadow-sm">
-                <QRMock value={qr.codi} size={220} />
+              <div className="rounded-xl border bg-white p-4 shadow-sm">
+                <img
+                  src={qr.pngUrl}
+                  alt={t("qr.alt")}
+                  width={220}
+                  height={220}
+                  style={{ imageRendering: "pixelated" }}
+                />
               </div>
             )}
             {qr && comercQ.data ? (
               <div className="text-center">
                 <p className="text-sm font-bold text-km0-blue-800">{comercQ.data.nom}</p>
                 <p className="text-xs font-semibold text-km0-blue-400">
-                  ID: {qr.codi} · +{qr.puntsPerVisita} {t("qr.pointsPerVisit")}
+                  +{qr.puntsPerVisita} {t("qr.pointsPerVisit")}
                 </p>
               </div>
             ) : null}
@@ -98,17 +148,13 @@ export default function ElMeuQRPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button onClick={() => handleDownload("pdf")} disabled={loading}>
-                <FileText className="h-4 w-4" />
-                {t("qr.download.pdf")}
-              </Button>
-              <Button variant="outline" onClick={() => handleDownload("png")} disabled={loading}>
-                <Download className="h-4 w-4" />
-                {t("qr.download.png")}
-              </Button>
-              <Button variant="secondary" onClick={handlePrint} disabled={loading}>
+              <Button onClick={handlePrint} disabled={!ready}>
                 <Printer className="h-4 w-4" />
                 {t("qr.download.print")}
+              </Button>
+              <Button variant="outline" onClick={handleDownload} disabled={!ready}>
+                <Download className="h-4 w-4" />
+                {t("qr.download.png")}
               </Button>
             </div>
 
@@ -127,6 +173,20 @@ export default function ElMeuQRPage() {
           </CardContent>
         </Card>
       </section>
+
+      {mounted && ready && qr?.pngUrl && comercQ.data
+        ? createPortal(
+            <div id={POSTER_ID}>
+              <style>{POSTER_PRINT_CSS}</style>
+              <h1>{t("qr.poster.title")}</h1>
+              <img src={qr.pngUrl} alt={t("qr.alt")} />
+              <p className="shop">{comercQ.data.nom}</p>
+              <p className="how">{t("qr.poster.how")}</p>
+              <p className="brand">{t("app.brand")}</p>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

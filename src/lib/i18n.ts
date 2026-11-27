@@ -67,9 +67,9 @@ export const messages = {
     en: "Download or print",
   },
   "qr.download.pdfHint": {
-    ca: "El PDF és un cartell de taulell amb el logo de KM0 LAB i el text «Escaneja i guanya punts».",
-    es: "El PDF es un cartel de mostrador con el logo de KM0 LAB y el texto «Escanea y gana puntos».",
-    en: "The PDF is a counter poster with the KM0 LAB logo and the message “Scan and earn points”.",
+    ca: "Imprimeix el cartell de taulell: el QR ben gran, el nom del comerç i «Escaneja i guanya punts». Des de la mateixa finestra d’impressió el pots desar com a PDF.",
+    es: "Imprime el cartel de mostrador: el QR bien grande, el nombre del comercio y «Escanea y gana puntos». Desde la misma ventana de impresión puedes guardarlo como PDF.",
+    en: "Print the counter poster: a large QR, the shop name and “Scan and earn points”. You can save it as a PDF from the same print window.",
   },
   "qr.download.pngHint": {
     ca: "El PNG serveix per a altres usos (xarxes, aparadors, etiquetes…).",
@@ -78,11 +78,27 @@ export const messages = {
   },
   "qr.download.pdf": { ca: "Descarregar PDF", es: "Descargar PDF", en: "Download PDF" },
   "qr.download.png": { ca: "Descarregar PNG", es: "Descargar PNG", en: "Download PNG" },
-  "qr.download.print": { ca: "Imprimir", es: "Imprimir", en: "Print" },
+  "qr.download.print": { ca: "Imprimir el cartell", es: "Imprimir el cartel", en: "Print the poster" },
+  "qr.poster.title": {
+    ca: "Escaneja i guanya punts",
+    es: "Escanea y gana puntos",
+    en: "Scan and earn points",
+  },
+  "qr.poster.how": {
+    ca: "Obre la càmera del mòbil, enfoca el codi i segueix l’enllaç.",
+    es: "Abre la cámara del móvil, enfoca el código y sigue el enlace.",
+    en: "Open your phone camera, point it at the code and follow the link.",
+  },
+  "qr.alt": { ca: "Codi QR del comerç", es: "Código QR del comercio", en: "Shop QR code" },
+  "qr.toast.error": {
+    ca: "No hem pogut preparar el QR. Torna-ho a provar.",
+    es: "No hemos podido preparar el QR. Inténtalo de nuevo.",
+    en: "We couldn’t prepare the QR. Please try again.",
+  },
   "qr.note": {
-    ca: "El QR es genera automàticament en donar-te d'alta i no caduca. Si sospites que s'ha copiat de manera fraudulenta, pots regenerar-lo des de Configuració (l'anterior deixarà de funcionar).",
-    es: "El QR se genera automáticamente al darte de alta y no caduca. Si sospechas que se ha copiado de forma fraudulenta, puedes regenerarlo desde Configuración (el anterior dejará de funcionar).",
-    en: "Your QR is generated automatically on signup and never expires. If you suspect it has been copied fraudulently, you can regenerate it from Settings (the previous one will stop working).",
+    ca: "El QR es genera automàticament en donar-te d'alta i no caduca. Si sospites que s'ha copiat de manera fraudulenta, avisa qui gestiona el programa.",
+    es: "El QR se genera automáticamente al darte de alta y no caduca. Si sospechas que se ha copiado de forma fraudulenta, avisa a quien gestiona el programa.",
+    en: "Your QR is generated automatically on signup and never expires. If you suspect it has been copied fraudulently, tell whoever runs the programme.",
   },
   "qr.regenerate": { ca: "Regenerar QR", es: "Regenerar QR", en: "Regenerate QR" },
   "qr.toast.downloaded": {
