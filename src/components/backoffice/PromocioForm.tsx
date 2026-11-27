@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -8,18 +8,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { I18nField } from "@/components/backoffice/I18nField";
 import { useLang } from "@/contexts/LangContext";
 import type { MessageKey } from "@/lib/i18n";
-import type { Promocio, PromocioInput, PromoTipus } from "@/types/comerc";
+import type { Promocio, PromocioInput, PromoTipus } from "@/types/merchant";
 import { promoTipusList } from "@/services/promocionsService";
+import { normalizeLang, pickPlain, seedI18n, type Lang } from "@/types/i18n";
+
+const i18nMapSchema = z.object({
+  ca: z.string().optional(),
+  es: z.string().optional(),
+  en: z.string().optional(),
+});
 
 const promoSchema = z
   .object({
-    titol: z.string().min(1),
+    titol: z.string().optional().or(z.literal("")),
+    titolI18n: i18nMapSchema,
+    detallI18n: i18nMapSchema,
+    idiomaOrigen: z.enum(["ca", "es", "en"]),
     tipus: z.enum(["descompte", "dos_x_un", "regal", "preu_especial"]),
     valor: z.string().optional().or(z.literal("")),
     compraMinima: z.string().optional().or(z.literal("")),
-    detall: z.string().min(1),
+    detall: z.string().optional().or(z.literal("")),
     vigenciaInici: z.string().optional().or(z.literal("")),
     vigenciaFi: z.string().optional().or(z.literal("")),
     condicio: z.string().optional().or(z.literal("")),
@@ -31,7 +42,16 @@ const promoSchema = z
       !v.vigenciaFi ||
       new Date(v.vigenciaFi) >= new Date(v.vigenciaInici),
     { path: ["vigenciaFi"], message: "dateRange" },
-  );
+  )
+  .superRefine((v, ctx) => {
+    const src = v.idiomaOrigen;
+    if (!(v.titolI18n[src] || "").trim()) {
+      ctx.addIssue({ code: "custom", path: ["titolI18n"], message: "required" });
+    }
+    if (!(v.detallI18n[src] || "").trim()) {
+      ctx.addIssue({ code: "custom", path: ["detallI18n"], message: "required" });
+    }
+  });
 
 type FormValues = z.infer<typeof promoSchema>;
 
@@ -44,6 +64,7 @@ type Props = {
 
 export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props) {
   const { t } = useLang();
+  const origen = normalizeLang(initial?.idiomaOrigen);
 
   const {
     register,
@@ -51,11 +72,15 @@ export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props)
     setValue,
     watch,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(promoSchema),
     defaultValues: {
       titol: initial?.titol ?? "",
+      titolI18n: seedI18n(initial?.titol, origen, initial?.titolI18n),
+      detallI18n: seedI18n(initial?.detall, origen, initial?.detallI18n),
+      idiomaOrigen: origen,
       tipus: initial?.tipus ?? "descompte",
       valor: initial?.valor ?? "",
       compraMinima: initial?.compraMinima ?? "",
@@ -69,8 +94,12 @@ export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props)
 
   useEffect(() => {
     if (initial) {
+      const o = normalizeLang(initial.idiomaOrigen);
       reset({
         titol: initial.titol,
+        titolI18n: seedI18n(initial.titol, o, initial.titolI18n),
+        detallI18n: seedI18n(initial.detall, o, initial.detallI18n),
+        idiomaOrigen: o,
         tipus: initial.tipus,
         valor: initial.valor ?? "",
         compraMinima: initial.compraMinima ?? "",
@@ -85,6 +114,7 @@ export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props)
 
   const tipus = watch("tipus");
   const activa = watch("activa");
+  const idiomaOrigen = watch("idiomaOrigen");
 
   const showValueField = tipus === "descompte" || tipus === "preu_especial";
 
@@ -100,12 +130,16 @@ export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props)
   return (
     <form
       onSubmit={handleSubmit((values) => {
+        const src = values.idiomaOrigen as Lang;
         const input: PromocioInput = {
-          titol: values.titol,
+          titol: pickPlain(values.titolI18n, src, values.titol),
+          detall: pickPlain(values.detallI18n, src, values.detall),
+          titolI18n: values.titolI18n,
+          detallI18n: values.detallI18n,
+          idiomaOrigen: src,
           tipus: values.tipus,
           valor: values.valor || undefined,
           compraMinima: values.compraMinima || undefined,
-          detall: values.detall,
           vigenciaInici: values.vigenciaInici || undefined,
           vigenciaFi: values.vigenciaFi || undefined,
           condicio: values.condicio || undefined,
@@ -115,18 +149,24 @@ export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props)
       })}
       className="flex flex-col gap-5"
     >
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="titol">{t("form.name.label")}</Label>
-        <Input
-          id="titol"
-          placeholder={t("form.name.placeholder")}
-          aria-invalid={!!errors.titol}
-          {...register("titol")}
-        />
-        {errors.titol ? (
-          <p className="text-xs text-destructive">{t("form.error.required")}</p>
-        ) : null}
-      </div>
+      <Controller
+        control={control}
+        name="titolI18n"
+        render={({ field }) => (
+          <I18nField
+            id="titol"
+            label={t("form.name.label")}
+            value={field.value}
+            sourceLang={idiomaOrigen}
+            onChange={field.onChange}
+            onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+            placeholder={t("form.name.placeholder")}
+          />
+        )}
+      />
+      {errors.titolI18n ? (
+        <p className="text-xs text-destructive">{t("form.error.required")}</p>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label>{t("form.type.label")}</Label>
@@ -170,18 +210,24 @@ export function PromocioForm({ initial, onSubmit, onCancel, submitting }: Props)
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="detall">{t("form.detail.label")}</Label>
-        <Input
-          id="detall"
-          placeholder={t("form.detail.placeholder")}
-          aria-invalid={!!errors.detall}
-          {...register("detall")}
-        />
-        {errors.detall ? (
-          <p className="text-xs text-destructive">{t("form.error.required")}</p>
-        ) : null}
-      </div>
+      <Controller
+        control={control}
+        name="detallI18n"
+        render={({ field }) => (
+          <I18nField
+            id="detall"
+            label={t("form.detail.label")}
+            value={field.value}
+            sourceLang={idiomaOrigen}
+            onChange={field.onChange}
+            onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+            placeholder={t("form.detail.placeholder")}
+          />
+        )}
+      />
+      {errors.detallI18n ? (
+        <p className="text-xs text-destructive">{t("form.error.required")}</p>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label>{t("form.validity.label")}</Label>

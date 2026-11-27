@@ -25,8 +25,8 @@ export function RoleSwitcher() {
     const next = value as Rol;
     if (next === rol) return;
     setRol(next);
-    if (next === "admin") navigate({ to: "/admin/resum" });
-    else navigate({ to: "/comerc/el-meu-qr" });
+    if (next === "admin") navigate({ to: "/admin/overview" });
+    else navigate({ to: "/merchant/my-qr" });
   }
 
   return (

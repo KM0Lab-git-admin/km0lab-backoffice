@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Plus, Search, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import {
 import { useLang } from "@/contexts/LangContext";
 import { adminComercosService } from "@/services/adminComercosService";
 import { ComercoForm } from "@/components/backoffice/ComercoForm";
-import { ComercoCards, ComercoTable } from "@/components/backoffice/ComercoList";
+import { ComercoCards, ComercoTable, municipiAmbDiversesPoblacions } from "@/components/backoffice/ComercoList";
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { adminService } from "@/services/adminService";
@@ -36,8 +37,10 @@ type EstatFilter = "tots" | ComercEstat;
 
 export default function ComercosPage() {
   const { t } = useLang();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const poblacioId = useSessionStore((s) => s.poblacioId);
+  const enterActingAsShop = useSessionStore((s) => s.enterActingAsShop);
 
   const meQ = useQuery({
     queryKey: ["admin", "me"],
@@ -110,8 +113,12 @@ export default function ComercosPage() {
   const poblacioNom = meQ.data?.poblacioNom ?? "";
 
   const handleToggle = (c: ComercAdmin, next: boolean) => {
-    if (c.estat === "pendent") return;
     toggleMut.mutate({ id: c.id, estat: next ? "actiu" : "inactiu" });
+  };
+
+  const handleActAs = (c: ComercAdmin) => {
+    enterActingAsShop({ id: c.id, nom: c.nom });
+    void navigate({ to: "/merchant/my-qr" });
   };
 
   return (
@@ -179,7 +186,6 @@ export default function ComercosPage() {
               <SelectContent>
                 <SelectItem value="tots">{t("comercos.filter.all")}</SelectItem>
                 <SelectItem value="actiu">{t("comercos.estat.actiu")}</SelectItem>
-                <SelectItem value="pendent">{t("comercos.estat.pendent")}</SelectItem>
                 <SelectItem value="inactiu">{t("comercos.estat.inactiu")}</SelectItem>
               </SelectContent>
             </Select>
@@ -195,11 +201,15 @@ export default function ComercosPage() {
                 comercos={filtered}
                 onEdit={setEditing}
                 onToggle={handleToggle}
+                onActAs={handleActAs}
+                mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
               />
               <ComercoCards
                 comercos={filtered}
                 onEdit={setEditing}
                 onToggle={handleToggle}
+                onActAs={handleActAs}
+                mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
               />
             </>
           )}

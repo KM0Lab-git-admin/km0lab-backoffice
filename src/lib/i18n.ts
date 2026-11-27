@@ -26,6 +26,8 @@ export const messages = {
   "nav.estadistiques": { ca: "Estadístiques", es: "Estadísticas", en: "Statistics" },
   "nav.laMevaFitxa": { ca: "La meva fitxa", es: "Mi ficha", en: "My profile" },
   "nav.configuracio": { ca: "Configuració", es: "Configuración", en: "Settings" },
+  "nav.invitations": { ca: "Invitacions", es: "Invitaciones", en: "Invitations" },
+  "nav.vals": { ca: "Validar vals", es: "Validar vales", en: "Validate vouchers" },
   "nav.openMenu": { ca: "Obrir menú", es: "Abrir menú", en: "Open menu" },
 
   "common.loading": { ca: "Carregant…", es: "Cargando…", en: "Loading…" },
@@ -179,6 +181,26 @@ export const messages = {
   "form.submit": { ca: "Desar promoció", es: "Guardar promoción", en: "Save promotion" },
   "form.submitting": { ca: "Desant…", es: "Guardando…", en: "Saving…" },
   "form.error.required": { ca: "Camp obligatori", es: "Campo obligatorio", en: "Required field" },
+  "form.error.requiredField": {
+    ca: "Revisa el camp: {field}",
+    es: "Revisa el campo: {field}",
+    en: "Check the field: {field}",
+  },
+  "form.error.invalidTime": {
+    ca: "Hora no vàlida",
+    es: "Hora no válida",
+    en: "Invalid time",
+  },
+  "form.error.splitHours": {
+    ca: "Indica obertura i tancament del 2n tram",
+    es: "Indica apertura y cierre del 2.º tramo",
+    en: "Enter both open and close times for the 2nd slot",
+  },
+  "form.error.tooLong": {
+    ca: "Text massa llarg (màx. {max} caràcters)",
+    es: "Texto demasiado largo (máx. {max} caracteres)",
+    en: "Text too long (max {max} characters)",
+  },
   "form.error.dateRange": {
     ca: "La data final ha de ser posterior a la inicial",
     es: "La fecha final debe ser posterior a la inicial",
@@ -274,10 +296,60 @@ export const messages = {
   "fitxa.nom.label": { ca: "Nom del comerç", es: "Nombre del comercio", en: "Merchant name" },
   "fitxa.categories.label": { ca: "Categories", es: "Categorías", en: "Categories" },
   "fitxa.categories.hint": {
-    ca: "Separa-les per comes. P. ex. Alimentació, Fleca",
-    es: "Sepáralas por comas. P. ej. Alimentación, Panadería",
-    en: "Comma-separated. E.g. Food, Bakery",
+    ca: "Tria una o més categories que descriguin el teu comerç.",
+    es: "Elige una o más categorías que describan tu comercio.",
+    en: "Pick one or more categories that describe your shop.",
   },
+  "fitxa.categories.placeholder": {
+    ca: "Selecciona categories",
+    es: "Selecciona categorías",
+    en: "Select categories",
+  },
+  "fitxa.categories.search": {
+    ca: "Cerca categoria…",
+    es: "Buscar categoría…",
+    en: "Search category…",
+  },
+  "fitxa.categories.empty": {
+    ca: "Sense resultats",
+    es: "Sin resultados",
+    en: "No results",
+  },
+  "fitxa.categories.count": {
+    ca: "{{count}} seleccionades",
+    es: "{{count}} seleccionadas",
+    en: "{{count}} selected",
+  },
+  "shopCategories.bakery": { ca: "Fleca", es: "Panadería", en: "Bakery" },
+  "shopCategories.food": { ca: "Alimentació", es: "Alimentación", en: "Food" },
+  "shopCategories.cafe": { ca: "Cafeteria", es: "Cafetería", en: "Café" },
+  "shopCategories.restaurant": {
+    ca: "Restauració",
+    es: "Restauración",
+    en: "Restaurant",
+  },
+  "shopCategories.bar": { ca: "Bar", es: "Bar", en: "Bar" },
+  "shopCategories.butcher": { ca: "Carnisseria", es: "Carnicería", en: "Butcher" },
+  "shopCategories.greengrocer": {
+    ca: "Fruiteria",
+    es: "Frutería",
+    en: "Greengrocer",
+  },
+  "shopCategories.fishmonger": {
+    ca: "Peixateria",
+    es: "Pescadería",
+    en: "Fishmonger",
+  },
+  "shopCategories.pharmacy": { ca: "Farmàcia", es: "Farmacia", en: "Pharmacy" },
+  "shopCategories.bookstore": { ca: "Llibreria", es: "Librería", en: "Bookstore" },
+  "shopCategories.clothing": { ca: "Moda", es: "Moda", en: "Clothing" },
+  "shopCategories.hairdresser": {
+    ca: "Perruqueria",
+    es: "Peluquería",
+    en: "Hairdresser",
+  },
+  "shopCategories.services": { ca: "Serveis", es: "Servicios", en: "Services" },
+  "shopCategories.other": { ca: "Altres", es: "Otros", en: "Other" },
   "fitxa.descripcio.label": { ca: "Descripció", es: "Descripción", en: "Description" },
   "fitxa.descripcio.hint": {
     ca: "Text curt que veuran els veïns a la fitxa.",
@@ -287,11 +359,32 @@ export const messages = {
   "fitxa.adreca.label": { ca: "Adreça", es: "Dirección", en: "Address" },
   "fitxa.codiPostal.label": { ca: "Codi postal", es: "Código postal", en: "Postal code" },
   "fitxa.poblacio.label": { ca: "Població", es: "Población", en: "Town" },
+  "fitxa.poblacio.hint": {
+    ca: "Ve de la població del programa (no editable).",
+    es: "Viene de la población del programa (no editable).",
+    en: "Comes from the programme town (read-only).",
+  },
   "fitxa.telefon.label": { ca: "Telèfon", es: "Teléfono", en: "Phone" },
   "fitxa.web.label": { ca: "Web", es: "Web", en: "Website" },
   "fitxa.horari.tancat": { ca: "Tancat", es: "Cerrado", en: "Closed" },
   "fitxa.horari.obertura": { ca: "Obertura", es: "Apertura", en: "Opens" },
   "fitxa.horari.tancament": { ca: "Tancament", es: "Cierre", en: "Closes" },
+  "fitxa.horari.obertura2": {
+    ca: "Obertura (2n tram)",
+    es: "Apertura (2.º tramo)",
+    en: "Opens (2nd slot)",
+  },
+  "fitxa.horari.tancament2": {
+    ca: "Tancament (2n tram)",
+    es: "Cierre (2.º tramo)",
+    en: "Closes (2nd slot)",
+  },
+  "fitxa.horari.tram2": { ca: "2n tram", es: "2.º tramo", en: "2nd slot" },
+  "fitxa.horari.splitHint": {
+    ca: "Pots afegir un segon tram opcional (p. ex. tarda).",
+    es: "Puedes añadir un segundo tramo opcional (p. ej. tarde).",
+    en: "You can add an optional second slot (e.g. afternoon).",
+  },
   "fitxa.horari.obertAra": { ca: "Obert ara", es: "Abierto ahora", en: "Open now" },
   "fitxa.horari.tancaAvui": {
     ca: "tanca a les {hora}",
@@ -472,9 +565,14 @@ export const messages = {
     en: "Enter a valid email address.",
   },
   "login.error.generic": {
-    ca: "No hem pogut enviar el codi. Torna-ho a provar.",
-    es: "No hemos podido enviar el código. Inténtalo de nuevo.",
-    en: "We couldn't send the code. Please try again.",
+    ca: "No hem pogut iniciar la sessió. Torna-ho a provar.",
+    es: "No hemos podido iniciar la sesión. Inténtalo de nuevo.",
+    en: "We couldn't sign you in. Please try again.",
+  },
+  "login.error.apiUnreachable": {
+    ca: "No es pot connectar amb l'API (localhost:8000). Comprova que km0lab-api està en marxa.",
+    es: "No se puede conectar con la API (localhost:8000). Comprueba que km0lab-api está en marcha.",
+    en: "Cannot reach the API (localhost:8000). Make sure km0lab-api is running.",
   },
   "login.toRegister.text": {
     ca: "Encara no tens compte?",
@@ -483,6 +581,41 @@ export const messages = {
   },
   "login.toRegister.cta": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
   "login.toast.welcome": { ca: "Sessió iniciada", es: "Sesión iniciada", en: "Signed in" },
+  "login.dev.hint": {
+    ca: "Accés ràpid (només local — OTP desactivat)",
+    es: "Acceso rápido (solo local — OTP desactivado)",
+    en: "Quick access (local only — OTP disabled)",
+  },
+  "login.dev.admin": {
+    ca: "Entrar com a Admin (demo)",
+    es: "Entrar como Admin (demo)",
+    en: "Sign in as Admin (demo)",
+  },
+  "login.dev.merchant": {
+    ca: "Entrar com a Merchant (demo)",
+    es: "Entrar como Merchant (demo)",
+    en: "Sign in as Merchant (demo)",
+  },
+  "login.dev.malgratHint": {
+    ca: "Malgrat real (CP 08380) — OTP 123456",
+    es: "Malgrat real (CP 08380) — OTP 123456",
+    en: "Real Malgrat (postcode 08380) — OTP 123456",
+  },
+  "login.dev.malgratAdmin": {
+    ca: "Admin Malgrat",
+    es: "Admin Malgrat",
+    en: "Malgrat admin",
+  },
+  "login.dev.malgratMerchant1": {
+    ca: "Comerç 1 Malgrat",
+    es: "Comercio 1 Malgrat",
+    en: "Malgrat shop 1",
+  },
+  "login.dev.malgratMerchant2": {
+    ca: "Comerç 2 Malgrat",
+    es: "Comercio 2 Malgrat",
+    en: "Malgrat shop 2",
+  },
 
   // Register
   "register.title": { ca: "Registra el teu comerç", es: "Registra tu comercio", en: "Register your shop" },
@@ -710,11 +843,23 @@ export const messages = {
     es: "Registro en la app",
     en: "App sign-up",
   },
+  "accions.tipus.primer_escaneig": {
+    ca: "Primer escaneig d'un comerç",
+    es: "Primer escaneo de un comercio",
+    en: "First merchant scan",
+  },
   "accions.tipus.escaneig_qr": {
     ca: "Escaneig d'un comerç",
     es: "Escaneo de un comercio",
     en: "Merchant scan",
   },
+  "accions.tipus.aniversari": {
+    ca: "Aniversari",
+    es: "Aniversario",
+    en: "Birthday",
+  },
+
+
   "accions.tipus.visita_web": {
     ca: "Visita web",
     es: "Visita web",
@@ -734,6 +879,16 @@ export const messages = {
     ca: "Personalitzada",
     es: "Personalizada",
     en: "Custom",
+  },
+  "accions.tipus.invitacio_persona": {
+    ca: "Invitació de veí",
+    es: "Invitación de vecino",
+    en: "Neighbour invitation",
+  },
+  "accions.tipus.invitacio_negoci": {
+    ca: "Invitació de comerç",
+    es: "Invitación de comercio",
+    en: "Shop invitation",
   },
 
   "accions.form.new.title": { ca: "Nova acció de punts", es: "Nueva acción de puntos", en: "New point action" },
@@ -794,6 +949,21 @@ export const messages = {
     es: "Si la desactivas, la acción dejará de otorgar puntos.",
     en: "If disabled, the action will stop granting points.",
   },
+  "accions.form.visibleHome.label": {
+    ca: "Mostra aquesta acció a la home de l'app",
+    es: "Muestra esta acción en la home de la app",
+    en: "Show this action on the app home",
+  },
+  "accions.form.visibleHome.hint": {
+    ca: "Si està desactivat, l'acció continua atorgant punts però no apareix destacada a la pàgina principal dels veïns.",
+    es: "Si está desactivado, la acción sigue otorgando puntos pero no aparece destacada en la página principal de los vecinos.",
+    en: "If disabled, the action still grants points but is not featured on the residents' home page.",
+  },
+  "accions.badge.hiddenHome": {
+    ca: "Amagada a la home",
+    es: "Oculta en la home",
+    en: "Hidden on home",
+  },
   "accions.form.url.label": { ca: "URL de destí", es: "URL de destino", en: "Target URL" },
   "accions.form.url.placeholder": {
     ca: "https://…",
@@ -806,13 +976,170 @@ export const messages = {
     es: "Elige un evento",
     en: "Choose an event",
   },
+  "accions.form.esdevenimentUrl.label": {
+    ca: "URL de l'esdeveniment",
+    es: "URL del evento",
+    en: "Event URL",
+  },
+  "accions.form.esdevenimentUrl.placeholder": {
+    ca: "https://…",
+    es: "https://…",
+    en: "https://…",
+  },
+  "accions.form.esdevenimentUrl.hint": {
+    ca: "Enllaç a la pàgina de l'esdeveniment on el veí es pot inscriure.",
+    es: "Enlace a la página del evento donde el vecino puede inscribirse.",
+    en: "Link to the event page where residents can register.",
+  },
   "accions.form.comerc.label": { ca: "Comerç", es: "Comercio", en: "Merchant" },
   "accions.form.comerc.any": {
     ca: "Qualsevol comerç",
     es: "Cualquier comercio",
     en: "Any merchant",
   },
+  "accions.form.cooldown.label": {
+    ca: "Interval de reactivació del QR",
+    es: "Intervalo de reactivación del QR",
+    en: "QR reactivation interval",
+  },
+  "accions.form.cooldown.hint": {
+    ca: "Temps que ha de passar perquè el mateix veí pugui tornar a escanejar el QR d'aquest comerç i rebre punts. Deixa-ho buit per no aplicar cap límit temporal.",
+    es: "Tiempo que debe pasar para que el mismo vecino pueda volver a escanear el QR de este comercio y recibir puntos. Déjalo vacío para no aplicar límite temporal.",
+    en: "Time that must pass before the same resident can scan this merchant's QR again and earn points. Leave empty to apply no time limit.",
+  },
+  "accions.form.cooldown.valor": { ca: "Cada", es: "Cada", en: "Every" },
+  "accions.form.cooldown.unitat": { ca: "Unitat", es: "Unidad", en: "Unit" },
+  "accions.form.cooldown.unit.dies": { ca: "Dies", es: "Días", en: "Days" },
+  "accions.form.cooldown.unit.setmanes": { ca: "Setmanes", es: "Semanas", en: "Weeks" },
+  "accions.form.cooldown.unit.mesos": { ca: "Mesos", es: "Meses", en: "Months" },
+  "accions.form.cooldown.none": {
+    ca: "Sense límit temporal",
+    es: "Sin límite temporal",
+    en: "No time limit",
+  },
   "accions.form.submit": { ca: "Desar acció", es: "Guardar acción", en: "Save action" },
+  "accions.registre.fixedNom": {
+    ca: "Registre a l'aplicació",
+    es: "Registro en la aplicación",
+    en: "App registration",
+  },
+  "accions.registre.fixedDescripcio": {
+    ca: "Punts de benvinguda en donar-se d'alta a l'app KM0 LAB.",
+    es: "Puntos de bienvenida al darse de alta en la app KM0 LAB.",
+    en: "Welcome points for signing up to the KM0 LAB app.",
+  },
+  "accions.registre.info": {
+    ca: "El nom i la descripció d'aquesta acció són fixos i es mostren automàticament als veïns segons el seu idioma.",
+    es: "El nombre y la descripción de esta acción son fijos y se muestran automáticamente a los vecinos según su idioma.",
+    en: "Name and description for this action are fixed and shown to residents in their language.",
+  },
+  "accions.primerEscaneig.fixedNom": {
+    ca: "Primer escaneig d'un comerç",
+    es: "Primer escaneo de un comercio",
+    en: "First merchant scan",
+  },
+  "accions.primerEscaneig.fixedDescripcio": {
+    ca: "Bonificació única la primera vegada que el veí escaneja el QR d'un comerç KM0 LAB.",
+    es: "Bonificación única la primera vez que el vecino escanea el QR de un comercio KM0 LAB.",
+    en: "One-time bonus the first time a resident scans a KM0 LAB merchant QR.",
+  },
+  "accions.primerEscaneig.info": {
+    ca: "S'atorga un únic cop per veí, independentment del comerç. Es suma als punts del QR del comerç escanejat.",
+    es: "Se otorga una única vez por vecino, sea cual sea el comercio. Se suma a los puntos del QR del comercio escaneado.",
+    en: "Granted once per resident, regardless of which merchant. Added on top of that merchant's QR points.",
+  },
+  "accions.escaneigQr.fixedNom": {
+    ca: "Escaneig del QR d'un comerç",
+    es: "Escaneo del QR de un comercio",
+    en: "Merchant QR scan",
+  },
+  "accions.escaneigQr.fixedDescripcio": {
+    ca: "Punts en escanejar el QR d'un comerç KM0 LAB adherit.",
+    es: "Puntos al escanear el QR de un comercio KM0 LAB adherido.",
+    en: "Points for scanning a participating KM0 LAB merchant QR.",
+  },
+  "accions.escaneigQr.info": {
+    ca: "El nom i la descripció són fixos. Els límits es gestionen amb l'interval de reactivació del QR.",
+    es: "El nombre y la descripción son fijos. Los límites se gestionan con el intervalo de reactivación del QR.",
+    en: "Name and description are fixed. Limits are managed via the QR reactivation interval.",
+  },
+  "accions.aniversari.fixedNom": {
+    ca: "Perquè avui és el teu aniversari!",
+    es: "¡Porque hoy es tu cumpleaños!",
+    en: "Because it's your birthday!",
+  },
+  "accions.aniversari.fixedDescripcio": {
+    ca: "Punts pel teu aniversari",
+    es: "Puntos por tu cumpleaños",
+    en: "Birthday points",
+  },
+  "accions.aniversari.info": {
+    ca: "El nom i la descripció són fixos i es mostren automàticament als veïns segons el seu idioma.",
+    es: "El nombre y la descripción son fijos y se muestran automáticamente a los vecinos según su idioma.",
+    en: "Name and description are fixed and shown to residents in their language.",
+  },
+  "accions.visitaWeb.fixedNom": {
+    ca: "Visita la web de turisme",
+    es: "Visita la web de turismo",
+    en: "Visit the tourism website",
+  },
+  "accions.visitaWeb.fixedDescripcio": {
+    ca: "Visita la web municipal de turisme",
+    es: "Visita la web municipal de turismo",
+    en: "Visit the municipal tourism website",
+  },
+  "accions.visitaWeb.info": {
+    ca: "El nom i la descripció són fixos. Només cal indicar la URL de la web.",
+    es: "El nombre y la descripción son fijos. Solo hace falta indicar la URL de la web.",
+    en: "Name and description are fixed. Only the website URL is needed.",
+  },
+  "accions.registreWeb.fixedNom": {
+    ca: "Registre al butlletí municipal",
+    es: "Registro al boletín municipal",
+    en: "Newsletter signup",
+  },
+  "accions.registreWeb.fixedDescripcio": {
+    ca: "Subscripció al butlletí",
+    es: "Suscripción al boletín",
+    en: "Subscribe to the newsletter",
+  },
+  "accions.registreWeb.info": {
+    ca: "El nom i la descripció són fixos. Indica la URL del formulari de subscripció.",
+    es: "El nombre y la descripción son fijos. Indica la URL del formulario de suscripción.",
+    en: "Name and description are fixed. Provide the signup form URL.",
+  },
+  "accions.esdeveniment.fixedNom": {
+    ca: "Inscripció a la Festa Major",
+    es: "Inscripción a la Fiesta Mayor",
+    en: "Festa Major signup",
+  },
+  "accions.esdeveniment.fixedDescripcio": {
+    ca: "Inscripció a un esdeveniment municipal",
+    es: "Inscripción a un evento municipal",
+    en: "Signup to a municipal event",
+  },
+  "accions.esdeveniment.info": {
+    ca: "El nom i la descripció són fixos. Indica la URL de l'esdeveniment.",
+    es: "El nombre y la descripción son fijos. Indica la URL del evento.",
+    en: "Name and description are fixed. Provide the event URL.",
+  },
+  "accions.form.i18nHint": {
+    ca: "Escriu el nom i la descripció en l'idioma font (doble clic a la pestanya). Els altres idiomes es generaran automàticament en desar.",
+    es: "Escribe el nombre y la descripción en el idioma fuente (doble clic en la pestaña). Los otros idiomas se generarán automáticamente al guardar.",
+    en: "Write the name and description in the source language (double-click the tab). Other languages are auto-generated on save.",
+  },
+  "accions.form.i18nHintWeb": {
+    ca: "Escriu el nom i la descripció en l'idioma font (doble clic a la pestanya). Els altres idiomes es generaran automàticament en desar. La URL és obligatòria.",
+    es: "Escribe el nombre y la descripción en el idioma fuente (doble clic en la pestaña). Los otros idiomas se generarán automáticamente al guardar. La URL es obligatoria.",
+    en: "Write the name and description in the source language (double-click the tab). Other languages are auto-generated on save. URL is required.",
+  },
+  "accions.form.nomCa": { ca: "Nom (català)", es: "Nombre (catalán)", en: "Name (Catalan)" },
+  "accions.form.nomEs": { ca: "Nom (castellà)", es: "Nombre (castellano)", en: "Name (Spanish)" },
+  "accions.form.nomEn": { ca: "Nom (anglès)", es: "Nombre (inglés)", en: "Name (English)" },
+  "accions.form.descCa": { ca: "Descripció (català)", es: "Descripción (catalán)", en: "Description (Catalan)" },
+  "accions.form.descEs": { ca: "Descripció (castellà)", es: "Descripción (castellano)", en: "Description (Spanish)" },
+  "accions.form.descEn": { ca: "Descripció (anglès)", es: "Descripción (inglés)", en: "Description (English)" },
+
 
   "toast.accio.saved": { ca: "Acció desada", es: "Acción guardada", en: "Action saved" },
   "toast.accio.activated": { ca: "Acció activada", es: "Acción activada", en: "Action activated" },
@@ -954,14 +1281,19 @@ export const messages = {
     en: "Merchants / services where it can be used",
   },
   "recompenses.form.comercos.tots": {
-    ca: "Tots els comerços adherits",
-    es: "Todos los comercios adheridos",
-    en: "All partner merchants",
+    ca: "Per a tots els serveis",
+    es: "Para todos los servicios",
+    en: "For all services",
   },
   "recompenses.form.comercos.hint": {
     ca: "Selecciona en quins comerços es pot bescanviar.",
     es: "Selecciona en qué comercios se puede canjear.",
     en: "Choose the merchants where it can be redeemed.",
+  },
+  "recompenses.form.comercos.disabled": {
+    ca: "De moment totes les recompenses apliquen a tots els serveis.",
+    es: "De momento todas las recompensas aplican a todos los servicios.",
+    en: "For now all rewards apply to all services.",
   },
   "recompenses.form.estoc.label": { ca: "Estoc disponible", es: "Stock disponible", en: "Available stock" },
   "recompenses.form.estoc.unlimited": {
@@ -1081,6 +1413,21 @@ export const messages = {
   },
   "comercos.col.alta": { ca: "Alta", es: "Alta", en: "Joined" },
   "comercos.col.actions": { ca: "Accions", es: "Acciones", en: "Actions" },
+  "comercos.actAs": {
+    ca: "Gestionar com a comerç",
+    es: "Gestionar como comercio",
+    en: "Manage as merchant",
+  },
+  "acting.banner": {
+    ca: "Actuant com a {name}",
+    es: "Actuando como {name}",
+    en: "Acting as {name}",
+  },
+  "acting.exit": {
+    ca: "Sortir",
+    es: "Salir",
+    en: "Exit",
+  },
   "comercos.card.altaLabel": { ca: "Alta:", es: "Alta:", en: "Joined:" },
 
   "comercos.form.new.title": {
@@ -1089,9 +1436,9 @@ export const messages = {
     en: "Add merchant",
   },
   "comercos.form.new.subtitle": {
-    ca: "Dona d'alta un comerç i envia-li la invitació per accedir al seu panell.",
-    es: "Da de alta un comercio y envíale la invitación para acceder a su panel.",
-    en: "Register a merchant and send them the invitation to access their panel.",
+    ca: "Dona d'alta un comerç amb dades de contacte i envia-li la invitació al panell.",
+    es: "Da de alta un comercio con datos de contacto y envíale la invitación a su panel.",
+    en: "Register a merchant with contact details and send them an invite to their panel.",
   },
   "comercos.form.edit.title": {
     ca: "Editar comerç",
@@ -1115,14 +1462,29 @@ export const messages = {
     en: "Categories",
   },
   "comercos.form.categories.placeholder": {
-    ca: "Alimentació, Fleca",
-    es: "Alimentación, Panadería",
-    en: "Food, Bakery",
+    ca: "Selecciona categories…",
+    es: "Selecciona categorías…",
+    en: "Select categories…",
   },
   "comercos.form.categories.hint": {
-    ca: "Separa les categories amb comes.",
-    es: "Separa las categorías con comas.",
-    en: "Separate categories with commas.",
+    ca: "Pots triar fins a 6 categories del catàleg.",
+    es: "Puedes elegir hasta 6 categorías del catálogo.",
+    en: "You can choose up to 6 categories from the catalogue.",
+  },
+  "comercos.form.categories.count": {
+    ca: "{{count}} seleccionades",
+    es: "{{count}} seleccionadas",
+    en: "{{count}} selected",
+  },
+  "comercos.form.categories.search": {
+    ca: "Cerca categories…",
+    es: "Buscar categorías…",
+    en: "Search categories…",
+  },
+  "comercos.form.categories.empty": {
+    ca: "Cap categoria trobada",
+    es: "Ninguna categoría encontrada",
+    en: "No categories found",
   },
   "comercos.form.email.label": {
     ca: "Email de contacte",
@@ -1169,6 +1531,68 @@ export const messages = {
     ca: "C. Major, 12",
     es: "C. Mayor, 12",
     en: "12 Main St.",
+  },
+  "comercos.form.contact.title": {
+    ca: "Contacte i ubicació",
+    es: "Contacto y ubicación",
+    en: "Contact and location",
+  },
+  "comercos.col.poblacio": { ca: "Població", es: "Población", en: "Town" },
+  "recompenses.catalegComu": {
+    ca: "Els premis són del catàleg comú de KM0 LAB. Activa els que vulguis oferir.",
+    es: "Los premios son del catálogo común de KM0 LAB. Activa los que quieras ofrecer.",
+    en: "Rewards come from the shared KM0 LAB catalogue. Turn on the ones you want to offer.",
+  },
+  "recompenses.card.actiu": { ca: "Actiu", es: "Activo", en: "Active" },
+  "recompenses.card.senseExistencies": {
+    ca: "Sense existències",
+    es: "Sin existencias",
+    en: "Out of stock",
+  },
+  "comercos.form.localitat.label": {
+    ca: "Població",
+    es: "Población",
+    en: "Town",
+  },
+  "comercos.form.localitat.placeholder": {
+    ca: "Tria la població",
+    es: "Elige la población",
+    en: "Choose the town",
+  },
+  "comercos.form.localitat.hint": {
+    ca: "El municipi té diverses poblacions: indica a quina és el comerç.",
+    es: "El municipio tiene varias poblaciones: indica en cuál está el comercio.",
+    en: "The municipality has several towns: say which one the shop is in.",
+  },
+  "comercos.form.codiPostal.label": {
+    ca: "Codi postal",
+    es: "Código postal",
+    en: "Postal code",
+  },
+  "comercos.form.codiPostal.placeholder": {
+    ca: "00000",
+    es: "00000",
+    en: "00000",
+  },
+  "comercos.form.telefon.label": {
+    ca: "Telèfon",
+    es: "Teléfono",
+    en: "Phone",
+  },
+  "comercos.form.telefon.placeholder": {
+    ca: "937 00 00 00",
+    es: "937 00 00 00",
+    en: "+34 937 00 00 00",
+  },
+  "comercos.form.web.label": {
+    ca: "Pàgina web",
+    es: "Página web",
+    en: "Website",
+  },
+  "comercos.form.web.placeholder": {
+    ca: "https://elmeucomerc.cat",
+    es: "https://micomercio.es",
+    en: "https://mymerchant.com",
   },
   "comercos.form.inviteHint": {
     ca: "Es crearà el comerç en estat 'Pendent d'accés' i es generarà el seu QR automàticament.",
@@ -1250,6 +1674,11 @@ export const messages = {
     es: "No compartido",
     en: "Not shared",
   },
+  "usuaris.contact.none": {
+    ca: "Sense correu",
+    es: "Sin correo",
+    en: "No email",
+  },
   "usuaris.col.nom": { ca: "Nom", es: "Nombre", en: "Name" },
   "usuaris.col.punts": { ca: "Punts", es: "Puntos", en: "Points" },
   "usuaris.col.nivell": { ca: "Nivell", es: "Nivel", en: "Level" },
@@ -1261,6 +1690,7 @@ export const messages = {
     en: "Last activity",
   },
   "usuaris.col.contacte": { ca: "Contacte", es: "Contacto", en: "Contact" },
+  "usuaris.col.email": { ca: "Correu", es: "Correo", en: "Email" },
 
   "usuaris.activitat.escaneig": {
     ca: "Escaneig de QR",
@@ -1301,6 +1731,11 @@ export const messages = {
     ca: "Encara no hi ha activitat registrada.",
     es: "Aún no hay actividad registrada.",
     en: "No activity recorded yet.",
+  },
+  "usuaris.detall.invitacions": {
+    ca: "Invitacions",
+    es: "Invitaciones",
+    en: "Invitations",
   },
 
   // Admin · Configuració
@@ -1595,9 +2030,25 @@ export const messages = {
   },
 
   "bescanvis.search.placeholder": {
-    ca: "Cerca per usuari…",
-    es: "Buscar por usuario…",
-    en: "Search by user…",
+    ca: "Cerca per usuari o referència…",
+    es: "Buscar por usuario o referencia…",
+    en: "Search by user or reference…",
+  },
+  "bescanvis.col.referencia": { ca: "Referència", es: "Referencia", en: "Reference" },
+  "bescanvis.detall.referencia": {
+    ca: "Referència del bescanvi",
+    es: "Referencia del canje",
+    en: "Redemption reference",
+  },
+  "bescanvis.detall.referenciaAjuda": {
+    ca: "Identificador únic. Fes-lo servir en cas d'incidència.",
+    es: "Identificador único. Úsalo en caso de incidencia.",
+    en: "Unique identifier. Use it for any incident.",
+  },
+  "bescanvis.copy.ok": {
+    ca: "Referència copiada",
+    es: "Referencia copiada",
+    en: "Reference copied",
   },
   "bescanvis.filter.tipus": { ca: "Tipus de premi", es: "Tipo de premio", en: "Reward type" },
   "bescanvis.filter.estat": { ca: "Estat", es: "Estado", en: "Status" },
@@ -1746,7 +2197,473 @@ export const messages = {
     en: "Update failed",
   },
 
+  // Bescanvis · Pestanyes i pagaments als comerços
+  "bescanvis.tabs.bescanvis": { ca: "Bescanvis", es: "Canjes", en: "Redemptions" },
+  "bescanvis.tabs.pagaments": {
+    ca: "Pagaments als comerços",
+    es: "Pagos a los comercios",
+    en: "Merchant payouts",
+  },
+  "bescanvis.tabs.lliuraments": {
+    ca: "Lliuraments",
+    es: "Entregas",
+    en: "Deliveries",
+  },
+
+  "lliuraments.subtitle": {
+    ca: "Gestiona la preparació i entrega de marxandatge i experiències als veïns. Els punts ja s'han descomptat en el moment del bescanvi.",
+    es: "Gestiona la preparación y entrega de merchandising y experiencias a los vecinos. Los puntos ya se descontaron en el momento del canje.",
+    en: "Manage preparation and delivery of merchandise and experiences to residents. Points were already deducted at redemption time.",
+  },
+  "lliuraments.kpi.perPreparar": {
+    ca: "Per preparar",
+    es: "Por preparar",
+    en: "To prepare",
+  },
+  "lliuraments.kpi.perEntregar": {
+    ca: "Per entregar",
+    es: "Por entregar",
+    en: "To deliver",
+  },
+  "lliuraments.kpi.entregatsMes": {
+    ca: "Entregats aquest mes",
+    es: "Entregados este mes",
+    en: "Delivered this month",
+  },
+  "lliuraments.filter.allTipus": {
+    ca: "Marxandatge i experiències",
+    es: "Merchandising y experiencias",
+    en: "Merchandise and experiences",
+  },
+  "lliuraments.col.item": { ca: "Ítem", es: "Ítem", en: "Item" },
+  "lliuraments.col.acciorapida": {
+    ca: "Acció ràpida",
+    es: "Acción rápida",
+    en: "Quick action",
+  },
+  "lliuraments.action.marcar": {
+    ca: "Marcar com a {estat}",
+    es: "Marcar como {estat}",
+    en: "Mark as {estat}",
+  },
+  "lliuraments.action.veureDetall": {
+    ca: "Veure detall",
+    es: "Ver detalle",
+    en: "View detail",
+  },
+  "lliuraments.empty.title": {
+    ca: "Encara no hi ha lliuraments",
+    es: "Aún no hay entregas",
+    en: "No deliveries yet",
+  },
+  "lliuraments.empty.subtitle": {
+    ca: "Quan un veí bescanviï marxandatge o una experiència, apareixerà aquí perquè el gestionis.",
+    es: "Cuando un vecino canjee merchandising o una experiencia, aparecerá aquí para que lo gestiones.",
+    en: "When a resident redeems merchandise or an experience, it will appear here for you to manage.",
+  },
+
+  "bescanvis.col.pagament": { ca: "Pagament", es: "Pago", en: "Payout" },
+  "bescanvis.pagament.pendent": {
+    ca: "Pendent de pagar",
+    es: "Pendiente de pago",
+    en: "Payment pending",
+  },
+  "bescanvis.pagament.pagat": { ca: "Pagat", es: "Pagado", en: "Paid" },
+  "bescanvis.pagament.noAplica": { ca: "—", es: "—", en: "—" },
+
+  "bescanvis.filter.pagament": { ca: "Estat pagament", es: "Estado pago", en: "Payout status" },
+  "bescanvis.filter.allPagaments": {
+    ca: "Tots els pagaments",
+    es: "Todos los pagos",
+    en: "All payouts",
+  },
+  "bescanvis.filter.pagamentNoAplica": {
+    ca: "No aplica",
+    es: "No aplica",
+    en: "Not applicable",
+  },
+
+  "bescanvis.detall.pagament": {
+    ca: "Pagament al comerç",
+    es: "Pago al comercio",
+    en: "Merchant payout",
+  },
+  "bescanvis.detall.pagamentId": {
+    ca: "Referència de pagament",
+    es: "Referencia de pago",
+    en: "Payout reference",
+  },
+  "bescanvis.detall.dataPagament": {
+    ca: "Data de pagament",
+    es: "Fecha de pago",
+    en: "Payout date",
+  },
+
+  "pagaments.kpi.pendent": {
+    ca: "Pendent de pagar",
+    es: "Pendiente de pago",
+    en: "Pending payout",
+  },
+  "pagaments.kpi.comercos": {
+    ca: "Comerços amb deute",
+    es: "Comercios con deuda",
+    en: "Merchants with debt",
+  },
+  "pagaments.kpi.pagatMes": {
+    ca: "Pagat aquest mes",
+    es: "Pagado este mes",
+    en: "Paid this month",
+  },
+
+  "pagaments.col.comerc": { ca: "Comerç", es: "Comercio", en: "Merchant" },
+  "pagaments.col.pendents": {
+    ca: "Vals pendents",
+    es: "Vales pendientes",
+    en: "Pending vouchers",
+  },
+  "pagaments.col.importPendent": {
+    ca: "Import pendent",
+    es: "Importe pendiente",
+    en: "Pending amount",
+  },
+  "pagaments.col.importPagat": {
+    ca: "Pagat històric",
+    es: "Pagado histórico",
+    en: "Paid history",
+  },
+  "pagaments.col.accions": { ca: "Accions", es: "Acciones", en: "Actions" },
+
+  "pagaments.action.veureILiquidar": {
+    ca: "Veure i liquidar",
+    es: "Ver y liquidar",
+    en: "View & settle",
+  },
+
+  "pagaments.empty.title": {
+    ca: "Cap deute pendent",
+    es: "Sin deudas pendientes",
+    en: "No outstanding debt",
+  },
+  "pagaments.empty.subtitle": {
+    ca: "Quan els comerços comencin a escanejar vals de saldo o descompte, apareixeran aquí.",
+    es: "Cuando los comercios empiecen a escanear vales de saldo o descuento, aparecerán aquí.",
+    en: "As merchants scan balance or discount vouchers, they will appear here.",
+  },
+
+  "pagaments.sheet.title": {
+    ca: "Liquidar pagament",
+    es: "Liquidar pago",
+    en: "Settle payout",
+  },
+  "pagaments.sheet.subtitle": {
+    ca: "Selecciona els vals que abonaràs al comerç.",
+    es: "Selecciona los vales que abonarás al comercio.",
+    en: "Select the vouchers you're paying to the merchant.",
+  },
+  "pagaments.sheet.selected": {
+    ca: "Vals seleccionats",
+    es: "Vales seleccionados",
+    en: "Selected vouchers",
+  },
+  "pagaments.sheet.totalSeleccionat": {
+    ca: "Total a pagar",
+    es: "Total a pagar",
+    en: "Total to pay",
+  },
+  "pagaments.sheet.selectAll": {
+    ca: "Seleccionar-los tots",
+    es: "Seleccionar todos",
+    en: "Select all",
+  },
+  "pagaments.sheet.empty": {
+    ca: "No hi ha vals pendents per aquest comerç.",
+    es: "No hay vales pendientes para este comercio.",
+    en: "No pending vouchers for this merchant.",
+  },
+  "pagaments.sheet.nota": {
+    ca: "Nota interna (opcional)",
+    es: "Nota interna (opcional)",
+    en: "Internal note (optional)",
+  },
+  "pagaments.sheet.notaPlaceholder": {
+    ca: "Referència de transferència, mètode, etc.",
+    es: "Referencia de transferencia, método, etc.",
+    en: "Transfer reference, method, etc.",
+  },
+  "pagaments.sheet.marcarPagat": {
+    ca: "Marcar com a pagat",
+    es: "Marcar como pagado",
+    en: "Mark as paid",
+  },
+  "pagaments.sheet.historial": {
+    ca: "Historial de pagaments",
+    es: "Historial de pagos",
+    en: "Payout history",
+  },
+  "pagaments.sheet.historialEmpty": {
+    ca: "Encara no hi ha pagaments registrats.",
+    es: "Aún no hay pagos registrados.",
+    en: "No payouts recorded yet.",
+  },
+  "pagaments.sheet.pagamentDe": {
+    ca: "Pagament de {n} vals",
+    es: "Pago de {n} vales",
+    en: "Payout of {n} vouchers",
+  },
+
+  "pagaments.confirm.title": {
+    ca: "Confirmar el pagament",
+    es: "Confirmar el pago",
+    en: "Confirm payout",
+  },
+  "pagaments.confirm.body": {
+    ca: "Marcaràs {n} vals com a pagats per un total de {total}. Aquesta acció no es pot desfer.",
+    es: "Marcarás {n} vales como pagados por un total de {total}. Esta acción no se puede deshacer.",
+    en: "You will mark {n} vouchers as paid for a total of {total}. This cannot be undone.",
+  },
+  "pagaments.confirm.action": {
+    ca: "Confirmar pagament",
+    es: "Confirmar pago",
+    en: "Confirm payout",
+  },
+
+  "pagaments.toast.registrat": {
+    ca: "Pagament registrat correctament",
+    es: "Pago registrado correctamente",
+    en: "Payout recorded",
+  },
+  "pagaments.toast.error": {
+    ca: "No s'ha pogut registrar el pagament",
+    es: "No se ha podido registrar el pago",
+    en: "Could not record the payout",
+  },
+
+  // Vals · validació al comerç
+  "vals.title": {
+    ca: "Validar vals",
+    es: "Validar vales",
+    en: "Validate vouchers",
+  },
+  "vals.subtitle": {
+    ca: "Introdueix el codi de 5 dígits que el veí et mostra a l'app per aplicar el descompte i registrar el val al teu historial.",
+    es: "Introduce el código de 5 dígitos que el vecino te muestra en la app para aplicar el descuento y registrar el vale en tu historial.",
+    en: "Enter the 5-digit code the neighbour shows in the app to apply the discount and add the voucher to your history.",
+  },
+  "vals.validar.card.title": {
+    ca: "Codi de bescanvi",
+    es: "Código de canje",
+    en: "Redemption code",
+  },
+  "vals.validar.card.help": {
+    ca: "Vals disponibles a l'app: 5 €, 10 €, 20 € i 50 €.",
+    es: "Vales disponibles en la app: 5 €, 10 €, 20 € y 50 €.",
+    en: "Vouchers available in the app: 5 €, 10 €, 20 € and 50 €.",
+  },
+  "vals.validar.action": {
+    ca: "Validar codi",
+    es: "Validar código",
+    en: "Validate code",
+  },
+  "vals.validar.reset": {
+    ca: "Nou val",
+    es: "Nuevo vale",
+    en: "New voucher",
+  },
+  "vals.validar.zod.length": {
+    ca: "El codi ha de tenir 5 dígits.",
+    es: "El código debe tener 5 dígitos.",
+    en: "The code must be 5 digits.",
+  },
+  "vals.validar.ok.title": {
+    ca: "Val vàlid — aplica el descompte",
+    es: "Vale válido — aplica el descuento",
+    en: "Valid voucher — apply the discount",
+  },
+  "vals.validar.ok.body": {
+    ca: "{recompensa} de {veí}. S'ha registrat al teu historial com a pendent de cobrament via Bizum.",
+    es: "{recompensa} de {veí}. Se ha registrado en tu historial como pendiente de cobro por Bizum.",
+    en: "{recompensa} from {veí}. Recorded in your history as pending Bizum payout.",
+  },
+  "vals.validar.err.no_trobat": {
+    ca: "No hem trobat cap val amb aquest codi. Comprova-ho amb el veí.",
+    es: "No hemos encontrado ningún vale con este código. Compruébalo con el vecino.",
+    en: "No voucher matches this code. Please double-check with the neighbour.",
+  },
+  "vals.validar.err.ja_utilitzat": {
+    ca: "Aquest val ja s'ha utilitzat.",
+    es: "Este vale ya se ha utilizado.",
+    en: "This voucher has already been used.",
+  },
+  "vals.validar.err.cancelat": {
+    ca: "Aquest val està cancel·lat i no es pot aplicar.",
+    es: "Este vale está cancelado y no se puede aplicar.",
+    en: "This voucher is cancelled and cannot be used.",
+  },
+  "vals.validar.toast.ok": {
+    ca: "Val validat correctament",
+    es: "Vale validado correctamente",
+    en: "Voucher validated",
+  },
+
+  "vals.historial.title": {
+    ca: "Historial de vals",
+    es: "Historial de vales",
+    en: "Voucher history",
+  },
+  "vals.historial.search": {
+    ca: "Cerca per referència o codi",
+    es: "Buscar por referencia o código",
+    en: "Search by reference or code",
+  },
+  "vals.historial.filter.all": { ca: "Tots", es: "Todos", en: "All" },
+  "vals.historial.filter.pendent": {
+    ca: "Pendents Bizum",
+    es: "Pendientes Bizum",
+    en: "Pending Bizum",
+  },
+  "vals.historial.filter.pagat": {
+    ca: "Cobrats",
+    es: "Cobrados",
+    en: "Paid",
+  },
+  "vals.historial.col.ref": { ca: "Referència", es: "Referencia", en: "Reference" },
+  "vals.historial.col.codi": { ca: "Codi", es: "Código", en: "Code" },
+  "vals.historial.col.data": { ca: "Data d'ús", es: "Fecha de uso", en: "Used on" },
+  "vals.historial.col.import": { ca: "Import", es: "Importe", en: "Amount" },
+  "vals.historial.col.vei": { ca: "Veí", es: "Vecino", en: "Neighbour" },
+  "vals.historial.col.cobrament": {
+    ca: "Cobrament",
+    es: "Cobro",
+    en: "Payout",
+  },
+  "vals.historial.empty": {
+    ca: "Encara no has validat cap val.",
+    es: "Aún no has validado ningún vale.",
+    en: "You haven't validated any voucher yet.",
+  },
+  "vals.historial.emptyFiltres": {
+    ca: "Cap val amb aquests filtres.",
+    es: "Ningún vale con estos filtros.",
+    en: "No vouchers match these filters.",
+  },
+
+  "vals.kpi.mes": {
+    ca: "Vals validats aquest mes",
+    es: "Vales validados este mes",
+    en: "Vouchers validated this month",
+  },
+  "vals.kpi.pendent": {
+    ca: "Import pendent de cobrament",
+    es: "Importe pendiente de cobro",
+    en: "Pending payout amount",
+  },
+  "vals.kpi.cobrat": {
+    ca: "Import cobrat històric",
+    es: "Importe cobrado histórico",
+    en: "Total paid out",
+  },
+
+  "vals.cobrament.pendent": {
+    ca: "Pendent Bizum",
+    es: "Pendiente Bizum",
+    en: "Pending Bizum",
+  },
+  "vals.cobrament.pagat": {
+    ca: "Cobrat",
+    es: "Cobrado",
+    en: "Paid",
+  },
+
+  "vals.detall.title": {
+    ca: "Detall del val",
+    es: "Detalle del vale",
+    en: "Voucher detail",
+  },
+  "vals.detall.validat": {
+    ca: "Validat el {data}",
+    es: "Validado el {data}",
+    en: "Validated on {data}",
+  },
+  "vals.detall.cobrat": {
+    ca: "Cobrat el {data}",
+    es: "Cobrado el {data}",
+    en: "Paid on {data}",
+  },
+  "vals.detall.pendentCobrament": {
+    ca: "L'administració registrarà el cobrament via Bizum quan es faci efectiu.",
+    es: "La administración registrará el cobro por Bizum cuando se haga efectivo.",
+    en: "The admin will record the Bizum payout when it is completed.",
+  },
+
+  "invitations.title": { ca: "Invitacions", es: "Invitaciones", en: "Invitations" },
+  "invitations.subtitle": {
+    ca: "Registres completats a {poblacio}.",
+    es: "Registros completados en {poblacio}.",
+    en: "Completed signups in {poblacio}.",
+  },
+  "invitations.kpi.persons": { ca: "Veïns", es: "Vecinos", en: "Neighbours" },
+  "invitations.kpi.businesses": { ca: "Comerços", es: "Comercios", en: "Shops" },
+  "invitations.kpi.points": { ca: "Punts concedits", es: "Puntos concedidos", en: "Points granted" },
+  "invitations.kpi.shares": { ca: "Comparticions", es: "Compartidos", en: "Shares" },
+  "invitations.shares.note": {
+    ca: "Les comparticions són un senyal, no equivalen a enviaments ni lectures.",
+    es: "Los compartidos son una señal, no equivalen a envíos ni lecturas.",
+    en: "Shares are a signal, not proof of delivery or reads.",
+  },
+  "invitations.filter.all": { ca: "Tots", es: "Todos", en: "All" },
+  "invitations.filter.person": { ca: "Veí", es: "Vecino", en: "Neighbour" },
+  "invitations.filter.business": { ca: "Comerç", es: "Comercio", en: "Shop" },
+  "invitations.status.granted": { ca: "Concedida", es: "Concedida", en: "Granted" },
+  "invitations.status.pending": { ca: "Pendent", es: "Pendiente", en: "Pending" },
+  "invitations.status.failed": { ca: "Fallida", es: "Fallida", en: "Failed" },
+  "invitations.empty": {
+    ca: "Encara no hi ha registres completats.",
+    es: "Aún no hay registros completados.",
+    en: "No completed signups yet.",
+  },
+  "invitations.col.kind": { ca: "Tipus", es: "Tipo", en: "Kind" },
+  "invitations.col.name": { ca: "Nom", es: "Nombre", en: "Name" },
+  "invitations.col.status": { ca: "Estat", es: "Estado", en: "Status" },
+  "invitations.col.points": { ca: "Punts", es: "Puntos", en: "Points" },
+  "invitations.col.when": { ca: "Quan", es: "Cuándo", en: "When" },
+  "invitations.col.code": { ca: "Codi", es: "Código", en: "Code" },
+  "invitations.detail.title": { ca: "Conversió", es: "Conversión", en: "Conversion" },
+  "invitations.retry": { ca: "Reintentar recompensa", es: "Reintentar recompensa", en: "Retry reward" },
+  "invitations.retry.ok": { ca: "Recompensa actualitzada", es: "Recompensa actualizada", en: "Reward updated" },
+  "invitations.retry.error": { ca: "No s'ha pogut reintentar", es: "No se ha podido reintentar", en: "Retry failed" },
+  "accions.invitacioPersona.fixedNom": {
+    ca: "Invitació de veí",
+    es: "Invitación de vecino",
+    en: "Neighbour invitation",
+  },
+  "accions.invitacioPersona.fixedDescripcio": {
+    ca: "Alta d'un veí completada des d'una invitació",
+    es: "Alta de un vecino completada desde una invitación",
+    en: "Completed neighbour signup from an invitation",
+  },
+  "accions.invitacioPersona.info": {
+    ca: "S'abona al prescriptor quan el veí completa el registre al mateix municipi.",
+    es: "Se abona al prescriptor cuando el vecino completa el registro en el mismo municipio.",
+    en: "Paid to the inviter when the neighbour completes signup in the same town.",
+  },
+  "accions.invitacioNegoci.fixedNom": {
+    ca: "Invitació de comerç",
+    es: "Invitación de comercio",
+    en: "Shop invitation",
+  },
+  "accions.invitacioNegoci.fixedDescripcio": {
+    ca: "Alta d'un comerç completada des d'una invitació",
+    es: "Alta de un comercio completada desde una invitación",
+    en: "Completed shop signup from an invitation",
+  },
+  "accions.invitacioNegoci.info": {
+    ca: "S'abona al prescriptor quan el comerç queda activat al mateix municipi.",
+    es: "Se abona al prescriptor cuando el comercio queda activado en el mismo municipio.",
+    en: "Paid to the inviter when the shop is activated in the same town.",
+  },
+
 } satisfies Record<string, Dict>;
+
 
 
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { I18nField } from "@/components/backoffice/I18nField";
 import { useLang } from "@/contexts/LangContext";
 import { recompensesService } from "@/services/recompensesService";
 import { ImageUploader } from "@/components/backoffice/ImageUploader";
+import { RecompensaTipusIcon } from "@/components/backoffice/recompensaTipusIcon";
 import {
   estatLabelKey,
   tipusLabelKey,
@@ -22,6 +24,7 @@ import type {
   RecompensaInput,
   RecompensaTipus,
 } from "@/types/backoffice";
+import { normalizeLang, pickPlain, seedI18n, type Lang } from "@/types/i18n";
 
 const TIPUS_LIST: RecompensaTipus[] = [
   "descompte",
@@ -34,10 +37,19 @@ const TIPUS_LIST: RecompensaTipus[] = [
 
 const ESTAT_LIST: RecompensaEstat[] = ["activa", "inactiva", "esgotada"];
 
+const i18nMapSchema = z.object({
+  ca: z.string().optional(),
+  es: z.string().optional(),
+  en: z.string().optional(),
+});
+
 const schema = z
   .object({
-    nom: z.string().min(1),
-    descripcio: z.string().min(1),
+    nom: z.string().optional().or(z.literal("")),
+    descripcio: z.string().optional().or(z.literal("")),
+    nomI18n: i18nMapSchema,
+    descripcioI18n: i18nMapSchema,
+    idiomaOrigen: z.enum(["ca", "es", "en"]),
     imatgeUrl: z.string().optional(),
     tipus: z.enum([
       "descompte",
@@ -67,7 +79,20 @@ const schema = z
   .refine(
     (v) => !v.dataInici || !v.dataFi || new Date(v.dataFi) >= new Date(v.dataInici),
     { path: ["dataFi"], message: "dateRange" },
-  );
+  )
+  .superRefine((v, ctx) => {
+    const src = v.idiomaOrigen;
+    if (!(v.nomI18n[src] || "").trim()) {
+      ctx.addIssue({ code: "custom", path: ["nomI18n"], message: "required" });
+    }
+    if (!(v.descripcioI18n[src] || "").trim()) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["descripcioI18n"],
+        message: "required",
+      });
+    }
+  });
 
 type FormValues = z.infer<typeof schema>;
 
@@ -80,9 +105,13 @@ type Props = {
 
 function toDefaults(initial?: Recompensa): FormValues {
   const comercosTots = !initial || initial.comercos === "tots";
+  const origen = normalizeLang(initial?.idiomaOrigen);
   return {
     nom: initial?.nom ?? "",
     descripcio: initial?.descripcio ?? "",
+    nomI18n: seedI18n(initial?.nom, origen, initial?.nomI18n),
+    descripcioI18n: seedI18n(initial?.descripcio, origen, initial?.descripcioI18n),
+    idiomaOrigen: origen,
     imatgeUrl: initial?.imatgeUrl,
     tipus: initial?.tipus ?? "saldo",
     puntsNecessaris: initial?.puntsNecessaris ?? 500,
@@ -112,6 +141,7 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
     setValue,
     watch,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -129,6 +159,7 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
   const estocIllimitat = watch("estocIllimitat");
   const estocValue = watch("estoc");
   const imatgeUrl = watch("imatgeUrl");
+  const idiomaOrigen = watch("idiomaOrigen");
 
   const shouldForceEsgotada =
     !estocIllimitat && typeof estocValue === "number" && estocValue === 0;
@@ -139,24 +170,24 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
     }
   }, [shouldForceEsgotada, estat, setValue]);
 
-  const toggleComerc = (id: string, checked: boolean) => {
-    const next = checked
-      ? Array.from(new Set([...comercosIds, id]))
-      : comercosIds.filter((x) => x !== id);
-    setValue("comercosIds", next, { shouldDirty: true, shouldValidate: true });
-  };
-
   return (
     <form
       onSubmit={handleSubmit((values) => {
+        const origen = values.idiomaOrigen as Lang;
+        const nomI18n = values.nomI18n;
+        const descripcioI18n = values.descripcioI18n;
         const input: RecompensaInput = {
-          nom: values.nom.trim(),
-          descripcio: values.descripcio.trim(),
+          nom: pickPlain(nomI18n, origen, values.nom),
+          descripcio: pickPlain(descripcioI18n, origen, values.descripcio),
+          nomI18n,
+          descripcioI18n,
+          idiomaOrigen: origen,
           imatgeUrl: values.imatgeUrl || undefined,
           tipus: values.tipus,
           puntsNecessaris: Number(values.puntsNecessaris),
           valor: values.valor ? values.valor.trim() : undefined,
-          comercos: values.comercosTots ? "tots" : values.comercosIds,
+          // Comerços selector temporarily disabled in UI — always all merchants.
+          comercos: "tots",
           estoc: values.estocIllimitat
             ? undefined
             : typeof values.estoc === "number"
@@ -182,36 +213,53 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
         hint={t("recompenses.form.imatge.hint")}
         recommendation={t("recompenses.form.imatge.recommendation")}
         placeholderLabel={t("recompenses.form.imatge.placeholder")}
+        placeholderNode={
+          <div className="flex flex-col items-center gap-2 bg-gradient-to-br from-km0-yellow-300/40 to-km0-yellow-400/50 px-6 py-8 text-km0-blue-800">
+            <RecompensaTipusIcon tipus={tipus} className="h-14 w-14" />
+            <span className="text-xs font-medium">{t(tipusLabelKey(tipus))}</span>
+          </div>
+        }
       />
 
-      {/* Nom */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="rec-nom">{t("recompenses.form.nom.label")}</Label>
-        <Input
-          id="rec-nom"
-          placeholder={t("recompenses.form.nom.placeholder")}
-          aria-invalid={!!errors.nom}
-          {...register("nom")}
-        />
-        {errors.nom ? (
-          <p className="text-xs text-destructive">{t("form.error.required")}</p>
-        ) : null}
-      </div>
+      <Controller
+        control={control}
+        name="nomI18n"
+        render={({ field }) => (
+          <I18nField
+            id="rec-nom"
+            label={t("recompenses.form.nom.label")}
+            value={field.value}
+            sourceLang={idiomaOrigen}
+            onChange={field.onChange}
+            onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+            placeholder={t("recompenses.form.nom.placeholder")}
+          />
+        )}
+      />
+      {errors.nomI18n ? (
+        <p className="text-xs text-destructive">{t("form.error.required")}</p>
+      ) : null}
 
-      {/* Descripció */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="rec-descripcio">{t("recompenses.form.descripcio.label")}</Label>
-        <Textarea
-          id="rec-descripcio"
-          rows={3}
-          placeholder={t("recompenses.form.descripcio.placeholder")}
-          aria-invalid={!!errors.descripcio}
-          {...register("descripcio")}
-        />
-        {errors.descripcio ? (
-          <p className="text-xs text-destructive">{t("form.error.required")}</p>
-        ) : null}
-      </div>
+      <Controller
+        control={control}
+        name="descripcioI18n"
+        render={({ field }) => (
+          <I18nField
+            id="rec-descripcio"
+            label={t("recompenses.form.descripcio.label")}
+            value={field.value}
+            sourceLang={idiomaOrigen}
+            onChange={field.onChange}
+            onSourceLangChange={(lang) => setValue("idiomaOrigen", lang)}
+            multiline
+            rows={3}
+            placeholder={t("recompenses.form.descripcio.placeholder")}
+          />
+        )}
+      />
+      {errors.descripcioI18n ? (
+        <p className="text-xs text-destructive">{t("form.error.required")}</p>
+      ) : null}
 
       {/* Tipus */}
       <div className="flex flex-col gap-2">
@@ -266,13 +314,19 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
         </div>
       </div>
 
-      {/* Comerços */}
-      <div className="flex flex-col gap-3 rounded-md border bg-muted/30 p-3">
+      {/* Comerços — visible but disabled until multi-merchant selection is ready */}
+      <div
+        className="flex flex-col gap-3 rounded-md border bg-muted/30 p-3 opacity-60"
+        aria-disabled="true"
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-medium">{t("recompenses.form.comercos.label")}</p>
             <p className="text-xs text-muted-foreground">
               {t("recompenses.form.comercos.hint")}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("recompenses.form.comercos.disabled")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -280,8 +334,8 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
               {t("recompenses.form.comercos.tots")}
             </span>
             <Switch
-              checked={comercosTots}
-              onCheckedChange={(v) => setValue("comercosTots", v, { shouldDirty: true, shouldValidate: true })}
+              checked={true}
+              disabled
               aria-label={t("recompenses.form.comercos.tots")}
             />
           </div>
@@ -293,11 +347,11 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
               return (
                 <label
                   key={c.id}
-                  className="flex items-center gap-2 rounded-md border bg-background p-2 text-sm"
+                  className="flex cursor-not-allowed items-center gap-2 rounded-md border bg-background p-2 text-sm"
                 >
                   <Checkbox
                     checked={checked}
-                    onCheckedChange={(v) => toggleComerc(c.id, v === true)}
+                    disabled
                     aria-label={c.nom}
                   />
                   <span className="truncate">{c.nom}</span>
@@ -305,9 +359,6 @@ export function RecompensaForm({ initial, onSubmit, onCancel, submitting }: Prop
               );
             })}
           </div>
-        ) : null}
-        {errors.comercosIds ? (
-          <p className="text-xs text-destructive">{t("form.error.required")}</p>
         ) : null}
       </div>
 

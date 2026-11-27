@@ -14,11 +14,12 @@ export default function ElMeuQRPage() {
   const { t } = useLang();
 
   const comercQ = useQuery({ queryKey: ["comerc", "me"], queryFn: () => comercService.getMe() });
-  const qrQ = useQuery({ queryKey: ["qr", "me"], queryFn: () => qrService.getMyQR() });
-  const metricsQ = useQuery({ queryKey: ["qr", "metrics"], queryFn: () => qrService.getMetrics() });
+  const qrQ = useQuery({ queryKey: ["qr", "me"], queryFn: () => qrService.getMyQRPage() });
 
-  const loading = comercQ.isLoading || qrQ.isLoading || metricsQ.isLoading;
-  const error = comercQ.error || qrQ.error || metricsQ.error;
+  const loading = comercQ.isLoading || qrQ.isLoading;
+  const error = comercQ.error || qrQ.error;
+  const qr = qrQ.data?.qr;
+  const metrics = qrQ.data?.metrics;
 
   if (error) {
     return (
@@ -26,7 +27,6 @@ export default function ElMeuQRPage() {
         onRetry={() => {
           comercQ.refetch();
           qrQ.refetch();
-          metricsQ.refetch();
         }}
       />
     );
@@ -52,16 +52,16 @@ export default function ElMeuQRPage() {
 
       {/* Metrics */}
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {loading || !metricsQ.data ? (
+        {loading || !metrics ? (
           <>
             <Skeleton className="h-24" />
             <Skeleton className="h-24" />
           </>
         ) : (
           <>
-            <MetricCard value={metricsQ.data.visites.toLocaleString()} label={t("qr.metrics.visits")} />
+            <MetricCard value={metrics.visites.toLocaleString()} label={t("qr.metrics.visits")} />
             <MetricCard
-              value={metricsQ.data.puntsAtorgats.toLocaleString()}
+              value={metrics.puntsAtorgats.toLocaleString()}
               label={t("qr.metrics.points")}
             />
           </>
@@ -72,18 +72,18 @@ export default function ElMeuQRPage() {
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
         <Card className="overflow-hidden">
           <CardContent className="flex flex-col items-center gap-4 bg-gradient-to-b from-white to-km0-beige-50 p-6">
-            {loading || !qrQ.data || !comercQ.data ? (
+            {loading || !qr || !comercQ.data ? (
               <Skeleton className="h-[240px] w-[240px]" />
             ) : (
               <div className="rounded-xl border bg-white p-4 text-km0-blue-800 shadow-sm">
-                <QRMock value={qrQ.data.codi} size={220} />
+                <QRMock value={qr.codi} size={220} />
               </div>
             )}
-            {qrQ.data && comercQ.data ? (
+            {qr && comercQ.data ? (
               <div className="text-center">
                 <p className="text-sm font-bold text-km0-blue-800">{comercQ.data.nom}</p>
                 <p className="text-xs font-semibold text-km0-blue-400">
-                  ID: {qrQ.data.codi} · +{qrQ.data.puntsPerVisita} {t("qr.pointsPerVisit")}
+                  ID: {qr.codi} · +{qr.puntsPerVisita} {t("qr.pointsPerVisit")}
                 </p>
               </div>
             ) : null}

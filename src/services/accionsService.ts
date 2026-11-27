@@ -1,72 +1,56 @@
+import { api } from "@/lib/apiClient";
+import { accioFromApi, accioToApi } from "@/lib/mappers/admin";
 import type { AccioPunts, AccioPuntsInput, AccioPuntsTipus } from "@/types/backoffice";
-import { useAdminAccionsStore } from "@/stores/useAdminAccionsStore";
-import { useSessionStore } from "@/stores/useSessionStore";
-import {
-  comercosOptionsFixture,
-  esdevenimentsOptionsFixture,
-} from "@/data/fixtures/accions";
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms + Math.random() * 250));
-
-function newId(): string {
-  return `ap-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
-}
+import type { ApiPointAction, ApiShop } from "@/types/api";
 
 export const accioTipusList: AccioPuntsTipus[] = [
   "registre",
+  "primer_escaneig",
   "escaneig_qr",
+  "aniversari",
   "visita_web",
   "registre_web",
   "esdeveniment",
   "personalitzada",
+  "invitacio_persona",
+  "invitacio_negoci",
 ];
 
 export const accionsService = {
   async list(): Promise<AccioPunts[]> {
-    await delay(400);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminAccionsStore.getState().accions.filter((a) => a.poblacioId === poblacioId);
+    const rows = await api.get<ApiPointAction[]>("/actions");
+    return rows.map(accioFromApi);
   },
 
   async get(id: string): Promise<AccioPunts | undefined> {
-    await delay(200);
-    return useAdminAccionsStore.getState().accions.find((a) => a.id === id);
+    const rows = await api.get<ApiPointAction[]>("/actions");
+    const found = rows.find((a) => a.id === id);
+    return found ? accioFromApi(found) : undefined;
   },
 
   async create(input: AccioPuntsInput): Promise<AccioPunts> {
-    await delay(500);
-    const { poblacioId } = useSessionStore.getState();
-    const accio: AccioPunts = { ...input, id: newId(), poblacioId };
-    useAdminAccionsStore.getState().upsert(accio);
-    return accio;
+    const created = await api.post<ApiPointAction>("/actions", accioToApi(input));
+    return accioFromApi(created);
   },
 
   async update(id: string, input: AccioPuntsInput): Promise<AccioPunts> {
-    await delay(500);
-    const current = useAdminAccionsStore.getState().accions.find((a) => a.id === id);
-    const poblacioId = current?.poblacioId ?? useSessionStore.getState().poblacioId;
-    const accio: AccioPunts = { ...input, id, poblacioId };
-    useAdminAccionsStore.getState().upsert(accio);
-    return accio;
+    const updated = await api.patch<ApiPointAction>(
+      `/actions/${id}`,
+      accioToApi(input),
+    );
+    return accioFromApi(updated);
   },
 
   async toggle(id: string, activa: boolean): Promise<void> {
-    await delay(250);
-    useAdminAccionsStore.getState().toggle(id, activa);
+    await api.post(`/actions/${id}/${activa ? "activate" : "deactivate"}`);
   },
 
   async remove(id: string): Promise<void> {
-    await delay(300);
-    useAdminAccionsStore.getState().remove(id);
+    await api.delete(`/actions/${id}`);
   },
 
   async getComercosOptions() {
-    await delay(150);
-    return comercosOptionsFixture;
-  },
-
-  async getEsdevenimentsOptions() {
-    await delay(150);
-    return esdevenimentsOptionsFixture;
+    const shops = await api.get<ApiShop[]>("/shops");
+    return shops.map((s) => ({ id: s.id, nom: s.name }));
   },
 };

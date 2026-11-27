@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
-import type { Promocio } from "@/types/comerc";
+import type { Promocio } from "@/types/merchant";
 
 function DiscBadge({ label }: { label: string }) {
   return (

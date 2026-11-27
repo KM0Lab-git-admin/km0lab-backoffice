@@ -14,6 +14,7 @@ import {
   Users,
   Settings,
   Landmark,
+  Share2,
 } from "lucide-react";
 
 import {
@@ -39,20 +40,22 @@ type NavItem = {
 };
 
 const comercNav: NavItem[] = [
-  { to: "/comerc/el-meu-qr", labelKey: "nav.elMeuQR", icon: QrCode },
-  { to: "/comerc/promocions", labelKey: "nav.promocions", icon: Tag },
-  { to: "/comerc/estadistiques", labelKey: "nav.estadistiques", icon: BarChart3 },
-  { to: "/comerc/la-meva-fitxa", labelKey: "nav.laMevaFitxa", icon: Store },
+  { to: "/merchant/my-qr", labelKey: "nav.elMeuQR", icon: QrCode },
+  { to: "/merchant/promotions", labelKey: "nav.promocions", icon: Tag },
+  { to: "/merchant/vouchers", labelKey: "nav.vals", icon: Ticket },
+  { to: "/merchant/statistics", labelKey: "nav.estadistiques", icon: BarChart3 },
+  { to: "/merchant/my-profile", labelKey: "nav.laMevaFitxa", icon: Store },
 ];
 
 const adminNav: NavItem[] = [
-  { to: "/admin/resum", labelKey: "nav.resum", icon: LayoutDashboard },
-  { to: "/admin/accions", labelKey: "nav.accions", icon: Zap },
-  { to: "/admin/recompenses", labelKey: "nav.recompenses", icon: Gift },
-  { to: "/admin/bescanvis", labelKey: "nav.bescanvis", icon: Ticket },
-  { to: "/admin/comercos", labelKey: "nav.comercos", icon: Store },
-  { to: "/admin/usuaris", labelKey: "nav.usuaris", icon: Users },
-  { to: "/admin/configuracio", labelKey: "nav.configuracio", icon: Settings },
+  { to: "/admin/overview", labelKey: "nav.resum", icon: LayoutDashboard },
+  { to: "/admin/actions", labelKey: "nav.accions", icon: Zap },
+  { to: "/admin/rewards", labelKey: "nav.recompenses", icon: Gift },
+  { to: "/admin/redemptions", labelKey: "nav.bescanvis", icon: Ticket },
+  { to: "/admin/merchants", labelKey: "nav.comercos", icon: Store },
+  { to: "/admin/users", labelKey: "nav.usuaris", icon: Users },
+  { to: "/admin/invites", labelKey: "nav.invitations", icon: Share2 },
+  { to: "/admin/settings", labelKey: "nav.configuracio", icon: Settings },
 ];
 
 export type SidebarIdentity = {
@@ -60,6 +63,7 @@ export type SidebarIdentity = {
   title: string;
   subtitleKey: MessageKey;
   emoji?: string;
+  logoUrl?: string;
   editHref?: string;
 };
 
@@ -99,9 +103,15 @@ export function AppSidebar({ identity }: Props) {
           <div className="flex items-center gap-3 rounded-xl bg-white/5 p-2.5 group-data-[collapsible=icon]:hidden">
             <div
               aria-hidden
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-km0-yellow-300 to-km0-yellow-400 text-lg text-km0-blue-800"
+              className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-km0-yellow-300 to-km0-yellow-400 text-lg text-km0-blue-800"
             >
-              {identity.emoji ? (
+              {identity.logoUrl ? (
+                <img
+                  src={identity.logoUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : identity.emoji ? (
                 <span>{identity.emoji}</span>
               ) : (
                 <Landmark className="h-4 w-4" />

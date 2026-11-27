@@ -81,7 +81,7 @@ export function RegistrePage() {
       const user = await authService.verifyRegistration(pending.email, otp);
       signIn(user);
       toast.success(t("register.toast.welcome"));
-      navigate({ to: "/comerc/el-meu-qr" });
+      navigate({ to: "/merchant/my-qr" });
     } catch {
       setOtpError("auth.otp.invalid");
     } finally {

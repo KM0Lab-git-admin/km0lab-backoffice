@@ -1,6 +1,8 @@
 import { Bell, ChevronLeft, Globe, MapPin, Phone, ScanLine } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
-import type { ComercFitxa, DiaSetmana } from "@/types/comerc";
+import { categoryLabelToSlug } from "@/lib/mappers/categories";
+import { formatHorariDia } from "@/lib/mappers/horari";
+import type { ComercFitxa, DiaSetmana } from "@/types/merchant";
 import type { MessageKey } from "@/lib/i18n";
 
 const dayOrder: DiaSetmana[] = [
@@ -29,7 +31,11 @@ export function FitxaPreview({ fitxa }: Props) {
   const today = dayOrder[todayIndex()];
   const horariAvui = fitxa.horari[today];
   const obertAra = !horariAvui.tancat;
-  const categoriesLine = fitxa.categories.filter(Boolean).join(" · ").toUpperCase();
+  const categoriesLine = fitxa.categories
+    .filter(Boolean)
+    .map((c) => t(`shopCategories.${categoryLabelToSlug(c)}` as MessageKey))
+    .join(" · ")
+    .toUpperCase();
 
   return (
     <div className="mx-auto w-full max-w-[380px] overflow-hidden rounded-[32px] border-2 border-km0-blue-800/80 bg-km0-beige-50 shadow-xl">
@@ -45,7 +51,7 @@ export function FitxaPreview({ fitxa }: Props) {
           </button>
           <div className="flex-1 text-center">
             <p className="text-lg font-black leading-none text-km0-blue-800">
-              Malgrat de Mar
+              {fitxa.poblacio}
             </p>
             <span className="mt-1 inline-flex items-center rounded-md bg-km0-blue-700 px-2 py-0.5 text-[10px] font-black tracking-wide text-km0-beige-100">
               KM0 LAB
@@ -71,23 +77,6 @@ export function FitxaPreview({ fitxa }: Props) {
             <div className="flex h-full w-full items-center justify-center text-xs text-km0-blue-500">
               {t("fitxa.preview.heroPlaceholder")}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Logo panel */}
-      <div className="bg-km0-beige-100 px-6 py-6">
-        <div className="mx-auto flex aspect-square w-40 items-center justify-center overflow-hidden rounded-2xl bg-white">
-          {fitxa.logoUrl ? (
-            <img
-              src={fitxa.logoUrl}
-              alt={fitxa.nom}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="px-2 text-center text-xs text-muted-foreground">
-              {t("fitxa.preview.logoPlaceholder")}
-            </span>
           )}
         </div>
       </div>
@@ -178,7 +167,7 @@ export function FitxaPreview({ fitxa }: Props) {
               title={
                 horariAvui.tancat
                   ? t("fitxa.horari.tancatAvui")
-                  : `${horariAvui.obertura}–${horariAvui.tancament}`
+                  : formatHorariDia(horariAvui)
               }
               subtitle={
                 obertAra ? (
@@ -228,7 +217,7 @@ export function FitxaPreview({ fitxa }: Props) {
                   <span>
                     {h.tancat
                       ? t("fitxa.horari.tancat")
-                      : `${h.obertura}–${h.tancament}`}
+                      : formatHorariDia(h)}
                   </span>
                 </li>
               );

@@ -142,6 +142,7 @@ export default function ConfiguracioPage() {
     onSuccess: () => {
       toast.success(t("config.saved"));
       qc.invalidateQueries({ queryKey: ["admin", "config", poblacioId] });
+      qc.invalidateQueries({ queryKey: ["admin", "me"] });
     },
     onError: () => toast.error(t("config.saveError")),
   });

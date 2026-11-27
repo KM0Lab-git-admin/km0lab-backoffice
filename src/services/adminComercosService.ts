@@ -1,66 +1,48 @@
+import { api } from "@/lib/apiClient";
+import {
+  comercAdminFromShop,
+  comercAdminToCreate,
+  comercAdminToUpdate,
+  comercEstatToApi,
+} from "@/lib/mappers/admin";
 import type { ComercAdmin, ComercAdminInput, ComercEstat } from "@/types/backoffice";
-import { useAdminComercosStore } from "@/stores/useAdminComercosStore";
-import { useSessionStore } from "@/stores/useSessionStore";
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms + Math.random() * 200));
-
-function newId(nom: string): string {
-  const slug = nom
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 32);
-  return `${slug || "comerc"}-${Math.random().toString(36).slice(2, 6)}`;
-}
+import type { ApiShop } from "@/types/api";
 
 export const adminComercosService = {
   async list(): Promise<ComercAdmin[]> {
-    await delay(350);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminComercosStore
-      .getState()
-      .comercos.filter((c) => c.poblacioId === poblacioId);
+    const shops = await api.get<ApiShop[]>("/shops");
+    // /promotions is merchant-scoped; admin list shows 0 until a dedicated count exists.
+    return shops.map((s) => comercAdminFromShop(s, 0));
   },
 
   async get(id: string): Promise<ComercAdmin | undefined> {
-    await delay(200);
-    return useAdminComercosStore.getState().comercos.find((c) => c.id === id);
+    try {
+      const shop = await api.get<ApiShop>(`/shops/${id}`);
+      return comercAdminFromShop(shop, 0);
+    } catch {
+      return undefined;
+    }
   },
 
   async create(input: ComercAdminInput): Promise<ComercAdmin> {
-    await delay(500);
-    const { poblacioId } = useSessionStore.getState();
-    const c: ComercAdmin = {
-      ...input,
-      id: newId(input.nom),
-      poblacioId,
-      estat: "pendent",
-      qrGenerat: true,
-      nPromocionsActives: 0,
-      dataAlta: new Date().toISOString(),
-    };
-    useAdminComercosStore.getState().upsert(c);
-    return c;
+    const shop = await api.post<ApiShop>("/shops", comercAdminToCreate(input));
+    return comercAdminFromShop(shop, 0);
   },
 
   async update(id: string, input: ComercAdminInput): Promise<ComercAdmin> {
-    await delay(400);
-    const current = useAdminComercosStore.getState().comercos.find((c) => c.id === id);
-    if (!current) throw new Error("not_found");
-    const c: ComercAdmin = { ...current, ...input };
-    useAdminComercosStore.getState().upsert(c);
-    return c;
+    const shop = await api.patch<ApiShop>(
+      `/shops/${id}`,
+      comercAdminToUpdate(input),
+    );
+    return comercAdminFromShop(shop, 0);
   },
 
   async setEstat(id: string, estat: ComercEstat): Promise<void> {
-    await delay(250);
-    useAdminComercosStore.getState().setEstat(id, estat);
+    await api.patch(`/shops/${id}`, { status: comercEstatToApi(estat) });
   },
 
   async remove(id: string): Promise<void> {
-    await delay(300);
-    useAdminComercosStore.getState().remove(id);
+    // No DELETE endpoint — soft-deactivate.
+    await api.patch(`/shops/${id}`, { status: "inactive" });
   },
 };

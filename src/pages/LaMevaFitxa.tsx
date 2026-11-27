@@ -8,7 +8,7 @@ import { FitxaListingPreview } from "@/components/backoffice/FitxaListingPreview
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import { fitxaService } from "@/services/fitxaService";
 import { useLang } from "@/contexts/LangContext";
-import type { ComercFitxa, ComercFitxaInput } from "@/types/comerc";
+import type { ComercFitxa, ComercFitxaInput } from "@/types/merchant";
 
 export default function LaMevaFitxa() {
   const { t } = useLang();
@@ -28,6 +28,7 @@ export default function LaMevaFitxa() {
     mutationFn: (input: ComercFitxaInput) => fitxaService.updateFitxa(input),
     onSuccess: (saved) => {
       qc.setQueryData(["fitxa", "me"], saved);
+      void qc.invalidateQueries({ queryKey: ["comerc", "me"] });
       setDraft(saved);
       toast.success(t("fitxa.toast.saved"));
     },

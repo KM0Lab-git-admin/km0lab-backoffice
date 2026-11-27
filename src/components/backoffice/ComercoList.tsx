@@ -1,4 +1,5 @@
-import { Pencil, QrCode, Store } from "lucide-react";
+import { LogIn, Pencil, QrCode, Store } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -12,24 +13,20 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/contexts/LangContext";
+import { categoryLabelToSlug } from "@/lib/mappers/categories";
+import { fitxaService } from "@/services/fitxaService";
 import type { MessageKey } from "@/lib/i18n";
-import type { ComercAdmin, ComercEstat } from "@/types/backoffice";
+import type { ComercAdmin, ComercEstat, Poblacio } from "@/types/backoffice";
 
 export const estatLabelKey = (e: ComercEstat): MessageKey =>
-  e === "actiu"
-    ? "comercos.estat.actiu"
-    : e === "pendent"
-      ? "comercos.estat.pendent"
-      : "comercos.estat.inactiu";
+  e === "actiu" ? "comercos.estat.actiu" : "comercos.estat.inactiu";
 
 function EstatBadge({ estat }: { estat: ComercEstat }) {
   const { t } = useLang();
   const cls =
     estat === "actiu"
       ? "bg-km0-teal-100 text-km0-teal-700 border-km0-teal-200"
-      : estat === "pendent"
-        ? "bg-km0-yellow-100 text-km0-blue-800 border-km0-yellow-300"
-        : "bg-muted text-muted-foreground border-border";
+      : "bg-muted text-muted-foreground border-border";
   return (
     <Badge variant="outline" className={cn("font-medium", cls)}>
       {t(estatLabelKey(estat))}
@@ -39,8 +36,16 @@ function EstatBadge({ estat }: { estat: ComercEstat }) {
 
 function ComercAvatar({ comerc }: { comerc: ComercAdmin }) {
   return (
-    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-km0-yellow-300 to-km0-yellow-400 text-lg text-km0-blue-800">
-      {comerc.emoji ? <span>{comerc.emoji}</span> : <Store className="h-4 w-4" />}
+    <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-km0-yellow-300 to-km0-yellow-400 text-lg text-km0-blue-800">
+      {comerc.logoUrl ? (
+        <img
+          src={comerc.logoUrl}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <Store className="h-4 w-4" />
+      )}
     </div>
   );
 }
@@ -61,10 +66,27 @@ type Props = {
   comercos: ComercAdmin[];
   onEdit: (c: ComercAdmin) => void;
   onToggle: (c: ComercAdmin, actiu: boolean) => void;
+  onActAs?: (c: ComercAdmin) => void;
+  mostrarPoblacio: boolean;
 };
 
-export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
+export function municipiAmbDiversesPoblacions(poblacions: Poblacio[] | undefined): boolean {
+  return (poblacions?.length ?? 0) > 1;
+}
+
+export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio }: Props) {
   const { t, lang } = useLang();
+  const categoriesQ = useQuery({
+    queryKey: ["shop-categories", lang],
+    queryFn: () => fitxaService.listCategories(lang),
+    staleTime: 60_000,
+  });
+  const categoryLabel = (value: string) => {
+    const slug = categoryLabelToSlug(value);
+    const row = categoriesQ.data?.find((c) => c.slug === slug);
+    const label = row?.label ?? t(`shopCategories.${slug}` as MessageKey);
+    return row?.emoji ? `${row.emoji} ${label}` : label;
+  };
 
   return (
     <div className="hidden overflow-hidden rounded-lg border md:block">
@@ -72,6 +94,7 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[32%]">{t("comercos.col.comerc")}</TableHead>
+            {mostrarPoblacio ? <TableHead>{t("comercos.col.poblacio")}</TableHead> : null}
             <TableHead>{t("comercos.col.categories")}</TableHead>
             <TableHead>{t("comercos.col.estat")}</TableHead>
             <TableHead className="text-center">{t("comercos.col.qr")}</TableHead>
@@ -98,11 +121,14 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
                   </div>
                 </div>
               </TableCell>
+              {mostrarPoblacio ? (
+                <TableCell className="text-sm">{c.poblacioNom ?? "—"}</TableCell>
+              ) : null}
               <TableCell>
                 <div className="flex flex-wrap gap-1">
                   {c.categories.map((cat) => (
                     <Badge key={cat} variant="secondary" className="font-normal">
-                      {cat}
+                      {categoryLabel(cat)}
                     </Badge>
                   ))}
                 </div>
@@ -132,10 +158,20 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
                     <Switch
                       checked={c.estat === "actiu"}
                       onCheckedChange={(v) => onToggle(c, v)}
-                      disabled={c.estat === "pendent"}
                       aria-label={t(estatLabelKey(c.estat))}
                     />
                   </div>
+                  {onActAs ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onActAs(c)}
+                      aria-label={t("comercos.actAs")}
+                      title={t("comercos.actAs")}
+                    >
+                      <LogIn className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -154,8 +190,19 @@ export function ComercoTable({ comercos, onEdit, onToggle }: Props) {
   );
 }
 
-export function ComercoCards({ comercos, onEdit, onToggle }: Props) {
+export function ComercoCards({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio }: Props) {
   const { t, lang } = useLang();
+  const categoriesQ = useQuery({
+    queryKey: ["shop-categories", lang],
+    queryFn: () => fitxaService.listCategories(lang),
+    staleTime: 60_000,
+  });
+  const categoryLabel = (value: string) => {
+    const slug = categoryLabelToSlug(value);
+    const row = categoriesQ.data?.find((c) => c.slug === slug);
+    const label = row?.label ?? t(`shopCategories.${slug}` as MessageKey);
+    return row?.emoji ? `${row.emoji} ${label}` : label;
+  };
 
   return (
     <div className="flex flex-col gap-3 md:hidden">
@@ -177,10 +224,15 @@ export function ComercoCards({ comercos, onEdit, onToggle }: Props) {
               <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 {c.emailContacte}
               </p>
+              {mostrarPoblacio && c.poblacioNom ? (
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {t("comercos.col.poblacio")}: {c.poblacioNom}
+                </p>
+              ) : null}
               <div className="mt-2 flex flex-wrap gap-1">
                 {c.categories.map((cat) => (
                   <Badge key={cat} variant="secondary" className="font-normal">
-                    {cat}
+                    {categoryLabel(cat)}
                   </Badge>
                 ))}
               </div>
@@ -218,9 +270,19 @@ export function ComercoCards({ comercos, onEdit, onToggle }: Props) {
               <Switch
                 checked={c.estat === "actiu"}
                 onCheckedChange={(v) => onToggle(c, v)}
-                disabled={c.estat === "pendent"}
                 aria-label={t(estatLabelKey(c.estat))}
               />
+              {onActAs ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onActAs(c)}
+                  aria-label={t("comercos.actAs")}
+                  title={t("comercos.actAs")}
+                >
+                  <LogIn className="h-4 w-4" />
+                </Button>
+              ) : null}
               <Button
                 variant="ghost"
                 size="icon"

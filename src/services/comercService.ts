@@ -1,11 +1,11 @@
-import { comercMeFixture } from "@/data/fixtures/promocions";
-import type { ComercMe } from "@/types/comerc";
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import { api } from "@/lib/apiClient";
+import { comercMeFromShop } from "@/lib/mappers/shop";
+import type { ComercMe } from "@/types/merchant";
+import type { ApiShop } from "@/types/api";
 
 export const comercService = {
   async getMe(): Promise<ComercMe> {
-    await delay(300);
-    return comercMeFixture;
+    const shop = await api.get<ApiShop>("/shops/me");
+    return comercMeFromShop(shop);
   },
 };

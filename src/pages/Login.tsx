@@ -15,8 +15,15 @@ import {
 } from "@/components/ui/input-otp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLang } from "@/contexts/LangContext";
-import { authService, MOCK_OTP_CODE } from "@/services/authService";
+import {
+  authService,
+  DEV_SKIP_OTP,
+  MOCK_OTP_CODE,
+  isFixedOtpEmail,
+} from "@/services/authService";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useSessionStore } from "@/stores/useSessionStore";
+import { homePathForRol, rolFromRoles } from "@/lib/roles";
 import { translate, type MessageKey } from "@/lib/i18n";
 
 const emailSchema = z.object({
@@ -29,6 +36,7 @@ export function LoginPage() {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const signIn = useAuthStore((s) => s.signIn);
+  const setSession = useSessionStore((s) => s.setSession);
 
   const [step, setStep] = useState<"email" | "otp">("email");
   const [email, setEmail] = useState("");
@@ -41,16 +49,42 @@ export function LoginPage() {
     defaultValues: { email: "" },
   });
 
+  function applySession(
+    session: Awaited<ReturnType<typeof authService.verifyLoginCode>>,
+  ) {
+    const rol = rolFromRoles(session.user.roles);
+    signIn(session);
+    setSession({
+      rol,
+      poblacioId: session.user.townId ?? "",
+      comercId: session.user.shopId ?? undefined,
+    });
+    toast.success(t("login.toast.welcome"));
+    navigate({ to: homePathForRol(rol) });
+  }
+
   const onEmailSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true);
     try {
+      // Local: cuentas con OTP fijo (demo + Malgrat QA) entran sin pantalla de código.
+      if (DEV_SKIP_OTP && isFixedOtpEmail(values.email)) {
+        const session = await authService.verifyLoginCode(
+          values.email,
+          MOCK_OTP_CODE,
+        );
+        applySession(session);
+        return;
+      }
       await authService.requestLoginCode(values.email);
       setEmail(values.email);
       setOtp("");
       setStep("otp");
       toast.success(t("auth.otp.sent"));
-    } catch {
-      toast.error(t("login.error.generic"));
+    } catch (err) {
+      console.error("[login] request-otp failed", err);
+      const detail =
+        err instanceof Error && err.message ? err.message : null;
+      toast.error(detail ?? t("login.error.generic"));
     } finally {
       setSubmitting(false);
     }
@@ -61,12 +95,18 @@ export function LoginPage() {
     setSubmitting(true);
     setOtpError(null);
     try {
-      const user = await authService.verifyLoginCode(email, otp);
-      signIn(user);
-      toast.success(t("login.toast.welcome"));
-      navigate({ to: "/comerc/el-meu-qr" });
-    } catch {
-      setOtpError("auth.otp.invalid");
+      const session = await authService.verifyLoginCode(email, otp);
+      applySession(session);
+    } catch (err) {
+      const unreachable =
+        err instanceof TypeError ||
+        (err instanceof Error &&
+          /failed to fetch|networkerror|load failed/i.test(err.message));
+      if (unreachable) {
+        toast.error(t("login.error.apiUnreachable"));
+      } else {
+        setOtpError("auth.otp.invalid");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -78,6 +118,42 @@ export function LoginPage() {
       toast.success(t("auth.otp.sent"));
     } catch {
       toast.error(t("login.error.generic"));
+    }
+  }
+
+  async function onDemoLogin(kind: "admin" | "merchant") {
+    setSubmitting(true);
+    try {
+      const session = await authService.loginAsDemo(kind);
+      applySession(session);
+    } catch (err) {
+      console.error("[login] demo bypass failed", err);
+      const unreachable =
+        err instanceof TypeError ||
+        (err instanceof Error && /failed to fetch|networkerror|load failed/i.test(err.message));
+      toast.error(
+        unreachable ? t("login.error.apiUnreachable") : t("login.error.generic"),
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function onMalgratLogin(kind: "admin" | "merchant1" | "merchant2") {
+    setSubmitting(true);
+    try {
+      const session = await authService.loginAsMalgrat(kind);
+      applySession(session);
+    } catch (err) {
+      console.error("[login] malgrat QA bypass failed", err);
+      const unreachable =
+        err instanceof TypeError ||
+        (err instanceof Error && /failed to fetch|networkerror|load failed/i.test(err.message));
+      toast.error(
+        unreachable ? t("login.error.apiUnreachable") : t("login.error.generic"),
+      );
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -120,11 +196,16 @@ export function LoginPage() {
             ) : null}
           </div>
 
-          <Alert>
-            <AlertDescription>
-              {translate("auth.otp.hint", lang).replace("{codi}", MOCK_OTP_CODE)}
-            </AlertDescription>
-          </Alert>
+          {DEV_SKIP_OTP ? (
+            <Alert>
+              <AlertDescription>
+                {translate("auth.otp.hint", lang).replace(
+                  "{codi}",
+                  MOCK_OTP_CODE,
+                )}
+              </AlertDescription>
+            </Alert>
+          ) : null}
 
           <Button
             type="button"
@@ -154,7 +235,10 @@ export function LoginPage() {
       footer={
         <>
           {t("login.toRegister.text")}{" "}
-          <Link to="/registre" className="font-medium text-foreground underline underline-offset-4">
+          <Link
+            to="/register"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
             {t("login.toRegister.cta")}
           </Link>
         </>
@@ -176,9 +260,65 @@ export function LoginPage() {
         </div>
 
         <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? t("login.submitting") : t("login.submit")}
+          {submitting
+            ? t("login.verifying")
+            : t("login.submit")}
         </Button>
       </form>
+
+      {DEV_SKIP_OTP ? (
+        <div className="mt-6 space-y-2 border-t pt-4">
+          <p className="text-xs text-muted-foreground">{t("login.dev.hint")}</p>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onDemoLogin("admin")}
+          >
+            {t("login.dev.admin")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onDemoLogin("merchant")}
+          >
+            {t("login.dev.merchant")}
+          </Button>
+          <p className="pt-2 text-xs text-muted-foreground">
+            {t("login.dev.malgratHint")}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onMalgratLogin("admin")}
+          >
+            {t("login.dev.malgratAdmin")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onMalgratLogin("merchant1")}
+          >
+            {t("login.dev.malgratMerchant1")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={submitting}
+            onClick={() => onMalgratLogin("merchant2")}
+          >
+            {t("login.dev.malgratMerchant2")}
+          </Button>
+        </div>
+      ) : null}
     </AuthShell>
   );
 }

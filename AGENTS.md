@@ -1,7 +1,7 @@
 # AGENTS — km0lab-backoffice
 
 Front de producto del backoffice KM0 LAB. La UI nace en Lovable
-(`km0lab-backoffice-lovable`) y se trae aquí con `bun run sync:lovable`
+(`km0lab-backoffice-lovable`) y se trae aquí con `npm run sync:lovable`
 (ver `docs/SYNC-FROM-LOVABLE.md`).
 
 ## Frontera
@@ -13,9 +13,13 @@ Front de producto del backoffice KM0 LAB. La UI nace en Lovable
 
 ## Sync Lovable
 
+- **Antes de cada porte:** `git fetch` + `checkout main` + `pull --ff-only`
+  en `km0lab-backoffice-lovable`. Nunca sync desde otra rama ni desde un
+  `main` desactualizado. Detalle en `docs/SYNC-FROM-LOVABLE.md`.
 - No sobrescribe rutas en `locked` del manifest.
 - Tras sync: revisar `git diff`, tipado y pantallas afectadas.
 - Fixes visuales van primero a Lovable `main`; luego sync a `develop`.
+- Prohibido depender del CDN Lovable (`/__l5e/...`).
 
 ## Ramas
 

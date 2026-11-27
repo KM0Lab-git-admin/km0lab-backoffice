@@ -1,57 +1,91 @@
+import { api, absoluteMediaUrl } from "@/lib/apiClient";
+import {
+  recompensaFromApi,
+  recompensaToApi,
+  recompensaEstatToApi,
+} from "@/lib/mappers/admin";
 import type { Recompensa, RecompensaInput } from "@/types/backoffice";
-import { useAdminRecompensesStore } from "@/stores/useAdminRecompensesStore";
-import { useSessionStore } from "@/stores/useSessionStore";
-import { comercosOptionsFixture } from "@/data/fixtures/accions";
+import type { ApiReward, ApiShop } from "@/types/api";
 
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms + Math.random() * 250));
+function dataUrlToBlob(dataUrl: string): { blob: Blob; filename: string } {
+  const [header, data] = dataUrl.split(",");
+  const mime = /data:([^;]+)/.exec(header)?.[1] ?? "image/png";
+  const binary = atob(data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const ext = mime.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+  return { blob: new Blob([bytes], { type: mime }), filename: `upload.${ext}` };
+}
 
-function newId(): string {
-  return `r-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+async function uploadImageIfDataUrl(
+  rewardId: string,
+  value: string | undefined,
+): Promise<void> {
+  if (!value?.startsWith("data:")) return;
+  const { blob, filename } = dataUrlToBlob(value);
+  const form = new FormData();
+  form.append("file", blob, filename);
+  await api.put(`/rewards/${rewardId}/media`, form, { rawBody: true });
+}
+
+async function deleteImageIfCleared(
+  rewardId: string,
+  value: string | undefined,
+  hadImage: boolean,
+): Promise<void> {
+  // Only when the user explicitly cleared the uploader (no URL / no data URL).
+  // Keep media if the form still has the persisted HTTP(S) media URL.
+  if (!hadImage) return;
+  if (value?.startsWith("data:") || value?.startsWith("http")) return;
+  if (value) return;
+  await api.delete(`/rewards/${rewardId}/media`);
 }
 
 export const recompensesService = {
   async list(): Promise<Recompensa[]> {
-    await delay(400);
-    const { poblacioId } = useSessionStore.getState();
-    return useAdminRecompensesStore
-      .getState()
-      .recompenses.filter((r) => r.poblacioId === poblacioId);
+    const rows = await api.get<ApiReward[]>("/rewards");
+    return rows.map(recompensaFromApi);
   },
 
   async get(id: string): Promise<Recompensa | undefined> {
-    await delay(200);
-    return useAdminRecompensesStore.getState().recompenses.find((r) => r.id === id);
+    try {
+      const reward = await api.get<ApiReward>(`/rewards/${id}`);
+      return recompensaFromApi(reward);
+    } catch {
+      return undefined;
+    }
   },
 
   async create(input: RecompensaInput): Promise<Recompensa> {
-    await delay(500);
-    const { poblacioId } = useSessionStore.getState();
-    const r: Recompensa = { ...input, id: newId(), poblacioId };
-    useAdminRecompensesStore.getState().upsert(r);
-    return r;
+    const created = await api.post<ApiReward>("/rewards", recompensaToApi(input));
+    await uploadImageIfDataUrl(created.id, input.imatgeUrl);
+    const fresh = await api.get<ApiReward>(`/rewards/${created.id}`);
+    return recompensaFromApi(fresh);
   },
 
   async update(id: string, input: RecompensaInput): Promise<Recompensa> {
-    await delay(500);
-    const current = useAdminRecompensesStore.getState().recompenses.find((r) => r.id === id);
-    const poblacioId = current?.poblacioId ?? useSessionStore.getState().poblacioId;
-    const r: Recompensa = { ...input, id, poblacioId };
-    useAdminRecompensesStore.getState().upsert(r);
-    return r;
+    const before = await api.get<ApiReward>(`/rewards/${id}`);
+    await api.patch<ApiReward>(`/rewards/${id}`, recompensaToApi(input));
+    await uploadImageIfDataUrl(id, input.imatgeUrl);
+    await deleteImageIfCleared(id, input.imatgeUrl, Boolean(before.has_image));
+    const fresh = await api.get<ApiReward>(`/rewards/${id}`);
+    const mapped = recompensaFromApi(fresh);
+    if (input.imatgeUrl?.startsWith("data:") && !mapped.imatgeUrl) {
+      mapped.imatgeUrl = absoluteMediaUrl(fresh.image_url) ?? input.imatgeUrl;
+    }
+    return mapped;
   },
 
-  async setEstat(id: string, estat: Recompensa["estat"]): Promise<void> {
-    await delay(250);
-    useAdminRecompensesStore.getState().setEstat(id, estat);
+  async setEstat(id: string, estat: "activa" | "inactiva"): Promise<void> {
+    await api.patch(`/rewards/${id}`, { status: recompensaEstatToApi(estat) });
   },
 
   async remove(id: string): Promise<void> {
-    await delay(300);
-    useAdminRecompensesStore.getState().remove(id);
+    await api.delete(`/rewards/${id}`);
   },
 
   async getComercosOptions() {
-    await delay(150);
-    return comercosOptionsFixture;
+    const shops = await api.get<ApiShop[]>("/shops");
+    return shops.map((s) => ({ id: s.id, nom: s.name }));
   },
 };

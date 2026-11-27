@@ -5,6 +5,8 @@ export type Rol = "admin" | "comerc";
 export type Poblacio = {
   id: string;
   nom: string;
+  /** Només a producció (API `postal_codes`): el formulari de comerç els fa servir. */
+  codisPostals?: string[];
 };
 
 export type Sessio = {
@@ -16,9 +18,14 @@ export type Sessio = {
 
 export type AdminMe = {
   id: string;
+  /** El municipi (àmbit gestionat), no la població on viu l'administrador. */
   poblacioId: string;
   poblacioNom: string;
+  // Poblacions que formen el municipi (pot ser més d'una).
+  poblacions: Poblacio[];
   nom: string;
+  /** Town brand logo (Settings / config). */
+  logoUrl?: string;
 };
 
 export type AdminResumStats = {
@@ -59,11 +66,18 @@ export type BescanviResum = {
 // Admin · Accions de punts (llistat + alta/edició)
 export type AccioPuntsTipus =
   | "registre"
+  | "primer_escaneig"
   | "escaneig_qr"
+  | "aniversari"
   | "visita_web"
   | "registre_web"
   | "esdeveniment"
-  | "personalitzada";
+  | "personalitzada"
+  | "invitacio_persona"
+  | "invitacio_negoci";
+
+
+export type CooldownUnitat = "dies" | "setmanes" | "mesos";
 
 export type AccioPunts = {
   id: string;
@@ -71,6 +85,9 @@ export type AccioPunts = {
   tipus: AccioPuntsTipus;
   nom: string;
   descripcio: string;
+  nomI18n?: import("@/types/i18n").I18nMap;
+  descripcioI18n?: import("@/types/i18n").I18nMap;
+  idiomaOrigen?: import("@/types/i18n").Lang;
   punts: number;
   limitPerUsuari?: number;
   limitTotal?: number;
@@ -78,9 +95,17 @@ export type AccioPunts = {
   vigenciaFi?: string;
   condicions?: string;
   activa: boolean;
+  // Si l'acció apareix destacada a la home de l'app dels veïns.
+  // Algunes accions (aniversari, primer registre) no tenen sentit a la home.
+  visibleAHome?: boolean;
   url?: string;
   esdevenimentId?: string;
   comercId?: string;
+  // Només per a `escaneig_qr`: interval abans que el mateix usuari pugui
+  // tornar a escanejar el QR del mateix comerç i rebre punts.
+  // undefined = sense cooldown (comportament actual).
+  cooldownValor?: number;
+  cooldownUnitat?: CooldownUnitat;
 };
 
 export type AccioPuntsInput = Omit<AccioPunts, "id" | "poblacioId">;
@@ -104,6 +129,9 @@ export type Recompensa = {
   poblacioId: string;
   nom: string;
   descripcio: string;
+  nomI18n?: import("@/types/i18n").I18nMap;
+  descripcioI18n?: import("@/types/i18n").I18nMap;
+  idiomaOrigen?: import("@/types/i18n").Lang;
   imatgeUrl?: string;
   tipus: RecompensaTipus;
   puntsNecessaris: number;
@@ -114,12 +142,15 @@ export type Recompensa = {
   dataFi?: string;
   condicions?: string;
   estat: RecompensaEstat;
+  // API: `content_locked`. true = premi del catàleg comú de KM0 LAB:
+  // l'admin només el pot activar o desactivar.
+  contingutBloquejat?: boolean;
 };
 
 export type RecompensaInput = Omit<Recompensa, "id" | "poblacioId">;
 
 // Admin · Comerços (llistat + alta/invitació)
-export type ComercEstat = "actiu" | "pendent" | "inactiu";
+export type ComercEstat = "actiu" | "inactiu";
 
 export type ComercAdmin = {
   id: string;
@@ -131,6 +162,12 @@ export type ComercAdmin = {
   emailContacte: string;
   puntsPerVisita: number;
   adreca?: string;
+  codiPostal?: string;
+  /** Població del municipi on és el comerç (API `locality_id` i `town_name`). */
+  localitatId?: string;
+  poblacioNom?: string;
+  telefon?: string;
+  web?: string;
   estat: ComercEstat;
   qrGenerat: boolean;
   nPromocionsActives: number;
@@ -145,6 +182,11 @@ export type ComercAdminInput = {
   emailContacte: string;
   puntsPerVisita: number;
   adreca?: string;
+  codiPostal?: string;
+  /** Obligatori quan el municipi té més d'una població. */
+  localitatId?: string;
+  telefon?: string;
+  web?: string;
 };
 
 // Admin · Usuaris (veïns del programa)
@@ -215,6 +257,8 @@ export type BescanviHist = {
   nota?: string;
 };
 
+export type BescanviPagamentEstat = "pendent" | "pagat";
+
 export type Bescanvi = {
   id: string;
   poblacioId: string;
@@ -230,10 +274,16 @@ export type Bescanvi = {
   // val_qr
   import?: string;
   qrGenerat?: boolean;
+  codi?: string; // codi de 5 dígits que el veí ensenya al comerç
   comercId?: string;
   comercNom?: string;
   dataUs?: string;
   importAplicat?: string;
+  // val_qr · pagament al comerç
+  importPagatNum?: number; // import numèric del val a abonar al comerç
+  pagamentEstat?: BescanviPagamentEstat;
+  pagamentId?: string;
+  dataPagament?: string;
   // lliurament
   dataLliurament?: string;
   historial?: BescanviHist[];
@@ -244,6 +294,7 @@ export type BescanviFiltres = {
   tipus?: RecompensaTipus | "tots";
   estat?: BescanviEstat | "tots";
   comercId?: string | "tots";
+  pagament?: "tots" | "pendent" | "pagat" | "no_aplica";
   desde?: string;
   fins?: string;
 };
@@ -251,5 +302,26 @@ export type BescanviFiltres = {
 export function deriveBescanviFlux(tipus: RecompensaTipus): BescanviFlux {
   return tipus === "saldo" || tipus === "descompte" ? "val_qr" : "lliurament";
 }
+
+// Admin · Pagaments als comerços (liquidació dels vals utilitzats)
+export type PagamentComerc = {
+  id: string;
+  poblacioId: string;
+  comercId: string;
+  comercNom: string;
+  data: string; // ISO
+  bescanviIds: string[];
+  importTotal: number;
+  nota?: string;
+};
+
+export type DeuteComerc = {
+  comercId: string;
+  comercNom: string;
+  nBescanvisPendents: number;
+  importPendent: number;
+  importPagatHistoric: number;
+};
+
 
 

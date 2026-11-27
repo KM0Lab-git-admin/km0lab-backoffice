@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar, type SidebarIdentity } from "@/components/backoffice/AppSidebar";
 import { LangSwitcher } from "@/components/backoffice/LangSwitcher";
 import { RoleSwitcher } from "@/components/backoffice/RoleSwitcher";
+import { Button } from "@/components/ui/button";
 import { comercService } from "@/services/comercService";
 import { adminService } from "@/services/adminService";
 import { useLang } from "@/contexts/LangContext";
@@ -16,10 +18,14 @@ type Props = {
 
 export function AppLayout({ children }: Props) {
   const { t } = useLang();
+  const navigate = useNavigate();
   const rol = useSessionStore((s) => s.rol);
+  const actingAsShopId = useSessionStore((s) => s.actingAsShopId);
+  const actingAsShopName = useSessionStore((s) => s.actingAsShopName);
+  const exitActingAsShop = useSessionStore((s) => s.exitActingAsShop);
 
   const comercQuery = useQuery({
-    queryKey: ["comerc", "me"],
+    queryKey: ["comerc", "me", actingAsShopId],
     queryFn: () => comercService.getMe(),
     enabled: rol === "comerc",
   });
@@ -27,7 +33,7 @@ export function AppLayout({ children }: Props) {
   const adminQuery = useQuery({
     queryKey: ["admin", "me"],
     queryFn: () => adminService.getMe(),
-    enabled: rol === "admin",
+    enabled: rol === "admin" && !actingAsShopId,
   });
 
   let identity: SidebarIdentity | null = null;
@@ -39,7 +45,8 @@ export function AppLayout({ children }: Props) {
       title: comercQuery.data.nom,
       subtitleKey: "app.merchantSubtitle",
       emoji: comercQuery.data.emoji ?? "🏪",
-      editHref: "/comerc/la-meva-fitxa",
+      logoUrl: comercQuery.data.logoUrl,
+      editHref: "/merchant/my-profile",
     };
     headerTitle = comercQuery.data.nom;
   } else if (rol === "admin" && adminQuery.data) {
@@ -48,9 +55,15 @@ export function AppLayout({ children }: Props) {
       title: adminQuery.data.poblacioNom,
       subtitleKey: "app.adminSubtitle",
       emoji: "🏛️",
+      logoUrl: adminQuery.data.logoUrl,
     };
     headerTitle = adminQuery.data.poblacioNom;
   }
+
+  const handleExitActing = () => {
+    exitActingAsShop();
+    void navigate({ to: "/admin/merchants" });
+  };
 
   return (
     <SidebarProvider>
@@ -64,6 +77,24 @@ export function AppLayout({ children }: Props) {
         )}
 
         <div className="flex min-w-0 flex-1 flex-col">
+          {actingAsShopId ? (
+            <div className="flex items-center justify-between gap-3 bg-km0-blue-800 px-4 py-2 text-sm text-white">
+              <p className="min-w-0 truncate font-medium">
+                {t("acting.banner").replace(
+                  "{name}",
+                  actingAsShopName || headerTitle || "…",
+                )}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onClick={handleExitActing}
+              >
+                {t("acting.exit")}
+              </Button>
+            </div>
+          ) : null}
           <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
             <SidebarTrigger aria-label={t("nav.openMenu")} />
             <div className="min-w-0 flex-1">
@@ -71,7 +102,7 @@ export function AppLayout({ children }: Props) {
                 {headerTitle}
               </p>
             </div>
-            <RoleSwitcher />
+            {import.meta.env.DEV && !actingAsShopId ? <RoleSwitcher /> : null}
             <LangSwitcher />
           </header>
 

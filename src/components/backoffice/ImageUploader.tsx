@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/contexts/LangContext";
@@ -12,6 +12,7 @@ type Props = {
   hint: string;
   recommendation?: string;
   placeholderLabel: string;
+  placeholderNode?: ReactNode;
 };
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -24,6 +25,7 @@ export function ImageUploader({
   hint,
   recommendation,
   placeholderLabel,
+  placeholderNode,
 }: Props) {
   const { t } = useLang();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +64,10 @@ export function ImageUploader({
       <div className={`${boxClass} overflow-hidden rounded-xl border bg-muted/40`}>
         {value ? (
           <img src={value} alt={label} className="h-full w-full object-cover" />
+        ) : placeholderNode ? (
+          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+            {placeholderNode}
+          </div>
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-center text-muted-foreground">
             <ImagePlus className="h-6 w-6" aria-hidden />

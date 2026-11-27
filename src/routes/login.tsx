@@ -7,9 +7,9 @@ export const Route = createFileRoute("/login")({
   beforeLoad: () => {
     if (useAuthStore.getState().isAuthenticated) {
       if (useSessionStore.getState().rol === "admin") {
-        throw redirect({ to: "/admin/resum" });
+        throw redirect({ to: "/admin/overview" });
       }
-      throw redirect({ to: "/comerc/el-meu-qr" });
+      throw redirect({ to: "/merchant/my-qr" });
     }
   },
   head: () => ({

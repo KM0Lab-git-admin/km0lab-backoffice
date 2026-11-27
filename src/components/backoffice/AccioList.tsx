@@ -7,6 +7,9 @@ import {
   Mail,
   CalendarDays,
   Sparkles,
+  Star,
+  Cake,
+  Store,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,19 +30,27 @@ import type { AccioPunts, AccioPuntsTipus } from "@/types/backoffice";
 
 const TIPUS_ICON: Record<AccioPuntsTipus, LucideIcon> = {
   registre: UserPlus,
+  primer_escaneig: Star,
   escaneig_qr: QrCode,
+  aniversari: Cake,
   visita_web: Globe,
   registre_web: Mail,
   esdeveniment: CalendarDays,
   personalitzada: Sparkles,
+  invitacio_persona: UserPlus,
+  invitacio_negoci: Store,
 };
 
 export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
   switch (tp) {
     case "registre":
       return "accions.tipus.registre";
+    case "primer_escaneig":
+      return "accions.tipus.primer_escaneig";
     case "escaneig_qr":
       return "accions.tipus.escaneig_qr";
+    case "aniversari":
+      return "accions.tipus.aniversari";
     case "visita_web":
       return "accions.tipus.visita_web";
     case "registre_web":
@@ -48,8 +59,13 @@ export function tipusLabelKey(tp: AccioPuntsTipus): MessageKey {
       return "accions.tipus.esdeveniment";
     case "personalitzada":
       return "accions.tipus.personalitzada";
+    case "invitacio_persona":
+      return "accions.tipus.invitacio_persona";
+    case "invitacio_negoci":
+      return "accions.tipus.invitacio_negoci";
   }
 }
+
 
 function TipusIcon({ tipus }: { tipus: AccioPuntsTipus }) {
   const Icon = TIPUS_ICON[tipus];
@@ -105,7 +121,14 @@ export function AccioTable({ accions, onEdit, onDelete, onToggle }: Props) {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="secondary">{t(tipusLabelKey(a.tipus))}</Badge>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge variant="secondary">{t(tipusLabelKey(a.tipus))}</Badge>
+                  {a.visibleAHome === false ? (
+                    <Badge variant="outline" className="text-xs">
+                      {t("accions.badge.hiddenHome")}
+                    </Badge>
+                  ) : null}
+                </div>
               </TableCell>
               <TableCell>
                 <PuntsBadge punts={a.punts} />
@@ -173,6 +196,11 @@ export function AccioCards({ accions, onEdit, onDelete, onToggle }: Props) {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">{t(tipusLabelKey(a.tipus))}</Badge>
+            {a.visibleAHome === false ? (
+              <Badge variant="outline" className="text-xs">
+                {t("accions.badge.hiddenHome")}
+              </Badge>
+            ) : null}
           </div>
           <div className="flex items-center justify-between border-t pt-3">
             <div className="flex items-center gap-2">

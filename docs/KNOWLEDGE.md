@@ -1,9 +1,12 @@
 # Knowledge — Backoffice KM0 LAB (rol comerç + rol administrador)
 
-> **Qué es este proyecto**: el **backoffice web de KM0 LAB**. Hoy contiene el panel del
-> **comerç** (El meu QR, Promocions, La meva fitxa, Estadístiques). Se va a **ampliar** con
-> el rol **ADMINISTRADOR** (gestor de una població) y un shell que se **adapta al rol** del
-> usuario autenticado.
+> **Qué es este proyecto**: el **backoffice web de KM0 LAB**. Contiene el panel del
+> **comerç** (El meu QR, Promocions, Vals, La meva fitxa, Estadístiques) **y** el del
+> **ADMINISTRADOR** (gestor de una població), con un shell que se **adapta al rol** del
+> usuario autenticado. Ambos roles **ya están implementados**; este documento es el
+> contrato de generación con el que se construyeron y la referencia viva de arquitectura,
+> roles y reglas. (Partes redactadas en futuro —"se va a ampliar", "añade admin.tsx"— son
+> el registro de cómo se generó el rol admin.)
 >
 > **NO es un proyecto nuevo ni una reescritura**: intégrate con lo que ya existe (shell,
 > sidebar, i18n, tokens, services, store). Añade; no rehagas.
@@ -24,7 +27,8 @@
 - **Zustand** para estado global (`src/stores/`), **@tanstack/react-query** para datos,
   **react-hook-form + zod** para formularios, **sonner** para toasts, **date-fns** para fechas,
   **lucide-react** para iconos, **framer-motion** para animación.
-- Gestor de paquetes **bun**. Build con **vite**.
+- Gestor de paquetes **npm** (`packageManager` en `package.json`, `package-lock.json`).
+  Build con **vite**.
 - Alias `@/` → `src/`. Importa primitivos ui **archivo a archivo** (`@/components/ui/button`).
 
 ## Bloque compacto para el campo Knowledge de Lovable (≤10k)
@@ -46,9 +50,9 @@ Arquitectura de dominio:
 - Todo el dato está SCOPED: el admin ve su població; el comerç ve solo su comerç.
 - El menú lateral y las rutas se adaptan AUTOMÁTICAMENTE al rol.
 
-Menú por rol:
-- admin:  Resum · Accions de punts · Recompenses · Comerços · Usuaris · Configuració
-- comerç: Resum · El meu QR · Promocions · La meva fitxa · Estadístiques · Configuració
+Menú por rol (rutas reales en inglés bajo /admin y /merchant):
+- admin:  Resum · Accions de punts · Recompenses · Bescanvis · Comerços · Usuaris · Configuració
+- comerç: Resum · El meu QR · Promocions · Vals · La meva fitxa · Estadístiques · Configuració
 
 Reglas críticas (ante conflicto manda docs/KNOWLEDGE.md):
 1. Frontera: todo MOCK. Sin auth real, secretos, BD ni escrituras a backend real. Login,
@@ -137,7 +141,7 @@ export type AdminMe = { id: string; poblacioId: string; poblacioNom: string; nom
 | Configuració               | De la població                      | Del seu comerç                         |
 
 El rol vive en un **store de sesión** (Zustand). Las rutas están **guardadas por rol**:
-`/comerc/*` solo `comerc`; `/admin/*` solo `admin`. Acceder a una ruta ajena redirige a la
+`/merchant/*` solo `comerc`; `/admin/*` solo `admin`. Acceder a una ruta ajena redirige a la
 home del propio rol.
 
 ## 4. Menú lateral por rol
@@ -145,11 +149,16 @@ home del propio rol.
 El **shell es único** (`AppLayout` + `AppSidebar`). La sidebar renderiza sus ítems según el
 rol del usuario autenticado:
 
-- **admin**: `Resum` (`/admin/resum`) · `Accions de punts` (`/admin/accions`) · `Recompenses`
-  (`/admin/recompenses`) · `Comerços` (`/admin/comercos`) · `Usuaris` (`/admin/usuaris`) ·
-  `Configuració` (`/admin/configuracio`).
-- **comerc** (ya existente): `Resum` · `El meu QR` (`/comerc/el-meu-qr`) · `Promocions` ·
-  `La meva fitxa` · `Estadístiques` · `Configuració`.
+Las rutas reales usan slugs en **inglés** (los `admin.*.tsx` / `merchant.*.tsx`
+de `src/routes/`); las etiquetas visibles salen de i18n (`nav.*`):
+
+- **admin**: `Resum` (`/admin/overview`) · `Accions de punts` (`/admin/actions`) ·
+  `Recompenses` (`/admin/rewards`) · `Bescanvis` (`/admin/redemptions`) · `Comerços`
+  (`/admin/merchants`) · `Usuaris` (`/admin/users`) · `Configuració` (`/admin/settings`).
+- **comerç**: `Resum` · `El meu QR` (`/merchant/my-qr`) · `Promocions`
+  (`/merchant/promotions`) · `Vals` (`/merchant/vouchers`) · `La meva fitxa`
+  (`/merchant/my-profile`) · `Estadístiques` (`/merchant/statistics`) · `Configuració`
+  (`/merchant/settings`).
 
 La identidad de la sidebar (bloque `who`) muestra: admin → nombre de la població + «Entitat
 gestora»; comerç → nombre del comercio + «Comerç adherit» (ya implementado con `ComercMe`).
@@ -183,9 +192,10 @@ Trabaja SOLO dentro de `src/`. Estructura ya establecida:
 ```
 src/
 ├── routes/          # rutas por fichero (TanStack Router). NO editar routeTree.gen.ts
-│   ├── comerc.tsx   # layout del comerç (envuelve con AppLayout)
-│   ├── comerc.<seg>.tsx
-│   └── admin.tsx …  # ← NUEVO: layout del admin + admin.<seg>.tsx
+│   ├── merchant.tsx        # layout del comerç (envuelve con AppLayout)
+│   ├── merchant.<seg>.tsx  # merchant.my-qr.tsx, merchant.promotions.tsx, merchant.vouchers.tsx…
+│   ├── admin.tsx           # layout del admin
+│   └── admin.<seg>.tsx     # admin.overview.tsx, admin.actions.tsx, admin.rewards.tsx…
 ├── pages/           # componentes de pantalla (export default) que las rutas importan
 ├── components/
 │   ├── backoffice/  # shell y componentes de dominio (AppLayout, AppSidebar, *Form, *List…)
@@ -204,7 +214,7 @@ src/
 Convenciones de nombres: pantallas/páginas y componentes `PascalCase` (export default);
 primitivos `components/ui/` en `kebab-case`; services/stores/data `camelCase.ts`; rutas
 `kebab-case`. Un fichero de ruta importa su página: p. ej.
-`admin.accions.tsx` → `import Accions from "@/pages/Accions"`.
+`admin.actions.tsx` → `import Accions from "@/pages/Accions"`.
 
 ## 7. Estructura visual y componentes existentes
 
@@ -256,7 +266,7 @@ primitivos `components/ui/` en `kebab-case`; services/stores/data `camelCase.ts`
   identidad salgan del **rol** (store de sesión). No crees un segundo shell ni una segunda
   sidebar.
 - **Routing**: añade `src/routes/admin.tsx` (layout con `AppLayout` + `<Outlet/>`, igual que
-  `comerc.tsx`), `admin.index.tsx` (redirect a `/admin/resum`) y `admin.<seg>.tsx` para resum,
+  `merchant.tsx`), `admin.index.tsx` (redirect a `/admin/overview`) y `admin.<seg>.tsx` para overview,
   accions, recompenses, comercos, usuaris, configuracio. Guarda las rutas por rol.
 - **Sesión/rol en el store**: crea `src/stores/useSessionStore.ts` (o similar) con `rol`,
   `poblacioId`, `comercId?`. Provee un mock y un conmutador de rol de desarrollo para

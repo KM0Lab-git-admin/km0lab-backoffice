@@ -1,54 +1,40 @@
-import type { Promocio, PromocioInput, PromoTipus } from "@/types/comerc";
-import { useBackofficeStore } from "@/stores/useBackofficeStore";
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms + Math.random() * 300));
-
-function etiquetaFor(input: PromocioInput): string {
-  if (input.etiqueta && input.etiqueta.trim()) return input.etiqueta.trim();
-  switch (input.tipus) {
-    case "descompte":
-      return input.valor ? `-${input.valor.replace(/^-/, "")}` : "-%";
-    case "dos_x_un":
-      return "2×1";
-    case "regal":
-      return "Regal";
-    case "preu_especial":
-      return input.valor ?? "Preu";
-  }
-}
-
-function newId(): string {
-  return `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
-}
+import { api } from "@/lib/apiClient";
+import {
+  promocioFromApi,
+  promocioToCreate,
+  promocioToUpdate,
+} from "@/lib/mappers/promocio";
+import type { Promocio, PromocioInput, PromoTipus } from "@/types/merchant";
+import type { ApiPromotion } from "@/types/api";
 
 export const promocionsService = {
   async list(): Promise<Promocio[]> {
-    await delay(400);
-    return useBackofficeStore.getState().promocions;
+    const rows = await api.get<ApiPromotion[]>("/promotions");
+    return rows.map(promocioFromApi);
   },
 
   async create(input: PromocioInput): Promise<Promocio> {
-    await delay(500);
-    const promo: Promocio = { ...input, etiqueta: etiquetaFor(input), id: newId() };
-    useBackofficeStore.getState().upsertPromocio(promo);
-    return promo;
+    const created = await api.post<ApiPromotion>(
+      "/promotions",
+      promocioToCreate(input),
+    );
+    return promocioFromApi(created);
   },
 
   async update(id: string, input: PromocioInput): Promise<Promocio> {
-    await delay(500);
-    const promo: Promocio = { ...input, etiqueta: etiquetaFor(input), id };
-    useBackofficeStore.getState().upsertPromocio(promo);
-    return promo;
+    const updated = await api.patch<ApiPromotion>(
+      `/promotions/${id}`,
+      promocioToUpdate(input),
+    );
+    return promocioFromApi(updated);
   },
 
   async toggle(id: string, activa: boolean): Promise<void> {
-    await delay(300);
-    useBackofficeStore.getState().togglePromocio(id, activa);
+    await api.patch(`/promotions/${id}`, { active: activa });
   },
 
   async remove(id: string): Promise<void> {
-    await delay(300);
-    useBackofficeStore.getState().removePromocio(id);
+    await api.delete(`/promotions/${id}`);
   },
 };
 
