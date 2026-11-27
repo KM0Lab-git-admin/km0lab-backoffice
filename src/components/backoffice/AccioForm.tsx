@@ -306,13 +306,17 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
           idiomaOrigen: origen,
           tipus: values.tipus,
           punts: Number(values.punts),
-          limitPerUsuari: isSimple
-            ? values.tipus === "escaneig_qr"
-              ? undefined
-              : 1
-            : values.limitPerUsuari === "" || values.limitPerUsuari == null
-              ? undefined
-              : Number(values.limitPerUsuari),
+          // Invitar a un veí: el límit és quants amics premiats pot tenir
+          // cada persona (buit = sense límit). L'API el respecta; abans
+          // s'hi desava sempre un 1 que no es veia enlloc.
+          limitPerUsuari:
+            isSimple && values.tipus !== "invitacio_persona"
+              ? values.tipus === "escaneig_qr"
+                ? undefined
+                : 1
+              : values.limitPerUsuari === "" || values.limitPerUsuari == null
+                ? undefined
+                : Number(values.limitPerUsuari),
           limitTotal: isSimple
             ? undefined
             : values.limitTotal === "" || values.limitTotal == null
@@ -531,6 +535,17 @@ export function AccioForm({ initial, onSubmit, onCancel, submitting }: Props) {
           <p className="text-xs text-destructive">{t("accions.form.punts.error")}</p>
         ) : null}
       </div>
+
+      {tipus === "invitacio_persona" && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="limitAmics">
+            {t("accions.form.limitAmics.label")}{" "}
+            <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
+          </Label>
+          <Input id="limitAmics" type="number" min={1} step={1} {...register("limitPerUsuari")} />
+          <p className="text-xs text-muted-foreground">{t("accions.form.limitAmics.hint")}</p>
+        </div>
+      )}
 
       {!isSimpleAction(tipus) && (
         <>

@@ -938,6 +938,16 @@ export const messages = {
     es: "Introduce un número de puntos válido.",
     en: "Enter a valid number of points.",
   },
+  "accions.form.limitAmics.label": {
+    ca: "Amics premiats per persona",
+    es: "Amigos premiados por persona",
+    en: "Rewarded friends per person",
+  },
+  "accions.form.limitAmics.hint": {
+    ca: "Quants amics pot convidar cada veí cobrant punts. Per sobre del límit l’amic entra igual, però no dona punts. Buit = sense límit.",
+    es: "Cuántos amigos puede invitar cada vecino cobrando puntos. Por encima del límite el amigo entra igual, pero no da puntos. Vacío = sin límite.",
+    en: "How many friends each resident can invite for points. Over the limit the friend still joins, but pays nothing. Empty = no limit.",
+  },
   "accions.form.limitPerUsuari.label": {
     ca: "Límit d'usos per usuari",
     es: "Límite de usos por usuario",
