@@ -21,6 +21,21 @@ Front de producto del backoffice KM0 LAB. La UI nace en Lovable
 - Fixes visuales van primero a Lovable `main`; luego sync a `develop`.
 - Prohibido depender del CDN Lovable (`/__l5e/...`).
 
+## Costuras del prototipo
+
+Algunas pantallas del prototipo importan funciones simuladas de
+`src/services/mock/*`. En producción esos ficheros solo reexportan el
+servicio real del mismo nombre (`src/services/shopRequestService.ts`,
+`shopReviewService.ts`, `pilotLimitService.ts`), y los tres pares tienen
+candado. Así la pantalla viaja sin tocarla y la llamada es la de la API.
+Una pantalla nueva con costura simulada: mismo patrón.
+
+## Pruebas
+
+`npm test` (vitest, sin navegador): servicios, mapeos y comprobaciones de
+producción, contra una API de mentira (`src/test/fakeApi.ts`). Los ficheros
+`*.test.ts` no viajan con el porte (`exclude` del manifest).
+
 ## Ramas
 
 - `develop` — integración diaria

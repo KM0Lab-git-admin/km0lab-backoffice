@@ -18,15 +18,27 @@ import { fitxaService } from "@/services/fitxaService";
 import type { MessageKey } from "@/lib/i18n";
 import type { ComercAdmin, ComercEstat, Poblacio } from "@/types/backoffice";
 
-export const estatLabelKey = (e: ComercEstat): MessageKey =>
-  e === "actiu" ? "comercos.estat.actiu" : "comercos.estat.inactiu";
+const estatKeys: Record<ComercEstat, MessageKey> = {
+  pendent_validar: "alta.estat.pendent",
+  esperant_comerc: "alta.estat.esperant",
+  actiu: "comercos.estat.actiu",
+  inactiu: "comercos.estat.inactiu",
+  rebutjat: "alta.estat.rebutjat",
+};
+
+export const estatLabelKey = (e: ComercEstat): MessageKey => estatKeys[e];
+
+const estatBadgeClass: Record<ComercEstat, string> = {
+  pendent_validar: "bg-km0-yellow-100 text-km0-blue-800 border-km0-yellow-300",
+  esperant_comerc: "bg-km0-blue-50 text-km0-blue-700 border-km0-blue-100",
+  actiu: "bg-km0-teal-100 text-km0-teal-700 border-km0-teal-200",
+  inactiu: "bg-muted text-muted-foreground border-border",
+  rebutjat: "bg-destructive/10 text-destructive border-destructive/30",
+};
 
 function EstatBadge({ estat }: { estat: ComercEstat }) {
   const { t } = useLang();
-  const cls =
-    estat === "actiu"
-      ? "bg-km0-teal-100 text-km0-teal-700 border-km0-teal-200"
-      : "bg-muted text-muted-foreground border-border";
+  const cls = estatBadgeClass[estat];
   return (
     <Badge variant="outline" className={cn("font-medium", cls)}>
       {t(estatLabelKey(estat))}
@@ -68,13 +80,66 @@ type Props = {
   onToggle: (c: ComercAdmin, actiu: boolean) => void;
   onActAs?: (c: ComercAdmin) => void;
   mostrarPoblacio: boolean;
+  onReview?: (c: ComercAdmin) => void;
 };
+
+const esToggleable = (e: ComercEstat) => e === "actiu" || e === "inactiu";
+
+function RowActions({
+  c,
+  onEdit,
+  onToggle,
+  onActAs,
+  onReview,
+}: { c: ComercAdmin } & Pick<Props, "onEdit" | "onToggle" | "onActAs" | "onReview">) {
+  const { t } = useLang();
+  if (c.estat === "pendent_validar" || c.estat === "rebutjat") {
+    return (
+      <div className="flex items-center justify-end gap-2">
+        {c.estat === "rebutjat" ? (
+          <span className="text-xs text-muted-foreground">{t("alta.admin.rejectedHelp")}</span>
+        ) : null}
+        {onReview ? (
+          <Button variant="outline" size="sm" onClick={() => onReview(c)}>
+            {t("alta.admin.review")}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center justify-end gap-2">
+      {esToggleable(c.estat) ? (
+        <Switch
+          checked={c.estat === "actiu"}
+          onCheckedChange={(v) => onToggle(c, v)}
+          aria-label={t(estatLabelKey(c.estat))}
+        />
+      ) : null}
+      {/* De producción: el administrador entra a gestionar ese comercio. */}
+      {onActAs ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onActAs(c)}
+          aria-label={t("comercos.actAs")}
+          title={t("comercos.actAs")}
+        >
+          <LogIn className="h-4 w-4" />
+        </Button>
+      ) : null}
+      <Button variant="ghost" size="icon" onClick={() => onEdit(c)} aria-label={t("common.edit")}>
+        <Pencil className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
 
 export function municipiAmbDiversesPoblacions(poblacions: Poblacio[] | undefined): boolean {
   return (poblacions?.length ?? 0) > 1;
 }
 
-export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio }: Props) {
+export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio, onReview }: Props) {
   const { t, lang } = useLang();
   const categoriesQ = useQuery({
     queryKey: ["shop-categories", lang],
@@ -108,7 +173,7 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPobla
           {comercos.map((c) => (
             <TableRow
               key={c.id}
-              className={cn(c.estat === "inactiu" && "opacity-60")}
+              className={cn((c.estat === "inactiu" || c.estat === "rebutjat") && "opacity-60")}
             >
               <TableCell>
                 <div className="flex items-center gap-3">
@@ -149,38 +214,11 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPobla
               <TableCell className="text-center text-sm tabular-nums">
                 +{c.puntsPerVisita}
               </TableCell>
-              <TableCell className="text-xs text-muted-foreground">
+              <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                 {formatDate(c.dataAlta, lang)}
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={c.estat === "actiu"}
-                      onCheckedChange={(v) => onToggle(c, v)}
-                      aria-label={t(estatLabelKey(c.estat))}
-                    />
-                  </div>
-                  {onActAs ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onActAs(c)}
-                      aria-label={t("comercos.actAs")}
-                      title={t("comercos.actAs")}
-                    >
-                      <LogIn className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(c)}
-                    aria-label={t("common.edit")}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
+                <RowActions c={c} onEdit={onEdit} onToggle={onToggle} onActAs={onActAs} onReview={onReview} />
               </TableCell>
             </TableRow>
           ))}
@@ -190,7 +228,7 @@ export function ComercoTable({ comercos, onEdit, onToggle, onActAs, mostrarPobla
   );
 }
 
-export function ComercoCards({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio }: Props) {
+export function ComercoCards({ comercos, onEdit, onToggle, onActAs, mostrarPoblacio, onReview }: Props) {
   const { t, lang } = useLang();
   const categoriesQ = useQuery({
     queryKey: ["shop-categories", lang],
@@ -211,7 +249,7 @@ export function ComercoCards({ comercos, onEdit, onToggle, onActAs, mostrarPobla
           key={c.id}
           className={cn(
             "flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm",
-            c.estat === "inactiu" && "opacity-60",
+            (c.estat === "inactiu" || c.estat === "rebutjat") && "opacity-60",
           )}
         >
           <div className="flex items-start gap-3">
@@ -266,32 +304,7 @@ export function ComercoCards({ comercos, onEdit, onToggle, onActAs, mostrarPobla
             <span className="text-xs text-muted-foreground">
               {t("comercos.card.altaLabel")} {formatDate(c.dataAlta, lang)}
             </span>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={c.estat === "actiu"}
-                onCheckedChange={(v) => onToggle(c, v)}
-                aria-label={t(estatLabelKey(c.estat))}
-              />
-              {onActAs ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onActAs(c)}
-                  aria-label={t("comercos.actAs")}
-                  title={t("comercos.actAs")}
-                >
-                  <LogIn className="h-4 w-4" />
-                </Button>
-              ) : null}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(c)}
-                aria-label={t("common.edit")}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </div>
+            <RowActions c={c} onEdit={onEdit} onToggle={onToggle} onActAs={onActAs} onReview={onReview} />
           </div>
         </div>
       ))}

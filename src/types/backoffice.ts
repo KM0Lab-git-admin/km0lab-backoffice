@@ -34,6 +34,17 @@ export type AdminResumStats = {
   bescanvisMes: number;
   accionsActives: number;
   accionsTotals: number;
+  signupsByProvider: SignupsByProvider;
+};
+
+export type SignupProvider = "email_code" | "google" | "facebook" | "apple";
+
+export type SignupsByProvider = Record<SignupProvider, number>;
+
+export type VeiIdentity = {
+  provider: SignupProvider;
+  linkedAt: string;
+  lastUsedAt: string | null;
 };
 
 export type AccioTipus =
@@ -150,7 +161,12 @@ export type Recompensa = {
 export type RecompensaInput = Omit<Recompensa, "id" | "poblacioId">;
 
 // Admin · Comerços (llistat + alta/invitació)
-export type ComercEstat = "actiu" | "inactiu";
+export type ComercEstat =
+  | "pendent_validar"
+  | "esperant_comerc"
+  | "actiu"
+  | "inactiu"
+  | "rebutjat";
 
 export type ComercAdmin = {
   id: string;
@@ -172,6 +188,9 @@ export type ComercAdmin = {
   qrGenerat: boolean;
   nPromocionsActives: number;
   dataAlta: string; // ISO
+  // Dades enviades a la sol·licitud d'alta (només comerços que s'hi han donat ells mateixos).
+  taxId?: string;
+  dataSolicitud?: string; // ISO
 };
 
 export type ComercAdminInput = {
@@ -215,6 +234,10 @@ export type VeiPrograma = {
   email?: string;
   telefon?: string;
   activitat?: VeiActivitat[];
+  signupProvider: SignupProvider | null;
+  signupAt: string | null;
+  emailHidden: boolean;
+  identities: VeiIdentity[];
 };
 
 

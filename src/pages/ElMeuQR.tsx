@@ -10,6 +10,7 @@ import { useLang } from "@/contexts/LangContext";
 import { qrService } from "@/services/qrService";
 import { comercService } from "@/services/comercService";
 import { ErrorState } from "@/components/backoffice/ErrorState";
+import { useMerchantWelcome } from "@/hooks/useMerchantWelcome";
 
 /*
  * Production page (locked in scripts/lovable-manifest.json).
@@ -51,6 +52,7 @@ const POSTER_PRINT_CSS = `
 
 export default function ElMeuQRPage() {
   const { t } = useLang();
+  const { markPosterDone } = useMerchantWelcome();
 
   const comercQ = useQuery({ queryKey: ["comerc", "me"], queryFn: () => comercService.getMe() });
   const qrQ = useQuery({ queryKey: ["qr", "me"], queryFn: () => qrService.getMyQRPage() });
@@ -86,6 +88,7 @@ export default function ElMeuQRPage() {
   }
 
   const handleDownload = async () => {
+    markPosterDone();
     try {
       await qrService.downloadPNG();
       toast.success(t("qr.toast.downloaded"));
@@ -95,7 +98,10 @@ export default function ElMeuQRPage() {
   };
 
   // Synchronous on purpose: called from the click, so no browser blocks it.
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    markPosterDone();
+    window.print();
+  };
 
   return (
     <div className="flex flex-col gap-8">

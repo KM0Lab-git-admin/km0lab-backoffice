@@ -27,6 +27,8 @@ import type {
   RecompensaTipus,
   VeiActivitat,
   VeiActivitatTipus,
+  SignupProvider,
+  SignupsByProvider,
   VeiPrograma,
 } from "@/types/backoffice";
 import { absoluteMediaUrl, cacheBustedMediaUrl } from "@/lib/apiClient";
@@ -287,12 +289,22 @@ export function recompensaEstatToApi(estat: RecompensaEstat): string {
 const ESTAT_TO_API: Record<ComercEstat, string> = {
   actiu: "active",
   inactiu: "inactive",
+  // These three are never chosen from a switch: a request is decided by
+  // approving or rejecting it, and a shop stops waiting when its owner
+  // signs in. They are here so every state has its name on the wire.
+  pendent_validar: "review",
+  esperant_comerc: "pending",
+  rebutjat: "rejected",
 };
 
 const ESTAT_FROM_API: Record<string, ComercEstat> = {
   active: "actiu",
-  pending: "inactiu",
+  // Registered by the administrator, waiting for its owner's first login.
+  pending: "esperant_comerc",
   inactive: "inactiu",
+  // Asked to join by itself: waiting for validation, or not validated.
+  review: "pendent_validar",
+  rejected: "rebutjat",
 };
 
 export function comercAdminFromShop(
@@ -318,6 +330,8 @@ export function comercAdminFromShop(
     qrGenerat: Boolean(shop.qr_code),
     nPromocionsActives,
     dataAlta: shop.created_at,
+    taxId: shop.tax_id ?? undefined,
+    dataSolicitud: shop.created_at,
   };
 }
 
@@ -357,6 +371,24 @@ const ACTIVITAT_TIPUS: Record<string, VeiActivitatTipus> = {
   welcome: "accio",
 };
 
+const SIGNUP_PROVIDERS: SignupProvider[] = ["email_code", "google", "facebook", "apple"];
+
+/** A door this panel knows how to name; anything else is left out. */
+export function signupProviderFromApi(value: string | null | undefined): SignupProvider | null {
+  return SIGNUP_PROVIDERS.includes(value as SignupProvider) ? (value as SignupProvider) : null;
+}
+
+export function signupsByProviderFromApi(
+  counts: Record<string, number> | undefined,
+): SignupsByProvider {
+  return {
+    email_code: counts?.email_code ?? 0,
+    google: counts?.google ?? 0,
+    facebook: counts?.facebook ?? 0,
+    apple: counts?.apple ?? 0,
+  };
+}
+
 export function veiFromResident(r: ApiResident): VeiPrograma {
   const activity: VeiActivitat[] = (r.activity ?? []).map((a) => ({
     id: a.id,
@@ -385,6 +417,15 @@ export function veiFromResident(r: ApiResident): VeiPrograma {
     email: r.email ?? undefined,
     telefon: r.phone ?? undefined,
     activitat: activity,
+    signupProvider: signupProviderFromApi(r.signup_provider),
+    signupAt: r.signup_at ?? null,
+    emailHidden: Boolean(r.email_hidden),
+    identities: (r.identities ?? []).flatMap((d) => {
+      const provider = signupProviderFromApi(d.provider);
+      return provider
+        ? [{ provider, linkedAt: d.linked_at, lastUsedAt: d.last_used_at ?? null }]
+        : [];
+    }),
   };
 }
 
@@ -547,6 +588,7 @@ export function adminStatsFromApi(s: ApiAdminStats): AdminResumStats {
     bescanvisMes: s.redemptions_this_month,
     accionsActives: s.active_actions,
     accionsTotals: s.total_actions,
+    signupsByProvider: signupsByProviderFromApi(s.signups_by_provider),
   };
 }
 

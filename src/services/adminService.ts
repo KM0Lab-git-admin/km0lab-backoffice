@@ -10,6 +10,7 @@ import type {
   AdminMe,
   AdminResumStats,
   BescanviResum,
+  SignupsByProvider,
 } from "@/types/backoffice";
 import type {
   ApiAdminStats,
@@ -33,6 +34,12 @@ export const adminService = {
   async getResumStats(): Promise<AdminResumStats> {
     const stats = await api.get<ApiAdminStats>("/stats/admin");
     return adminStatsFromApi(stats);
+  },
+
+  /** How the residents of this municipality came in, by door. */
+  async getSignupsByProvider(): Promise<SignupsByProvider> {
+    const stats = await api.get<ApiAdminStats>("/stats/admin");
+    return adminStatsFromApi(stats).signupsByProvider;
   },
 
   async getAccionsTop(): Promise<AccioTop[]> {

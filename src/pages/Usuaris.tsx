@@ -42,6 +42,7 @@ import { invitationsService } from "@/services/invitationsService";
 import { adminService } from "@/services/adminService";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { ErrorState } from "@/components/backoffice/ErrorState";
+import { SignupProviderBadge, signupProviderKey } from "@/components/backoffice/SignupProviderBadge";
 import type {
   VeiActivitat,
   VeiActivitatTipus,
@@ -109,7 +110,7 @@ function ContactCell({ v }: { v: VeiPrograma }) {
           className="inline-flex items-center gap-1 text-km0-blue-700 hover:underline"
         >
           <Mail className="h-3 w-3" />
-          {v.email}
+          {v.emailHidden ? t("origen.appleHidden") : v.email}
         </a>
       ) : null}
       {phone ? (
@@ -262,6 +263,7 @@ export default function UsuarisPage() {
                       <TableHead>{t("usuaris.col.alta")}</TableHead>
                       <TableHead>{t("usuaris.col.ultima")}</TableHead>
                       <TableHead>{t("usuaris.col.email")}</TableHead>
+                      <TableHead>{t("origen.col")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -291,6 +293,9 @@ export default function UsuarisPage() {
                         </TableCell>
                         <TableCell>
                           <ContactCell v={v} />
+                        </TableCell>
+                        <TableCell>
+                          <SignupProviderBadge provider={v.signupProvider} />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -344,6 +349,10 @@ export default function UsuarisPage() {
                     </div>
                     <div className="border-t pt-2 text-xs">
                       <ContactCell v={v} />
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{t("origen.col")}:</span>
+                      <SignupProviderBadge provider={v.signupProvider} />
                     </div>
                   </button>
                 ))}
@@ -404,6 +413,8 @@ export default function UsuarisPage() {
                   </p>
                   <ContactCell v={selected} />
                 </section>
+
+                <SignupOriginDetail v={selected} lang={lang} />
 
                 <section className="flex flex-col gap-3">
                   <p className="text-sm font-semibold">
@@ -471,6 +482,43 @@ export default function UsuarisPage() {
         </SheetContent>
       </Sheet>
     </div>
+  );
+}
+
+function SignupOriginDetail({ v, lang }: { v: VeiPrograma; lang: string }) {
+  const { t } = useLang();
+  return (
+    <>
+      {v.signupProvider ? (
+        <section className="flex flex-col gap-2">
+          <p className="text-sm font-semibold">{t("origen.detail.how")}</p>
+          <div className="flex items-center gap-2 text-sm">
+            <SignupProviderBadge provider={v.signupProvider} />
+            {v.signupAt ? (
+              <span className="text-muted-foreground">{formatDate(v.signupAt, lang)}</span>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+      {v.identities.length > 0 ? (
+        <section className="flex flex-col gap-2">
+          <p className="text-sm font-semibold">{t("origen.detail.ways")}</p>
+          <ul className="flex flex-col divide-y rounded-lg border bg-card">
+            {v.identities.map((i) => (
+              <li key={i.provider} className="flex flex-col gap-0.5 px-3 py-2 text-sm">
+                <span className="font-medium">{t(signupProviderKey[i.provider])}</span>
+                <span className="text-xs text-muted-foreground">
+                  {t("origen.detail.linked").replace("{data}", formatDate(i.linkedAt, lang))} ·{" "}
+                  {i.lastUsedAt
+                    ? t("origen.detail.lastUsed").replace("{data}", formatDate(i.lastUsedAt, lang))
+                    : t("origen.detail.noUse")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </>
   );
 }
 

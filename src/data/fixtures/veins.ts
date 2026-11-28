@@ -41,7 +41,9 @@ function actBescanvi(
   };
 }
 
-export const veinsFixture: VeiPrograma[] = [
+type VeiBase = Omit<VeiPrograma, "signupProvider" | "signupAt" | "emailHidden" | "identities">;
+
+const veinsBase: VeiBase[] = [
   {
     id: "u-marc-p",
     poblacioId: "malgrat",
@@ -207,3 +209,39 @@ export const veinsFixture: VeiPrograma[] = [
     activitat: [actAccio("ml1", 8, "Primer registre a l'app", 100)],
   },
 ];
+
+type Origin = Pick<VeiPrograma, "signupProvider" | "signupAt" | "emailHidden" | "identities">;
+
+const origin = (provider: Origin["signupProvider"], daysAgo: number, lastUsedDaysAgo: number | null): Origin => ({
+  signupProvider: provider,
+  signupAt: provider ? iso(daysAgo) : null,
+  emailHidden: false,
+  identities: provider
+    ? [{ provider, linkedAt: iso(daysAgo), lastUsedAt: lastUsedDaysAgo === null ? null : iso(lastUsedDaysAgo) }]
+    : [],
+});
+
+const originById: Record<string, Origin> = {
+  "u-marc-p": origin("google", 150, 0),
+  "u-laia-r": origin("email_code", 120, 2),
+  "u-joan-s": origin("facebook", 90, 10),
+  "u-nuria-t": {
+    signupProvider: "apple",
+    signupAt: iso(80),
+    emailHidden: true,
+    identities: [
+      { provider: "apple", linkedAt: iso(80), lastUsedAt: iso(1) },
+      { provider: "google", linkedAt: iso(20), lastUsedAt: null },
+    ],
+  },
+  "u-pau-m": origin("email_code", 60, 5),
+  "u-clara-v": origin("google", 45, 3),
+  "u-oriol-b": origin("apple", 30, 7),
+  "u-anna-g": origin("email_code", 15, 1),
+  // u-marta-l: legacy account without origin data.
+};
+
+export const veinsFixture: VeiPrograma[] = veinsBase.map((v) => ({
+  ...v,
+  ...(originById[v.id] ?? origin(null, 0, null)),
+}));

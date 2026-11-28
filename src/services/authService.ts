@@ -39,17 +39,14 @@ export function isFixedOtpEmail(email: string): boolean {
   return FIXED_OTP_EMAILS.has(email.trim().toLowerCase());
 }
 
-/** The backoffice is for administrators and shops; a resident has no page in it. */
-export function canUseBackoffice(roles: string[]): boolean {
-  return roles.includes("admin") || roles.includes("merchant");
+/**
+ * The backoffice is for administrators and shops; a resident has no page in
+ * it. One exception: whoever asked to register a shop gets in to see where
+ * the request stands, and nothing else.
+ */
+export function canUseBackoffice(roles: string[], hasShopRequest = false): boolean {
+  return roles.includes("admin") || roles.includes("merchant") || hasShopRequest;
 }
-
-export type RegisterInput = {
-  nomComerc: string;
-  personaContacte: string;
-  email: string;
-  telefon: string;
-};
 
 export type AuthenticatedUser = AuthUser;
 
@@ -58,7 +55,7 @@ export type AuthSession = {
   user: AuthUser;
 };
 
-function mapUser(apiUser: ApiUser, fallback?: Partial<AuthUser>): AuthUser {
+export function mapUser(apiUser: ApiUser, fallback?: Partial<AuthUser>): AuthUser {
   const display =
     apiUser.name?.trim() ||
     [apiUser.first_name, apiUser.last_name].filter(Boolean).join(" ").trim() ||
@@ -76,6 +73,13 @@ function mapUser(apiUser: ApiUser, fallback?: Partial<AuthUser>): AuthUser {
     townName: apiUser.town_name,
     municipalityName: apiUser.municipality_name ?? apiUser.town_name,
     shopId: apiUser.shop_id,
+    shopRequest: apiUser.shop_request
+      ? {
+          name: apiUser.shop_request.name,
+          status: apiUser.shop_request.status === "rejected" ? "rejected" : "review",
+          rejectionReason: apiUser.shop_request.reason ?? null,
+        }
+      : null,
   };
 }
 
@@ -85,8 +89,6 @@ function mapAuth(out: ApiAuthOut, fallback?: Partial<AuthUser>): AuthSession {
     user: mapUser(out.user, fallback),
   };
 }
-
-let pendingRegister: RegisterInput | null = null;
 
 export const authService = {
   async requestLoginCode(email: string, lang?: string): Promise<{ ok: true }> {
@@ -122,28 +124,5 @@ export const authService = {
           ? MALGRAT_MERCHANT1_EMAIL
           : MALGRAT_MERCHANT2_EMAIL;
     return authService.verifyLoginCode(email, MOCK_OTP_CODE);
-  },
-
-  async requestRegistration(input: RegisterInput): Promise<{ ok: true }> {
-    pendingRegister = input;
-    await api.post("/auth/request-otp", { email: input.email }, { auth: false });
-    return { ok: true };
-  },
-
-  async verifyRegistration(email: string, code: string): Promise<AuthSession> {
-    if (!pendingRegister || pendingRegister.email !== email) {
-      throw new Error("no_pending_registration");
-    }
-    const fallback = {
-      nomComerc: pendingRegister.nomComerc,
-      telefon: pendingRegister.telefon,
-    };
-    const out = await api.post<ApiAuthOut>(
-      "/auth/verify-otp",
-      { email, code },
-      { auth: false },
-    );
-    pendingRegister = null;
-    return mapAuth(out, fallback);
   },
 };

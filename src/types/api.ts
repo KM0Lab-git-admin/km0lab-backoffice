@@ -20,7 +20,28 @@ export type ApiUser = {
   phone: string | null;
   contact_shared: boolean;
   is_fake: boolean;
+  /** The shop this person asked to register, while it waits or was rejected. */
+  shop_request?: ApiShopRequest | null;
   created_at: string;
+};
+
+export type ApiShopRequest = {
+  shop_id: string;
+  name: string;
+  status: string; // review | rejected
+  reason?: string | null;
+};
+
+/** What the API checked on a shop's request (GET /shops/{id}/review). */
+export type ApiShopReview = {
+  status: string;
+  tax_id_valid: boolean;
+  postal_code_in_town: boolean;
+  email_verified: boolean;
+  same_tax_id: string[];
+  similar_names: string[];
+  invited_by: string | null;
+  invite_points: number;
 };
 
 export type ApiAuthOut = {
@@ -61,6 +82,7 @@ export type ApiShop = {
   has_hero: boolean;
   categories: string[];
   contact_email: string;
+  tax_id?: string | null;
   visit_points: number;
   address: string | null;
   postal_code: string | null;
@@ -71,6 +93,8 @@ export type ApiShop = {
   i18n_source_lang?: string;
   opening_hours: ApiOpeningHours | null;
   status: string;
+  /** Why its request was rejected, as the administrator wrote it. */
+  review_note?: string | null;
   qr_code: string | null;
   is_fake: boolean;
   created_at: string;
@@ -116,6 +140,8 @@ export type ApiAdminStats = {
   redemptions_this_month: number;
   active_actions: number;
   total_actions: number;
+  /** Residents by the door their account was born with. */
+  signups_by_provider?: Record<string, number>;
 };
 
 export type ApiMerchantStats = {
@@ -145,6 +171,10 @@ export type ApiResident = {
   email: string | null;
   phone: string | null;
   created_at: string;
+  signup_provider?: string | null;
+  signup_at?: string | null;
+  email_hidden?: boolean;
+  identities?: { provider: string; linked_at: string; last_used_at: string | null }[];
   activity: ApiResidentActivity[];
 };
 
@@ -272,6 +302,9 @@ export type ApiTown = {
   default_visit_points: number;
   default_lang: string;
   expiry_months: number | null;
+  /** Accounts the municipality admits (null = no limit) and how many it has. */
+  max_residents?: number | null;
+  residents_count?: number;
   postal_codes: { postal_code: string; is_primary: boolean }[];
   /** One entry (named like the municipality) when it is a single town. */
   localities?: ApiLocality[];

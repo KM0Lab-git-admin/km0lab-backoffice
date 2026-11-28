@@ -54,6 +54,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ImageUploader } from "@/components/backoffice/ImageUploader";
 import { ErrorState } from "@/components/backoffice/ErrorState";
+import { PilotLimitField } from "@/components/backoffice/PilotLimitField";
+import { usePilotLimit } from "@/hooks/usePilotLimit";
 
 const buildSchema = (t: (k: never) => string) =>
   z
@@ -96,6 +98,7 @@ export default function ConfiguracioPage() {
   const { t } = useLang();
   const qc = useQueryClient();
   const poblacioId = useSessionStore((s) => s.poblacioId);
+  const pilot = usePilotLimit();
 
   const configQ = useQuery({
     queryKey: ["admin", "config", poblacioId],
@@ -422,6 +425,24 @@ export default function ConfiguracioPage() {
           {saveMut.isPending ? t("config.saving") : t("config.save")}
         </Button>
       </div>
+
+      <PilotLimitField
+        loading={pilot.query.isLoading}
+        error={pilot.query.isError}
+        maxResidents={pilot.query.data?.maxResidents ?? null}
+        residentsCount={pilot.query.data?.residentsCount ?? 0}
+        saving={pilot.save.isPending}
+        onRetry={() => pilot.query.refetch()}
+        onSave={(max) =>
+          pilot.save.mutateAsync(max).then(
+            () => toast.success(t("alta.pilot.saved")),
+            (e: unknown) => {
+              toast.error(t("alta.pilot.saveError"));
+              throw e;
+            },
+          )
+        }
+      />
 
       {/* Zona de perill */}
       <Card className="border-destructive/40">

@@ -30,6 +30,7 @@ export const adminResumStatsFixture: AdminResumStats = {
   bescanvisMes: 312,
   accionsActives: 18,
   accionsTotals: 24,
+  signupsByProvider: { email_code: 412, google: 538, facebook: 96, apple: 194 },
 };
 
 export const accionsTopFixture: AccioTop[] = [

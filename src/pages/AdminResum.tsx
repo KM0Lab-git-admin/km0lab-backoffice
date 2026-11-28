@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { adminService } from "@/services/adminService";
+import { SignupOriginCard } from "@/components/backoffice/SignupOriginCard";
 import { useLang } from "@/contexts/LangContext";
 import type { AccioTipus } from "@/types/backoffice";
 import type { MessageKey } from "@/lib/i18n";
@@ -37,6 +38,8 @@ export default function AdminResumPage() {
   const statsQ = useQuery({ queryKey: ["admin", "resum", "stats"], queryFn: () => adminService.getResumStats() });
   const accionsQ = useQuery({ queryKey: ["admin", "resum", "accions"], queryFn: () => adminService.getAccionsTop() });
   const bescanvisQ = useQuery({ queryKey: ["admin", "resum", "bescanvis"], queryFn: () => adminService.getUltimsBescanvis() });
+
+  const signupsQ = useQuery({ queryKey: ["admin", "resum", "signups"], queryFn: () => adminService.getSignupsByProvider() });
 
   const isError = statsQ.isError || accionsQ.isError || bescanvisQ.isError;
 
@@ -175,6 +178,13 @@ export default function AdminResumPage() {
           </CardContent>
         </Card>
       </div>
+
+      <SignupOriginCard
+        loading={signupsQ.isLoading}
+        error={signupsQ.isError}
+        data={signupsQ.data}
+        onRetry={() => signupsQ.refetch()}
+      />
     </div>
   );
 }

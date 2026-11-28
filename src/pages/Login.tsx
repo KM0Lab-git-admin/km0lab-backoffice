@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/backoffice/AuthShell";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ export function LoginPage() {
   useEffect(() => {
     const { isAuthenticated, user } = useAuthStore.getState();
     if (!isAuthenticated || !user) return;
-    if (!canUseBackoffice(user.roles)) {
+    if (!canUseBackoffice(user.roles, Boolean(user.shopRequest))) {
       useAuthStore.getState().signOut();
       return;
     }
@@ -69,7 +69,8 @@ export function LoginPage() {
   ) {
     // The code was right but this email runs no shop: say so here. Letting
     // them in would leave them on a page that never loads.
-    if (!canUseBackoffice(session.user.roles)) {
+    // Whoever asked to register a shop does get in: to see their request.
+    if (!canUseBackoffice(session.user.roles, Boolean(session.user.shopRequest))) {
       setNoShop(true);
       setOtp("");
       setStep("email");
@@ -253,9 +254,20 @@ export function LoginPage() {
   }
 
   return (
-    <AuthShell title={t("login.title")} subtitle={t("login.subtitle")}>
-      {/* No "register your shop" link: shops are registered by whoever runs
-          the programme, and the old form created an account with no shop. */}
+    <AuthShell
+      title={t("login.title")}
+      subtitle={t("login.subtitle")}
+      footer={
+        // A shop can ask to join by itself: the request waits until the
+        // administrator of its municipality validates it.
+        <>
+          {t("login.toRegister.text")}{" "}
+          <Link to="/register" className="font-medium text-foreground underline underline-offset-4">
+            {t("login.toRegister.cta")}
+          </Link>
+        </>
+      }
+    >
       <form onSubmit={onEmailSubmit} className="space-y-4" noValidate>
         {noShop ? (
           <Alert variant="destructive">

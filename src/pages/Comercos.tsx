@@ -27,6 +27,10 @@ import { ComercoCards, ComercoTable, municipiAmbDiversesPoblacions } from "@/com
 import { ErrorState } from "@/components/backoffice/ErrorState";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { adminService } from "@/services/adminService";
+import { ShopRequestSheet, type ShopSheetPhase } from "@/components/backoffice/ShopRequestSheet";
+import { usePendingShopRequests } from "@/hooks/usePendingShopRequests";
+import { categorySlugToLabel } from "@/lib/mappers/categories";
+import { approveShop, getShopReview, rejectShop, ShopDecisionError } from "@/services/mock/shopReviewService";
 import type {
   ComercAdmin,
   ComercAdminInput,
@@ -56,6 +60,15 @@ export default function ComercosPage() {
   const [creating, setCreating] = useState(false);
   const [query, setQuery] = useState("");
   const [estatFilter, setEstatFilter] = useState<EstatFilter>("tots");
+  const [reviewing, setReviewing] = useState<ComercAdmin | null>(null);
+  const [reviewNotice, setReviewNotice] = useState<"approved" | "rejected" | "decided" | null>(null);
+
+  const pendingQ = usePendingShopRequests();
+  const reviewQ = useQuery({
+    queryKey: ["admin", "shopReview", reviewing?.id],
+    queryFn: () => getShopReview(reviewing?.id ?? ""),
+    enabled: !!reviewing,
+  });
 
   const invalidate = () =>
     qc.invalidateQueries({ queryKey: ["admin", "comercos"] });
@@ -94,7 +107,41 @@ export default function ComercosPage() {
     },
   });
 
+  const onDecisionError = (e: Error) => {
+    if (e instanceof ShopDecisionError && e.code === "already_decided") {
+      setReviewNotice("decided");
+      invalidate();
+    } else {
+      toast.error(t("alta.sheet.decisionError"));
+    }
+  };
+  const onDecided = (notice: "approved" | "rejected") => {
+    setReviewNotice(notice);
+    invalidate();
+    reviewQ.refetch();
+  };
+  const approveMut = useMutation({
+    mutationFn: (id: string) => approveShop(id),
+    onSuccess: () => onDecided("approved"),
+    onError: onDecisionError,
+  });
+  const rejectMut = useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => rejectShop(id, reason),
+    onSuccess: () => onDecided("rejected"),
+    onError: onDecisionError,
+  });
+  const reviewPhase: ShopSheetPhase = approveMut.isPending
+    ? "approving"
+    : rejectMut.isPending
+      ? "rejecting"
+      : "idle";
+  const openReview = (c: ComercAdmin) => {
+    setReviewNotice(null);
+    setReviewing(c);
+  };
+
   const comercos = listQ.data ?? [];
+  const pendingCount = pendingQ.data?.length ?? 0;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -185,13 +232,46 @@ export default function ComercosPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="tots">{t("comercos.filter.all")}</SelectItem>
+                <SelectItem value="pendent_validar">
+                  {t("alta.admin.filter.pending").replace("{n}", String(pendingCount))}
+                </SelectItem>
                 <SelectItem value="actiu">{t("comercos.estat.actiu")}</SelectItem>
                 <SelectItem value="inactiu">{t("comercos.estat.inactiu")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {filtered.length === 0 ? (
+          {estatFilter === "pendent_validar" ? (
+            pendingQ.isLoading ? (
+              <div className="flex flex-col gap-3">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+              </div>
+            ) : pendingQ.error ? (
+              <ErrorState onRetry={() => pendingQ.refetch()} />
+            ) : pendingCount === 0 ? (
+              <div className="rounded-lg border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
+                {t("alta.admin.pending.empty")}
+              </div>
+            ) : (
+              <>
+                <ComercoTable
+                  comercos={pendingQ.data ?? []}
+                  onEdit={setEditing}
+                  onToggle={handleToggle}
+                  onReview={openReview}
+                  mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
+                />
+                <ComercoCards
+                  comercos={pendingQ.data ?? []}
+                  onEdit={setEditing}
+                  onToggle={handleToggle}
+                  onReview={openReview}
+                  mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
+                />
+              </>
+            )
+          ) : filtered.length === 0 ? (
             <div className="rounded-lg border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
               {t("comercos.filter.noResults")}
             </div>
@@ -202,6 +282,7 @@ export default function ComercosPage() {
                 onEdit={setEditing}
                 onToggle={handleToggle}
                 onActAs={handleActAs}
+                onReview={openReview}
                 mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
               />
               <ComercoCards
@@ -209,12 +290,35 @@ export default function ComercosPage() {
                 onEdit={setEditing}
                 onToggle={handleToggle}
                 onActAs={handleActAs}
+                onReview={openReview}
                 mostrarPoblacio={municipiAmbDiversesPoblacions(meQ.data?.poblacions)}
               />
             </>
           )}
         </>
       )}
+
+      <ShopRequestSheet
+        open={!!reviewing}
+        onOpenChange={(o) => {
+          if (!o) setReviewing(null);
+        }}
+        // Production: the request shows its categories by name, not by the
+        // code the API stores.
+        comerc={
+          reviewing
+            ? { ...reviewing, categories: reviewing.categories.map(categorySlugToLabel) }
+            : reviewing
+        }
+        loading={reviewQ.isLoading}
+        error={reviewQ.isError}
+        review={reviewQ.data}
+        phase={reviewPhase}
+        notice={reviewNotice}
+        onApprove={() => reviewing && approveMut.mutate(reviewing.id)}
+        onReject={(reason) => reviewing && rejectMut.mutate({ id: reviewing.id, reason })}
+        onRetry={() => reviewQ.refetch()}
+      />
 
       <Sheet open={creating} onOpenChange={(o) => setCreating(o)}>
         <SheetContent side="right" className="flex w-full flex-col gap-6 sm:max-w-lg">

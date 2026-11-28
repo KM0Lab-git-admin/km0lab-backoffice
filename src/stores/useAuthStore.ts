@@ -15,6 +15,8 @@ export type AuthUser = {
   /** Municipi (àmbit gestionat). El que es mostra a un administrador. */
   municipalityName?: string | null;
   shopId?: string | null;
+  /** The shop this account asked to register, while it waits or was rejected. */
+  shopRequest?: { name: string; status: "review" | "rejected"; rejectionReason?: string | null } | null;
 };
 
 type AuthState = {

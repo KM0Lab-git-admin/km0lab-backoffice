@@ -25,6 +25,7 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
@@ -32,6 +33,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { MessageKey } from "@/lib/i18n";
 import type { Rol } from "@/types/backoffice";
+import { usePendingShopRequests } from "@/hooks/usePendingShopRequests";
 
 type NavItem = {
   to: string;
@@ -76,6 +78,8 @@ export function AppSidebar({ identity }: Props) {
   const navigate = useNavigate();
   const signOut = useAuthStore((s) => s.signOut);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const pendingQ = usePendingShopRequests(identity.rol === "admin");
+  const pendingCount = identity.rol === "admin" ? (pendingQ.data?.length ?? 0) : 0;
 
   const navItems = identity.rol === "admin" ? adminNav : comercNav;
   const roleTagKey: MessageKey =
@@ -150,6 +154,9 @@ export function AppSidebar({ identity }: Props) {
                         <span>{t(item.labelKey)}</span>
                       </Link>
                     </SidebarMenuButton>
+                    {item.to === "/admin/merchants" && pendingCount > 0 ? (
+                      <SidebarMenuBadge>{pendingCount}</SidebarMenuBadge>
+                    ) : null}
                   </SidebarMenuItem>
                 );
               })}
