@@ -79,6 +79,44 @@ async function parseError(res: Response): Promise<ApiError> {
   return new ApiError(res.status, message, detail);
 }
 
+/*
+ * Se entra una vez. La sesión vale desde la última vez que se renovó (un
+ * año un comercio, un mes un administrador) y el panel la renueva solo
+ * mientras se usa, como mucho una vez al día: quien lo usa no vuelve a
+ * identificarse. Renovar no gasta la credencial que ya se tiene, así que si
+ * falla por la conexión no pasa nada: se sigue con la de antes. La sesión
+ * solo termina cuando el servidor contesta 401 a una petición.
+ */
+const RENEW_EVERY_MS = 24 * 60 * 60 * 1000;
+let lastRenewalAt = 0;
+
+async function renewSession(token: string): Promise<void> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/auth/renew`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // Un 401 lo resolverá la petición que está en marcha; cualquier otro
+    // fallo deja la sesión como estaba.
+    if (!res.ok) return;
+    const data = (await res.json()) as { access_token?: string };
+    const store = useAuthStore.getState();
+    // Si mientras tanto se cerró sesión o entró otra cuenta, no es la suya.
+    if (data.access_token && store.user && store.token === token) {
+      store.signIn({ user: store.user, token: data.access_token });
+    }
+  } catch {
+    // Sin conexión: nadie sale por eso.
+  }
+}
+
+function keepSessionAlive(token: string | null): void {
+  if (!token || typeof window === "undefined") return;
+  if (Date.now() - lastRenewalAt < RENEW_EVERY_MS) return;
+  lastRenewalAt = Date.now();
+  void renewSession(token);
+}
+
 export async function apiRequest<T>(
   path: string,
   options: RequestOptions = {},
@@ -101,6 +139,9 @@ export async function apiRequest<T>(
       : auth
         ? useAuthStore.getState().token
         : null;
+
+  // Cualquier uso del panel con la sesión guardada la mantiene viva.
+  if (auth && options.token === undefined) keepSessionAlive(token);
 
   const reqHeaders: Record<string, string> = { ...headers };
   if (token) reqHeaders.Authorization = `Bearer ${token}`;
@@ -128,7 +169,8 @@ export async function apiRequest<T>(
 
   if (res.status === 401 && auth) {
     useAuthStore.getState().signOut();
-    // The session is over (it lasts 30 days). Back to the login, instead of
+    // The session is over (unused for too long, or closed from the server).
+    // Back to the login, instead of
     // an error page whose "retry" can only fail again.
     if (typeof window !== "undefined" && window.location.pathname !== "/login") {
       window.location.assign("/login");
